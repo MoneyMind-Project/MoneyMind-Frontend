@@ -1,0 +1,19 @@
+.desktop-toolbar {
+  display: flex;
+}
+
+.mobile-toolbar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .desktop-toolbar {
+    display: none;
+  }
+  .mobile-toolbar {
+    display: flex;
+  }
+}
