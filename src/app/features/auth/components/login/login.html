@@ -1,0 +1,26 @@
+<div class="login-container">
+  <h2>Iniciar Sesión</h2>
+
+  <form>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" placeholder="Ingresa tu correo" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Contraseña</mat-label>
+      <input matInput type="password" placeholder="Ingresa tu contraseña" required />
+    </mat-form-field>
+
+
+  </form>
+  <div class="button-group">
+    <button matButton="filled" (click)="onLogin()">Login</button>
+    <button
+      matButton="filled"
+      routerLink="/auth/register"
+    >
+      Register
+    </button>
+  </div>
+</div>

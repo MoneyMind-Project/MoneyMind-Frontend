@@ -1,0 +1,27 @@
+<div class="register-container">
+  <h2>Registro</h2>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" placeholder="Ingresa tu correo" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Contraseña</mat-label>
+      <input matInput type="password" formControlName="password" placeholder="Ingresa tu contraseña" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Confirmar contraseña</mat-label>
+      <input matInput type="password" formControlName="confirmPassword" placeholder="Repite tu contraseña" required />
+    </mat-form-field>
+
+    <div class="button-group">
+      <button mat-flat-button color="primary" type="submit">Registrar</button>
+      <button mat-flat-button color="accent" type="button" routerLink="/auth/login">
+        Ir a Login
+      </button>
+    </div>
+  </form>
+</div>
