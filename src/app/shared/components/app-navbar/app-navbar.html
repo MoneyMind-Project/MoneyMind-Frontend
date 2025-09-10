@@ -1,13 +1,26 @@
 <mat-toolbar color="primary" class="desktop-toolbar">
   <span>MoneyMind</span>
   <span class="spacer"></span>
-  <button mat-button routerLink="/home">Home</button>
-  <button mat-button routerLink="/profile">Profile</button>
-  <button mat-button routerLink="/dashboard">Dashboard</button>
+
+  <button mat-button routerLink="/home">Inicio</button>
+  <button mat-button routerLink="/scan">Escanear</button>
+  <button mat-button routerLink="/dashboard">Análisis</button>
+  <button mat-button routerLink="/profile">Perfil</button>
 </mat-toolbar>
 
-<mat-toolbar color="primary" class="mobile-toolbar">
-  <button mat-icon-button routerLink="/home"><mat-icon>home</mat-icon></button>
-  <button mat-icon-button routerLink="/profile"><mat-icon>person</mat-icon></button>
-  <button mat-icon-button routerLink="/dashboard"><mat-icon>dashboard</mat-icon></button>
+
+<mat-toolbar color="primary" class="mobile-toolbar" fxLayout="row" fxLayoutAlign="space-around center">
+  <button mat-icon-button routerLink="/home">
+    <mat-icon>home</mat-icon>
+  </button>
+  <button mat-icon-button routerLink="/scan">
+    <mat-icon>photo_camera</mat-icon>
+  </button>
+  <button mat-icon-button routerLink="/dashboard">
+    <mat-icon>bar_chart</mat-icon>
+  </button>
+  <button mat-icon-button routerLink="/profile">
+    <mat-icon>person</mat-icon>
+  </button>
 </mat-toolbar>
+

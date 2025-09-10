@@ -36,8 +36,10 @@ export class Login {
       // Aquí luego llamas a tu API
       //redirigir a home
     }
+    const fakeToken = 'abc123xyz'; // valor de ejemplo
+    localStorage.setItem('token', fakeToken);
     // aquí llamas a tu API, validas credenciales, etc.
-    console.log('Iniciando sesión...');
+    this.router.navigate(['/']);
     // Si el login es exitoso:
     //this.router.navigate(['/home']);
   }
