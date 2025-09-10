@@ -1,26 +1,33 @@
+<!-- Desktop Toolbar -->
 <mat-toolbar color="primary" class="desktop-toolbar">
-  <span>MoneyMind</span>
+  <span class="brand-name">MoneyMind</span>
   <span class="spacer"></span>
 
-  <button mat-button routerLink="/home">Inicio</button>
-  <button mat-button routerLink="/scan">Escanear</button>
-  <button mat-button routerLink="/dashboard">Análisis</button>
-  <button mat-button routerLink="/profile">Perfil</button>
+  <button mat-button routerLink="/home" routerLinkActive="active-desktop">Inicio</button>
+  <button mat-button routerLink="/scan" routerLinkActive="active-desktop">Escanear</button>
+  <button mat-button routerLink="/dashboard" routerLinkActive="active-desktop">Análisis</button>
+  <button mat-button routerLink="/profile" routerLinkActive="active-desktop">Perfil</button>
 </mat-toolbar>
 
+<!-- Mobile Bottom Navigation -->
+<mat-toolbar class="mobile-toolbar">
+  <button mat-button class="nav-item" routerLink="/home" routerLinkActive="active-mobile" #homeLink="routerLinkActive">
+    <span [ngClass]="homeLink.isActive ? 'material-icons' : 'material-symbols-outlined'">home</span>
+    <span class="nav-label">Inicio</span>
+  </button>
 
-<mat-toolbar color="primary" class="mobile-toolbar" fxLayout="row" fxLayoutAlign="space-around center">
-  <button mat-icon-button routerLink="/home">
-    <mat-icon>home</mat-icon>
+  <button mat-button class="nav-item" routerLink="/scan" routerLinkActive="active-mobile" #scanLink="routerLinkActive">
+    <span [ngClass]="scanLink.isActive ? 'material-icons' : 'material-symbols-outlined'">photo_camera</span>
+    <span class="nav-label">Escanear</span>
   </button>
-  <button mat-icon-button routerLink="/scan">
-    <mat-icon>photo_camera</mat-icon>
+
+  <button mat-button class="nav-item" routerLink="/dashboard" routerLinkActive="active-mobile" #dashLink="routerLinkActive">
+    <span [ngClass]="dashLink.isActive ? 'material-icons' : 'material-symbols-outlined'">insert_chart</span>
+    <span class="nav-label">Análisis</span>
   </button>
-  <button mat-icon-button routerLink="/dashboard">
-    <mat-icon>bar_chart</mat-icon>
-  </button>
-  <button mat-icon-button routerLink="/profile">
-    <mat-icon>person</mat-icon>
+
+  <button mat-button class="nav-item" routerLink="/profile" routerLinkActive="active-mobile" #profileLink="routerLinkActive">
+    <span [ngClass]="profileLink.isActive ? 'material-icons' : 'material-symbols-outlined'">person</span>
+    <span class="nav-label">Perfil</span>
   </button>
 </mat-toolbar>
-
