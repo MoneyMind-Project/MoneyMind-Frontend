@@ -5,6 +5,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {Router, RouterLink} from '@angular/router';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgIf} from '@angular/common';
+import {MatIconModule} from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,7 @@ import {NgIf} from '@angular/common';
     RouterLink,
     FormsModule,
     NgIf,
+    MatIconModule,
   ],
   styleUrl: './login.css'
 })

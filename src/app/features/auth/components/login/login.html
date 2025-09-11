@@ -1,10 +1,16 @@
 <div class="login-container">
-  <h2>Iniciar Sesión</h2>
+  <!-- Header -->
+  <div class="login-header">
+    <h1 class="brand-title">MoneyMind</h1>
+    <p class="subtitle">Inicia sesión en tu cuenta</p>
+  </div>
 
-  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+  <!-- Formulario -->
+  <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Email</mat-label>
-      <input matInput type="email" formControlName="email" placeholder="Ingresa tu correo" required />
+      <input matInput type="email" formControlName="email" placeholder="ejemplo@correo.com" required />
       <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
         El correo es obligatorio
       </mat-error>
@@ -15,17 +21,23 @@
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Contraseña</mat-label>
-      <input matInput type="password" formControlName="password" placeholder="Ingresa tu contraseña" required />
+      <input matInput type="password" formControlName="password" placeholder="Tu contraseña" required />
       <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
         La contraseña es obligatoria
       </mat-error>
     </mat-form-field>
 
-    <div class="button-group">
-      <button mat-flat-button color="primary" type="submit">Login</button>
-      <button mat-flat-button color="accent" type="button" routerLink="/auth/register">
-        Register
-      </button>
+    <button mat-flat-button class="login-btn" type="submit" [disabled]="loginForm.invalid">
+      Iniciar Sesión
+    </button>
+
+    <div class="links-section">
+      <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+      <p class="register-text">
+        ¿No tienes cuenta?
+        <a routerLink="/auth/register" class="register-link">Regístrate</a>
+      </p>
     </div>
+
   </form>
 </div>
