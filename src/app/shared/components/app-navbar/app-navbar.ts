@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {MatToolbar} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
-import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatButton} from '@angular/material/button';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {NgClass} from '@angular/common';
 
@@ -12,7 +12,6 @@ import {NgClass} from '@angular/common';
     MatIconModule,
     MatButton,
     RouterLink,
-    MatIconButton,
     RouterLinkActive,
     NgClass
   ],
