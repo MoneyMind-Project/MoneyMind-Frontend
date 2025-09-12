@@ -5,6 +5,7 @@ import { User } from '../../shared/models/user.model';
 import { RegisterRequest } from '../../shared/models/register-request.model';
 import { catchError, map } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
+import { ApiResponse} from '../../shared/models/response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,24 +16,53 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   // Registro
-  register(data: RegisterRequest): Observable<boolean> {
-    return this.http.post(`${this.apiUrl}/users/register/`, data).pipe(
-      map(() => true),              // si la API responde 201, devolvemos true
-      catchError(() => of(false))   // si hay error, devolvemos false
+  register(data: RegisterRequest): Observable<ApiResponse<User>> {
+    return this.http.post<User>(`${this.apiUrl}/users/register/`, data).pipe(
+      map((user) => ({
+        success: true,
+        message: 'Registro exitoso',
+        data: user
+      })),
+      catchError((error) =>
+        of({
+          success: false,
+          message: error.error?.message || 'Error en el registro',
+          data: null
+        })
+      )
     );
   }
 
   // Login
-  login(credentials: { email: string; password: string }): Observable<boolean> {
+  login(credentials: { email: string; password: string }): Observable<ApiResponse<{ token: string, user: User }>> {
     return this.http.post<any>(`${this.apiUrl}/users/login/`, credentials).pipe(
       map((response) => {
-        if (response && response.token) {
-          localStorage.setItem('token', response.token); // guardamos token
-          return true;
+        if (response && response.token && response.user) {
+          // Guardamos token
+          localStorage.setItem('token', response.token);
+
+          return {
+            success: true,
+            message: response.message || 'Login exitoso',
+            data: {
+              token: response.token,
+              user: response.user
+            }
+          } as ApiResponse<{ token: string, user: User }>;
         }
-        return false;
+
+        // Caso en el que backend solo devuelve un mensaje (ejemplo: credenciales inválidas)
+        return {
+          success: false,
+          message: response.message || 'Credenciales inválidas'
+        } as ApiResponse<{ token: string, user: User }>;
       }),
-      catchError(() => of(false)) // si hay error devolvemos false
+      catchError((error) =>
+        of({
+          success: false,
+          message: error?.error?.message || 'Error en el login'
+        } as ApiResponse<{ token: string, user: User }>)
+      )
     );
   }
 

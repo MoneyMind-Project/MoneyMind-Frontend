@@ -168,12 +168,12 @@ export class Register {
 
         console.log('Payload para API:', registerRequest);
 
-        this.userService.register(registerRequest).subscribe(success => {
-          if (success) {
-            console.log("Registro exitoso ✅");
+        this.userService.register(registerRequest).subscribe((response) => {
+          if (response.success) {
+            console.log("Registro exitoso ✅", response.data);
             this.router.navigate(['/auth/login']);
           } else {
-            console.log("Error en el registro ❌");
+            console.log("Error en el registro ❌", response.message);
           }
         });
       }

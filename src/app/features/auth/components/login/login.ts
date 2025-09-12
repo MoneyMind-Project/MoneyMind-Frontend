@@ -7,6 +7,7 @@ import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} fr
 import {NgIf} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {UserService} from '../../../../core/services/user.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +27,7 @@ import {UserService} from '../../../../core/services/user.service';
 export class Login {
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router, private userService: UserService) {
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private snackBar: MatSnackBar) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
@@ -37,12 +38,17 @@ export class Login {
     if (this.loginForm.valid) {
       const credentials = this.loginForm.value;
 
-      this.userService.login(credentials).subscribe(success => {
-        if (success) {
+      this.userService.login(credentials).subscribe((res) => {
+        if (res.success) {
           console.log('Login exitoso ✅');
-          this.router.navigate(['/']); // o '/home' según tu app
+          //localStorage.setItem('user', JSON.stringify(res.data?.user));
+          this.router.navigate(['/']); // o '/home'
         } else {
-          console.log('Credenciales inválidas ❌');
+          // Mostrar snackbar solo en caso de error
+          this.snackBar.open(res.message, 'Cerrar', {
+            duration: 3000,
+            panelClass: ['snackbar-error'], // opcional: estilo custom
+          });
         }
       });
     }
