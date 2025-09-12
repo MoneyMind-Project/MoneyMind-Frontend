@@ -7,7 +7,7 @@ import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} fr
 import {NgIf} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {UserService} from '../../../../core/services/user.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {NgToastService} from 'ng-angular-popup';
 
 @Component({
   selector: 'app-login',
@@ -27,7 +27,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class Login {
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private snackBar: MatSnackBar) {
+  constructor(private fb: FormBuilder, private router: Router,
+              private userService: UserService, private toast: NgToastService) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
@@ -44,11 +45,7 @@ export class Login {
           //localStorage.setItem('user', JSON.stringify(res.data?.user));
           this.router.navigate(['/']); // o '/home'
         } else {
-          // Mostrar snackbar solo en caso de error
-          this.snackBar.open(res.message, 'Cerrar', {
-            duration: 3000,
-            panelClass: ['snackbar-error'], // opcional: estilo custom
-          });
+          this.toast.danger(res.message, 'Error', 3000);
         }
       });
     }

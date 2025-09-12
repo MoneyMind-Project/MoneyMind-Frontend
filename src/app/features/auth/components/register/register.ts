@@ -15,6 +15,8 @@ import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import 'moment/locale/es';
 import {UserService} from '../../../../core/services/user.service';
 import { RegisterRequest} from '../../../../shared/models/register-request.model';
+import {NgToastService} from 'ng-angular-popup';
+
 
 @Component({
   selector: 'app-register',
@@ -42,7 +44,7 @@ export class Register {
   registerForm: FormGroup;
   currentStep: number = 1;
 
-  constructor(private fb: FormBuilder, private router: Router, private userService: UserService) {
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private toast: NgToastService) {
     this.registerForm = this.fb.group({
       // Paso 1: Información Personal
       firstName: ['', Validators.required],
@@ -170,10 +172,10 @@ export class Register {
 
         this.userService.register(registerRequest).subscribe((response) => {
           if (response.success) {
-            console.log("Registro exitoso ✅", response.data);
+            this.toast.success(response.message, 'Registro exitoso', 3000);
             this.router.navigate(['/auth/login']);
           } else {
-            console.log("Error en el registro ❌", response.message);
+            this.toast.danger(response.message, 'Error', 3000);
           }
         });
       }
