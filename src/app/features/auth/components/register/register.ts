@@ -10,10 +10,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import {ChangeDetectionStrategy} from '@angular/core';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {provideNativeDateAdapter} from '@angular/material/core';
-import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
-import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import 'moment/locale/es';
+import {UserService} from '../../../../core/services/user.service';
+import { RegisterRequest} from '../../../../shared/models/register-request.model';
 
 @Component({
   selector: 'app-register',
@@ -41,7 +42,7 @@ export class Register {
   registerForm: FormGroup;
   currentStep: number = 1;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService) {
     this.registerForm = this.fb.group({
       // Paso 1: Información Personal
       firstName: ['', Validators.required],
@@ -124,7 +125,7 @@ export class Register {
   // Envío del formulario
   onRegister(): void {
     if (this.currentStep === 2) {
-      // Primero verifica si las contraseñas coinciden
+      // Verifica contraseñas
       if (this.registerForm.hasError('passwordMismatch')) {
         console.log("Contraseñas no iguales");
         this.registerForm.get('confirmPassword')?.markAsTouched();
@@ -132,29 +133,49 @@ export class Register {
         return;
       }
 
-      // Luego verifica si el resto del formulario es válido
+      // Verifica si el formulario es válido
       if (this.registerForm.valid) {
         console.log("ejecutando register");
+
         const formData = { ...this.registerForm.value };
 
-        // Si prefiere no decir ingresos, elimina el campo del envío
+        // Si prefiere no decir ingresos, elimina el campo
         if (formData.preferNotToSayIncome) {
           delete formData.monthlyIncome;
         }
 
-        // Calcula la edad basada en la fecha de nacimiento
+        // Formatea fecha y calcula edad
         const birthDate = new Date(formData.birthDate);
+        const formattedDate = birthDate.toISOString().split('T')[0];
         const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear() -
+        const age =
+          today.getFullYear() - birthDate.getFullYear() -
           (today.getMonth() < birthDate.getMonth() ||
           (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate()) ? 1 : 0);
 
-        formData.age = age;
+        // Construye el objeto RegisterRequest
+        const registerRequest: RegisterRequest = {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          birth_date: formattedDate,
+          gender: formData.gender,
+          plan: formData.plan,
+          email: formData.email,
+          password: formData.password,
+          current_amount: formData.currentMoney,
+          monthly_income: formData.monthlyIncome ? Number(formData.monthlyIncome) : null
+        };
 
-        console.log('Usuario registrado:', formData);
+        console.log('Payload para API:', registerRequest);
 
-        // Aquí luego llamas a tu API
-        this.router.navigate(['/auth/login']);
+        this.userService.register(registerRequest).subscribe(success => {
+          if (success) {
+            console.log("Registro exitoso ✅");
+            this.router.navigate(['/auth/login']);
+          } else {
+            console.log("Error en el registro ❌");
+          }
+        });
       }
     }
   }

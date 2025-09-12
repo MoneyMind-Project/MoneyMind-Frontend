@@ -5,6 +5,7 @@ import {
   provideZoneChangeDetection
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http'; // 👈 importar HttpClient
 
 // Importa Angular Material
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
+    provideHttpClient(), // 👈 registrar HttpClient
     importProvidersFrom(
       MatFormFieldModule,
       MatInputModule,
