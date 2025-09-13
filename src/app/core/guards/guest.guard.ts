@@ -7,7 +7,7 @@ export class GuestGuard implements CanActivate {
   constructor(private router: Router) {}
 
   canActivate(): boolean {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('mm-current-user');
     if (!token) {
       console.log("no está logueado, puede ver login/register");
       return true; // no está logueado, puede ver login/register

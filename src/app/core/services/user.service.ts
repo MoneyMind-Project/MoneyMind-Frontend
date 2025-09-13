@@ -6,6 +6,8 @@ import { RegisterRequest } from '../../shared/models/register-request.model';
 import { catchError, map } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
 import { ApiResponse} from '../../shared/models/response.model';
+import { CryptoService } from './crypto.service';
+
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,7 @@ import { ApiResponse} from '../../shared/models/response.model';
 export class UserService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private crypto: CryptoService) {}
 
   // Registro
   register(data: RegisterRequest): Observable<ApiResponse<User>> {
@@ -38,8 +40,10 @@ export class UserService {
     return this.http.post<any>(`${this.apiUrl}/users/login/`, credentials).pipe(
       map((response) => {
         if (response && response.token && response.user) {
-          // Guardamos token
-          localStorage.setItem('token', response.token);
+
+          // Guardamos data en el localstorage
+          const currentUser = { token: response.token, user: response.user };
+          localStorage.setItem('mm-current-user', this.crypto.encrypt(currentUser));
 
           return {
             success: true,

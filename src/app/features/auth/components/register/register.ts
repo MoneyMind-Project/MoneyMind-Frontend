@@ -162,7 +162,7 @@ export class Register {
           birth_date: formattedDate,
           gender: formData.gender,
           plan: formData.plan,
-          email: formData.email,
+          email: formData.email.toLowerCase(),
           password: formData.password,
           current_amount: formData.currentMoney,
           monthly_income: formData.monthlyIncome ? Number(formData.monthlyIncome) : null

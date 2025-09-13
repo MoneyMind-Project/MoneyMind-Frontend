@@ -37,7 +37,12 @@ export class Login {
 
   onLogin() {
     if (this.loginForm.valid) {
-      const credentials = this.loginForm.value;
+      const formValue = this.loginForm.value;
+
+      const credentials = {
+        email: formValue.email.toLowerCase(),
+        password: formValue.password
+      };
 
       this.userService.login(credentials).subscribe((res) => {
         if (res.success) {

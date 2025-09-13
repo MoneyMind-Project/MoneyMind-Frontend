@@ -16,7 +16,7 @@ export class Profile {
 
   logOut() {
     // Limpia el token
-    localStorage.removeItem('token');
+    localStorage.removeItem('mm-current-user');
 
     // Opcional: limpiar todo lo del localStorage
     // localStorage.clear();

@@ -1,1 +1,7 @@
-<p>scan works!</p>
+<div class="scan-container">
+  <h2>Escanear recibo</h2>
+
+  <input type="file" (change)="onFileSelected($event)" />
+  <button (click)="analyzeReceipt()">Analizar con Gemini</button>
+
+</div>
