@@ -1,7 +1,100 @@
 <div class="scan-container">
-  <h2>Escanear recibo</h2>
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="total-amount-card">
+      <div class="amount-label">Monto total</div>
+      <div class="total-amount">S/ {{ totalAmount | number:'1.2-2' }}</div>
+    </div>
 
-  <input type="file" (change)="onFileSelected($event)" />
-  <button (click)="analyzeReceipt()">Analizar con Gemini</button>
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <div class="action-section">
+        <h4>GASTOS</h4>
+        <div class="buttons-row">
+          <button class="action-btn scan-btn">
+            <div class="btn-icon">
+              <i class="material-icons">camera_alt</i>
+            </div>
+            Escanear
+          </button>
+          <button class="action-btn upload-btn">
+            <div class="btn-icon">
+              <i class="material-icons">cloud_upload</i>
+            </div>
+            Subir foto
+          </button>
+          <button class="action-btn manual-btn">
+            <div class="btn-icon">
+              <i class="material-icons">edit</i>
+            </div>
+            Agregar manualmente
+          </button>
+        </div>
+      </div>
 
+      <div class="action-section">
+        <h4>INGRESOS</h4>
+        <div class="buttons-row">
+          <button class="action-btn income-manual-btn">
+            <div class="btn-icon">
+              <i class="material-icons">add</i>
+            </div>
+            Agregar manualmente
+          </button>
+          <button class="action-btn income-upload-btn">
+            <div class="btn-icon">
+              <i class="material-icons">cloud_upload</i>
+            </div>
+            Subir foto
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Movements Section -->
+  <div class="movements-section">
+    <div class="movements-header">
+      <h3>Últimos Movimientos ({{ expenses.length }})</h3>
+      <a href="#" class="view-all-link">ver todos ></a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+      <div class="search-box">
+        <i class="material-icons search-icon">search</i>
+        <input type="text" placeholder="Buscar movimiento" class="search-input">
+      </div>
+    </div>
+
+    <!-- Movements List -->
+    <div class="movements-list">
+      <ng-container *ngFor="let group of getGroupedExpenses()">
+        <div class="date-group">
+          <div class="date-header">{{ group.date }}</div>
+
+          <div class="expense-card" *ngFor="let expense of group.expenses">
+            <div class="expense-icon">
+              <div class="icon-circle" [style.background-color]="getCategoryColor(expense.category)">
+                <i class="material-icons">{{ getCategoryIcon(expense.category) }}</i>
+              </div>
+            </div>
+
+            <div class="expense-details">
+              <div class="expense-place">{{ expense.place }}</div>
+              <div class="expense-date">{{ expense.time }} • {{ formatDate(expense.date) }}</div>
+              <div class="expense-comment" *ngIf="expense.comment">{{ expense.comment }}</div>
+            </div>
+
+            <div class="expense-amount">
+              <span [class]="getAmountClass(expense.total)">
+                {{ formatAmount(expense.total) }}
+              </span>
+              <i class="material-icons visibility-icon">visibility</i>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
 </div>
