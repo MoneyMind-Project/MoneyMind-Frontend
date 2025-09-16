@@ -2,7 +2,7 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: 20px;
+  margin-top: 15px;
   background-color: #f8f9fa;
   min-height: 100vh;
   display: grid;
@@ -70,17 +70,12 @@
   gap: 8px;
   padding: 12px 20px 12px 0;
   border: none;
-  border-radius: 50px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
   margin-bottom: 10px;
   font-family: 'Poppins', sans-serif !important;
-}
-
-.action-btn:hover {
-
 }
 
 .btn-icon {
@@ -134,7 +129,7 @@
 }
 
 .view-all-link {
-  color: #007bff;
+  color: #1047d3;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -151,7 +146,7 @@
 
 .search-box {
   position: relative;
-  max-width: 400px;
+  width: 90%;
 }
 
 .search-icon {
@@ -208,12 +203,6 @@
   align-items: center;
   transition: all 0.3s ease;
   border: 1px solid transparent;
-}
-
-.expense-card:hover {
-  background: white;
-  border-color: #dee2e6;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .expense-icon {
@@ -290,11 +279,25 @@
 
 /* Mobile Responsive */
 @media (max-width: 968px) {
+
+  .action-buttons{
+    gap: 20px;
+    background-color: transparent;
+    padding: 0;
+  }
+
+  .action-section{
+    background: white;
+    border-radius: 16px;
+    padding: 5px 24px 10px 24px;
+  }
+
   .scan-container {
     padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 24px;
+    margin-top: 0;
   }
 
   .header-section {
@@ -310,14 +313,16 @@
   }
 
   .buttons-row {
-    justify-content: space-between;
+    display: flex;
+    justify-content: space-around;
   }
 
   .action-btn {
     flex: 1;
     min-width: 0;
-    padding: 10px 16px;
+    padding: 5px 16px 10px 16px;
     font-size: 13px;
+    justify-content: center;
   }
 
   .action-btn i {
@@ -366,14 +371,70 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 550px) {
+  .movements-header h3 {
+    font-size: 16px;
+  }
+
+  .movements-header a {
+    font-size: 13px;
+  }
+
+  .search-box{
+    max-width: none;
+    width: 81%;
+  }
+
+  .action-buttons{
+    gap: 20px;
+    background-color: transparent;
+    padding: 0;
+  }
+
+  .action-section{
+    background: white;
+    border-radius: 16px;
+    padding: 5px 24px 10px 24px;
+  }
+
   .buttons-row {
-    flex-direction: column;
+    display: flex;
+    justify-content: space-around;
   }
 
   .action-btn {
-    width: 100%;
+    flex: 1;
+    padding: 10px 10px 5px 10px; /* Cambié el padding para dar espacio arriba y abajo */
+    font-size: 13px;
+    display: flex; /* Cambié de block a flex */
+    flex-direction: column; /* Organiza los elementos verticalmente */
+    justify-content: space-between; /* Separa el ícono y texto a extremos */
+    align-items: center; /* Centra horizontalmente */
+    margin: 0;
+  }
+
+  .btn-icon{
+    margin: 0; /* Removí margin: auto */
+    width: 35px;
+    height: 35px;
+  }
+
+  .btn-icon-container{
+    display: flex;
     justify-content: center;
+    align-items: center; /* Centra el ícono dentro del contenedor */
+    border-radius: 8px; /* Agregué border-radius para mejor apariencia */
+  }
+
+  .btn-icon-text-container{
+    display:block;
+    align-content: start;
+    min-height: 50px;
+  }
+
+  .btn-icon i{
+    width: 16px;
+    height: 16px;
   }
 
   .expense-card {

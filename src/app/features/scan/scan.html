@@ -15,19 +15,30 @@
             <div class="btn-icon">
               <i class="material-icons">camera_alt</i>
             </div>
-            Escanear
+            <div class="btn-icon-text-container">
+              Escanear
+            </div>
+
           </button>
           <button class="action-btn upload-btn">
             <div class="btn-icon">
               <i class="material-icons">cloud_upload</i>
             </div>
-            Subir foto
+            <div class="btn-icon-text-container">
+              Subir foto
+            </div>
+
+
           </button>
           <button class="action-btn manual-btn">
             <div class="btn-icon">
-              <i class="material-icons">edit</i>
+              <i class="material-icons">add</i>
             </div>
-            Agregar manualmente
+            <div class="btn-icon-text-container">
+              Agregar manualmente
+            </div>
+
+
           </button>
         </div>
       </div>
@@ -35,17 +46,21 @@
       <div class="action-section">
         <h4>INGRESOS</h4>
         <div class="buttons-row">
-          <button class="action-btn income-manual-btn">
-            <div class="btn-icon">
-              <i class="material-icons">add</i>
-            </div>
-            Agregar manualmente
-          </button>
           <button class="action-btn income-upload-btn">
             <div class="btn-icon">
               <i class="material-icons">cloud_upload</i>
             </div>
-            Subir foto
+            <div class="btn-icon-text-container">
+              Subir foto
+            </div>
+          </button>
+          <button class="action-btn income-manual-btn">
+            <div class="btn-icon">
+              <i class="material-icons">add</i>
+            </div>
+            <div class="btn-icon-text-container">
+              Agregar manualmente
+            </div>
           </button>
         </div>
       </div>
@@ -83,7 +98,6 @@
             <div class="expense-details">
               <div class="expense-place">{{ expense.place }}</div>
               <div class="expense-date">{{ expense.time }} • {{ formatDate(expense.date) }}</div>
-              <div class="expense-comment" *ngIf="expense.comment">{{ expense.comment }}</div>
             </div>
 
             <div class="expense-amount">
