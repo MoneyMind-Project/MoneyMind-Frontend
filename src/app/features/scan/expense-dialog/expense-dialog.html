@@ -1,0 +1,20 @@
+<div class="expense-dialog">
+  <div *ngIf="step === 1">
+    <h2>Sube o arrastra tu recibo</h2>
+    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+    <button (click)="processReceipt()" [disabled]="!selectedFile">Procesar</button>
+    <button (click)="close()">Cerrar</button>
+  </div>
+
+  <div *ngIf="step === 2">
+    <h2>Revisa y edita tu gasto</h2>
+    <app-expense-form
+      [initialData]="parsedExpense ?? undefined" (save)="onSave($event)"
+    ></app-expense-form>
+
+    <button (click)="back()">Volver</button>
+  </div>
+
+  <div *ngIf="loading">Procesando con Gemini...</div>
+</div>
+

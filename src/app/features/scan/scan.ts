@@ -6,6 +6,9 @@ import {DecimalPipe} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
+import {ChangeDetectionStrategy, inject, model, signal} from '@angular/core';
+import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import {ExpenseDialog} from './expense-dialog/expense-dialog';
 
 @Component({
   selector: 'app-scan',
@@ -14,8 +17,10 @@ import {MatButtonModule} from '@angular/material/button';
     CommonModule,
     MatButtonModule,
     MatDividerModule,
-    MatIconModule
+    MatIconModule,
+    MatDialogModule
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './scan.html',
   styleUrl: './scan.css'
 })
@@ -24,7 +29,7 @@ export class Scan implements OnInit {
   totalAmount: number = 433.53;
   expenses: Expense[] = [];
 
-  constructor() { }
+  constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.loadMockExpenses();
@@ -103,6 +108,20 @@ export class Scan implements OnInit {
       default:
         return 'account_balance_wallet';
     }
+  }
+
+  openDialog(mode: 'upload' | 'camera' | 'manual') {
+    const dialogRef = this.dialog.open(ExpenseDialog, {
+      data: { mode }
+    });
+
+    dialogRef.afterClosed().subscribe((newExpense: Expense | null) => {
+      if (newExpense) {
+        console.log('Nuevo gasto guardado:', newExpense);
+        // aquí puedes guardarlo en un servicio o enviarlo al backend
+        //this.expenses.push(newExpense);
+      }
+    });
   }
 
   getCategoryColor(category: Category): string {

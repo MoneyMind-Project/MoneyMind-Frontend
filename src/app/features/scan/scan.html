@@ -15,30 +15,25 @@
             <div class="btn-icon">
               <i class="material-icons">camera_alt</i>
             </div>
-            <div class="btn-icon-text-container">
+            <div class="btn-icon-text-container" (click)="openDialog('camera')">
               Escanear
             </div>
-
           </button>
           <button class="action-btn upload-btn">
             <div class="btn-icon">
               <i class="material-icons">cloud_upload</i>
             </div>
-            <div class="btn-icon-text-container">
+            <div class="btn-icon-text-container" (click)="openDialog('upload')">
               Subir foto
             </div>
-
-
           </button>
           <button class="action-btn manual-btn">
             <div class="btn-icon">
               <i class="material-icons">add</i>
             </div>
-            <div class="btn-icon-text-container">
+            <div class="btn-icon-text-container" (click)="openDialog('manual')">
               Agregar manualmente
             </div>
-
-
           </button>
         </div>
       </div>
