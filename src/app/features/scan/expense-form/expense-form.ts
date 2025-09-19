@@ -38,6 +38,8 @@ import { MatButtonModule } from '@angular/material/button';
 export class ExpenseForm implements OnInit {
   @Input() initialData?: Partial<Expense>;
   @Output() save = new EventEmitter<Expense>();
+  @Output() cancel = new EventEmitter<void>();
+
 
   categories: Category[] = Object.values(Category);
 
@@ -69,9 +71,13 @@ export class ExpenseForm implements OnInit {
       this.save.emit(this.form.value as Expense);
     }
   }
+  onCancel() {
+    this.cancel.emit();
+  }
 
-  onCancel(){
+  resetForm() {
     this.form.reset();
   }
+
 }
 

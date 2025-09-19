@@ -1,4 +1,7 @@
 <div class="expense-dialog">
+  <button mat-icon-button class="close-btn" (click)="close()" aria-label="Cerrar">
+    <mat-icon>close</mat-icon>
+  </button>
   <div *ngIf="step === 1">
     <h2>Sube o arrastra tu recibo</h2>
     <input type="file" accept="image/*" (change)="onFileSelected($event)" />
@@ -7,14 +10,13 @@
   </div>
 
   <div *ngIf="step === 2">
-    <h2>Revisa y edita tu gasto</h2>
+    <h2>{{ mode === 'manual' ? 'Agrega tu gasto' : 'Revisa y edita tu gasto' }}</h2>
     <app-expense-form
-      [initialData]="parsedExpense ?? undefined" (save)="onSave($event)"
+      [initialData]="parsedExpense ?? undefined"
+      (save)="onSave($event)"
+      (cancel)="onCancel()"
     ></app-expense-form>
-
-    <button (click)="back()">Volver</button>
   </div>
 
   <div *ngIf="loading">Procesando con Gemini...</div>
 </div>
-

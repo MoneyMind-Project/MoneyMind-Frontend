@@ -1,16 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Expense } from '../../../shared/models/expense.model';
 import { HttpClient } from '@angular/common/http';
 import {MatDialogRef} from '@angular/material/dialog';
 import {ExpenseForm} from '../expense-form/expense-form';
 import { CommonModule } from '@angular/common';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ViewChild } from '@angular/core';
+import {MatIconModule} from '@angular/material/icon';
 
 
 @Component({
   selector: 'app-expense-dialog',
   imports: [
     ExpenseForm,
-    CommonModule
+    CommonModule,
+    MatIconModule
   ],
   templateUrl: './expense-dialog.html',
   styleUrl: './expense-dialog.css'
@@ -20,8 +24,18 @@ export class ExpenseDialog {
   selectedFile: File | null = null;
   parsedExpense: Partial<Expense> | null = null;
   loading = false;
+  mode: 'upload' | 'camera' | 'manual' = 'upload';
 
-  constructor(private http: HttpClient, private dialogRef: MatDialogRef<ExpenseDialog>) {}
+  @ViewChild(ExpenseForm) expenseForm!: ExpenseForm;
+
+  constructor(
+    private http: HttpClient,
+    private dialogRef: MatDialogRef<ExpenseDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: { mode: 'upload' | 'camera' | 'manual' }
+  ) {
+    if (data.mode === 'manual') this.step = 2;
+    this.mode = data.mode;
+  }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -58,8 +72,13 @@ export class ExpenseDialog {
     this.dialogRef.close(null);
   }
 
-  back() {
-    this.step = 1;
+  onCancel() {
+    if (this.mode === 'manual') {
+      this.close(); // Cierra el diálogo
+    } else {
+      this.step = 1;
+      this.expenseForm.resetForm(); // Limpia el formulario
+    }
   }
 }
 
