@@ -65,7 +65,7 @@
   <!-- Recent Movements Section -->
   <div class="movements-section">
     <div class="movements-header">
-      <h3>Últimos Movimientos ({{ expenses.length }})</h3>
+      <h3>Últimos Movimientos ({{ movements.length }})</h3>
       <a href="#" class="view-all-link">ver todos ></a>
     </div>
 
@@ -79,25 +79,38 @@
 
     <!-- Movements List -->
     <div class="movements-list">
-      <ng-container *ngFor="let group of getGroupedExpenses()">
+      <ng-container *ngFor="let group of getGroupedMovements()">
         <div class="date-group">
+          <!-- Encabezado de fecha -->
           <div class="date-header">{{ group.date }}</div>
 
-          <div class="expense-card" *ngFor="let expense of group.expenses">
+          <!-- Tarjeta de movimiento (usa las clases antiguas) -->
+          <div class="expense-card" *ngFor="let movement of group.movements">
             <div class="expense-icon">
-              <div class="icon-circle" [style.background-color]="getCategoryColor(expense.category)">
-                <i class="material-icons">{{ getCategoryIcon(expense.category) }}</i>
+              <div
+                class="icon-circle"
+                [style.background-color]="getCategoryColor(movement.category)">
+                <i class="material-icons">
+                  {{ movement.type === 'expense'
+                  ? getCategoryIcon(movement.category)
+                  : 'attach_money' }}
+                </i>
               </div>
             </div>
 
             <div class="expense-details">
-              <div class="expense-place">{{ expense.place }}</div>
-              <div class="expense-date">{{ expense.time }} • {{ formatDate(expense.date) }}</div>
+              <div class="expense-place">
+                <!-- Mostrar `place` si es gasto, `title` si es ingreso -->
+                {{ movement.type === 'expense' ? movement.place : movement.title }}
+              </div>
+              <div class="expense-date">
+                {{ movement.time }} • {{ formatDate(movement.date) }}
+              </div>
             </div>
 
             <div class="expense-amount">
-              <span [class]="getAmountClass(expense.total)">
-                {{ formatAmount(expense.total) }}
+              <span [class]="getAmountClass(movement.type)">
+                {{ formatAmount(movement.total, movement.type) }}
               </span>
               <i class="material-icons visibility-icon">visibility</i>
             </div>
@@ -105,5 +118,6 @@
         </div>
       </ng-container>
     </div>
+
   </div>
 </div>
