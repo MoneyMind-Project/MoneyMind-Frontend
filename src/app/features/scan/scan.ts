@@ -120,6 +120,15 @@ export class Scan implements OnInit {
     //this.totalAmount = this.totalAmount
   }
 
+  private addMovementUpdateTotal(type: 'income' | 'expense', amount: number): void {
+    if (type === 'income') {
+      this.totalAmount += amount;
+    } else {
+      this.totalAmount -= amount;
+    }
+  }
+
+
   getCategoryIcon(category?: Category): string {
     if (!category) {
       return 'attach_money'; // ícono para incomes
@@ -147,8 +156,7 @@ export class Scan implements OnInit {
     dialogRef.afterClosed().subscribe((newExpense: Expense | null) => {
       if (newExpense) {
         console.log('Nuevo gasto guardado:', newExpense);
-        // aquí puedes guardarlo en un servicio o enviarlo al backend
-        //this.expenses.push(newExpense);
+        this.addNewMovement('expense', newExpense);
       }
     });
   }
@@ -175,19 +183,18 @@ export class Scan implements OnInit {
       const income = movement as Income;
       displayable = {
         id: income.id,
-        type: 'income',
+        type: type,
         title: income.title,
         date: income.date,
         time: income.time,
         total: income.total,
         comment: income.comment,
       };
-      console.log("income");
     } else {
       const expense = movement as Expense;
       displayable = {
         id: expense.id,
-        type: 'expense',
+        type: type,
         title: expense.place,
         date: expense.date,
         time: expense.time,
@@ -196,7 +203,6 @@ export class Scan implements OnInit {
         category: expense.category,
         place: expense.place,
       };
-      console.log("expense");
     }
 
     this.movements = [displayable, ...this.movements].sort((a, b) => {
@@ -206,7 +212,7 @@ export class Scan implements OnInit {
     });
     console.log(this.movements);
 
-    this.calculateTotal();
+    this.addMovementUpdateTotal(type, movement.total);
     this.updateGroupedMovements(); // <<<<<< actualiza agrupados
   }
 
