@@ -1,0 +1,22 @@
+<div class="expense-dialog">
+  <button mat-icon-button class="close-btn" (click)="close()" aria-label="Cerrar">
+    <mat-icon>close</mat-icon>
+  </button>
+  <div *ngIf="step === 1">
+    <h2>Sube o arrastra tu recibo</h2>
+    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+    <button (click)="processReceipt()" [disabled]="!selectedFile">Procesar</button>
+    <button (click)="close()">Cerrar</button>
+  </div>
+
+  <div *ngIf="step === 2">
+    <h2>{{ mode === 'manual' ? 'Agrega tu ingreso' : 'Revisa y edita tu ingreso' }}</h2>
+    <app-income-form
+      [initialData]="parsedIncome ?? undefined"
+      (save)="onSave($event)"
+      (cancel)="onCancel()"
+    ></app-income-form>
+  </div>
+
+  <div *ngIf="loading">Procesando con Gemini...</div>
+</div>

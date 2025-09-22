@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Expense} from '../../shared/models/expense.model';
+import { Income} from '../../shared/models/income.model';
 import { Category} from '../../shared/enums/category.enum';
 import {DecimalPipe} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
@@ -9,6 +10,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {ChangeDetectionStrategy, inject, model, signal} from '@angular/core';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {ExpenseDialog} from './expense-dialog/expense-dialog';
+import {IncomeDialog} from './income-dialog/income-dialog';
 
 @Component({
   selector: 'app-scan',
@@ -110,7 +112,7 @@ export class Scan implements OnInit {
     }
   }
 
-  openDialog(mode: 'upload' | 'camera' | 'manual') {
+  openExpenseDialog(mode: 'upload' | 'camera' | 'manual') {
     const dialogRef = this.dialog.open(ExpenseDialog, {
       data: { mode }
     });
@@ -120,6 +122,20 @@ export class Scan implements OnInit {
         console.log('Nuevo gasto guardado:', newExpense);
         // aquí puedes guardarlo en un servicio o enviarlo al backend
         //this.expenses.push(newExpense);
+      }
+    });
+  }
+
+  openIncomeDialog(mode: 'upload' | 'camera' | 'manual') {
+    const dialogRef = this.dialog.open(IncomeDialog, {
+      data: { mode }
+    });
+
+    dialogRef.afterClosed().subscribe((newIncome: Income | null) => {
+      if (newIncome) {
+        console.log('Nuevo ingreso guardado:', newIncome);
+        // aquí puedes guardarlo en un servicio o enviarlo al backend
+        //this.incomes.push(newIncome);
       }
     });
   }

@@ -15,7 +15,7 @@
             <div class="btn-icon">
               <i class="material-icons">camera_alt</i>
             </div>
-            <div class="btn-icon-text-container" (click)="openDialog('camera')">
+            <div class="btn-icon-text-container" (click)="openExpenseDialog('camera')">
               Escanear
             </div>
           </button>
@@ -23,7 +23,7 @@
             <div class="btn-icon">
               <i class="material-icons">cloud_upload</i>
             </div>
-            <div class="btn-icon-text-container" (click)="openDialog('upload')">
+            <div class="btn-icon-text-container" (click)="openExpenseDialog('upload')">
               Subir foto
             </div>
           </button>
@@ -31,7 +31,7 @@
             <div class="btn-icon">
               <i class="material-icons">add</i>
             </div>
-            <div class="btn-icon-text-container" (click)="openDialog('manual')">
+            <div class="btn-icon-text-container" (click)="openExpenseDialog('manual')">
               Agregar manualmente
             </div>
           </button>
@@ -45,7 +45,7 @@
             <div class="btn-icon">
               <i class="material-icons">cloud_upload</i>
             </div>
-            <div class="btn-icon-text-container">
+            <div class="btn-icon-text-container" (click)="openIncomeDialog('upload')">
               Subir foto
             </div>
           </button>
@@ -53,7 +53,7 @@
             <div class="btn-icon">
               <i class="material-icons">add</i>
             </div>
-            <div class="btn-icon-text-container">
+            <div class="btn-icon-text-container" (click)="openIncomeDialog('manual')">
               Agregar manualmente
             </div>
           </button>
