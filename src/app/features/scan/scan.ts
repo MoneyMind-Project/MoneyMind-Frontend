@@ -23,7 +23,6 @@ import {IncomeDialog} from './income-dialog/income-dialog';
     MatIconModule,
     MatDialogModule
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './scan.html',
   styleUrl: './scan.css'
 })
@@ -31,12 +30,15 @@ export class Scan implements OnInit {
 
   totalAmount: number = 433.53;
   movements: DisplayableMovement[] = [];
+  groupedMovements: { date: string; movements: DisplayableMovement[] }[] = [];
+
 
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.movements = this.getMovements();
     this.calculateTotal();
+    this.updateGroupedMovements();
   }
 
   getMovements(): DisplayableMovement[] {
@@ -97,10 +99,10 @@ export class Scan implements OnInit {
     return [
       {
         id: '10',
-        title: 'Sueldo',
+        title: 'Pago de amigo',
         date: '2025-09-14',
         time: '09:00',
-        total: 1200.00,
+        total: 350.00,
         comment: 'Pago mensual'
       },
       {
@@ -159,10 +161,53 @@ export class Scan implements OnInit {
     dialogRef.afterClosed().subscribe((newIncome: Income | null) => {
       if (newIncome) {
         console.log('Nuevo ingreso guardado:', newIncome);
-        // aquí puedes guardarlo en un servicio o enviarlo al backend
-        //this.incomes.push(newIncome);
+        this.addNewMovement('income', newIncome);
       }
     });
+  }
+
+  // Reutilizable para income y expense
+  private addNewMovement(type: 'income' | 'expense', movement: Income | Expense) {
+    console.log("addNewMovement");
+    let displayable: DisplayableMovement;
+
+    if (type === 'income') {
+      const income = movement as Income;
+      displayable = {
+        id: income.id,
+        type: 'income',
+        title: income.title,
+        date: income.date,
+        time: income.time,
+        total: income.total,
+        comment: income.comment,
+      };
+      console.log("income");
+    } else {
+      const expense = movement as Expense;
+      displayable = {
+        id: expense.id,
+        type: 'expense',
+        title: expense.place,
+        date: expense.date,
+        time: expense.time,
+        total: expense.total,
+        comment: expense.comment,
+        category: expense.category,
+        place: expense.place,
+      };
+      console.log("expense");
+    }
+
+    this.movements = [displayable, ...this.movements].sort((a, b) => {
+      const d1 = new Date(`${a.date}T${a.time}`);
+      const d2 = new Date(`${b.date}T${b.time}`);
+      return d2.getTime() - d1.getTime();
+    });
+    console.log(this.movements);
+
+    this.calculateTotal();
+    this.updateGroupedMovements(); // <<<<<< actualiza agrupados
   }
 
   getCategoryColor(category?: Category): string {
@@ -213,6 +258,22 @@ export class Scan implements OnInit {
 
   getAmountClass(type: string): string {
     return type === 'income' ? 'amount-positive' : 'amount-negative';
+  }
+
+  private updateGroupedMovements(): void {
+    const groups: { [key: string]: DisplayableMovement[] } = {};
+
+    for (const mov of this.movements) {
+      if (!groups[mov.date]) {
+        groups[mov.date] = [];
+      }
+      groups[mov.date].push(mov);
+    }
+
+    this.groupedMovements = Object.keys(groups).map(date => ({
+      date,
+      movements: groups[date]
+    }));
   }
 
   getGroupedMovements() {

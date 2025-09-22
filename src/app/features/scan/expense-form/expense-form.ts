@@ -12,6 +12,7 @@ import {Category} from '../../../shared/enums/category.enum';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
+import {Income} from '../../../shared/models/income.model';
 
 
 @Component({
@@ -68,9 +69,28 @@ export class ExpenseForm implements OnInit {
 
   submit() {
     if (this.form.valid) {
-      this.save.emit(this.form.value as Expense);
+      const rawValue = this.form.value;
+
+      // Asegurar formato de fecha YYYY-MM-DD
+      const formattedDate = this.formatDate(rawValue.date);
+
+      this.save.emit({
+        ...rawValue,
+        date: formattedDate
+      } as Expense);
     }
   }
+
+  private formatDate(date: any): string {
+    if (!(date instanceof Date)) {
+      date = new Date(date);
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   onCancel() {
     this.cancel.emit();
   }
