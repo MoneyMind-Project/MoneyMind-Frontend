@@ -3,10 +3,22 @@
     <mat-icon>close</mat-icon>
   </button>
   <div *ngIf="step === 1">
-    <h2>Sube o arrastra tu recibo</h2>
-    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
-    <button (click)="processReceipt()" [disabled]="!selectedFile">Procesar</button>
-    <button (click)="close()">Cerrar</button>
+    <!-- Modo upload -->
+    <ng-container *ngIf="mode === 'upload'">
+      <h2>Sube o arrastra tu recibo</h2>
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+      <button (click)="processReceipt()" [disabled]="!selectedFile">Procesar</button>
+      <button (click)="close()">Cerrar</button>
+    </ng-container>
+
+    <!-- Modo cámara -->
+    <ng-container *ngIf="mode === 'camera'">
+      <h2>Escanea tu recibo</h2>
+      <video #video width="300" height="200" autoplay *ngIf="!loading"></video>
+      <canvas #canvas width="300" height="200" [style.display]="loading ? 'block' : 'none'"></canvas>
+      <button (click)="capturePhoto()" [disabled]="loading">Capturar foto</button>
+      <button (click)="close()">Cerrar</button>
+    </ng-container>
   </div>
 
   <div *ngIf="step === 2">

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import {AfterViewInit, Component, Inject} from '@angular/core';
 import { Expense } from '../../../shared/models/expense.model';
 import { HttpClient } from '@angular/common/http';
 import {MatDialogRef} from '@angular/material/dialog';
@@ -19,14 +19,19 @@ import {MatIconModule} from '@angular/material/icon';
   templateUrl: './expense-dialog.html',
   styleUrl: './expense-dialog.css'
 })
-export class ExpenseDialog {
+export class ExpenseDialog implements AfterViewInit {
   step = 1;
   selectedFile: File | null = null;
   parsedExpense: Partial<Expense> | null = null;
   loading = false;
   mode: 'upload' | 'camera' | 'manual' = 'upload';
 
+  photoFile: File | null = null;
+
   @ViewChild(ExpenseForm) expenseForm!: ExpenseForm;
+  @ViewChild('video', { static: false }) videoElementRef!: any;
+  @ViewChild('canvas', { static: false }) canvasElementRef!: any;
+
 
   constructor(
     private http: HttpClient,
@@ -35,6 +40,12 @@ export class ExpenseDialog {
   ) {
     if (data.mode === 'manual') this.step = 2;
     this.mode = data.mode;
+  }
+
+  ngAfterViewInit() {
+    if (this.mode === 'camera') {
+      this.startCamera();
+    }
   }
 
   onFileSelected(event: Event) {
@@ -63,6 +74,36 @@ export class ExpenseDialog {
         }
       });
   }
+
+  startCamera() {
+    const video: HTMLVideoElement = this.videoElementRef.nativeElement;
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+        video.play();
+      })
+      .catch(err => {
+        alert('No se pudo acceder a la cámara');
+      });
+  }
+
+  capturePhoto() {
+    this.loading = true; // Activa el loading y oculta el video
+    const video: HTMLVideoElement = this.videoElementRef.nativeElement;
+    const canvas: HTMLCanvasElement = this.canvasElementRef.nativeElement;
+    const context = canvas.getContext('2d');
+    context?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(blob => {
+      if (blob) {
+        this.photoFile = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
+        this.selectedFile = this.photoFile;
+        this.processReceipt();
+      } else {
+        this.loading = false;
+      }
+    }, 'image/jpeg');
+  }
+
 
   onSave(expense: Expense) {
     this.dialogRef.close(expense);

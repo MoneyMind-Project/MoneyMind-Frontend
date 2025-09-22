@@ -161,7 +161,7 @@ export class Scan implements OnInit {
     });
   }
 
-  openIncomeDialog(mode: 'upload' | 'camera' | 'manual') {
+  openIncomeDialog(mode: 'upload' | 'manual') {
     const dialogRef = this.dialog.open(IncomeDialog, {
       data: { mode }
     });
