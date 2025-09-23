@@ -82,7 +82,7 @@
       <ng-container *ngFor="let group of groupedMovements">
         <div class="date-group">
           <!-- Encabezado de fecha -->
-          <div class="date-header">{{ group.date }}</div>
+          <div class="date-header">{{ formatDate(group.date) }}</div>
 
           <!-- Tarjeta de movimiento (usa las clases antiguas) -->
           <div class="expense-card" *ngFor="let movement of group.movements">
@@ -104,7 +104,7 @@
                 {{ movement.type === 'expense' ? movement.place : movement.title }}
               </div>
               <div class="expense-date">
-                {{ movement.time }} • {{ formatDate(movement.date) }}
+                {{ formatDate(movement.date) }} • {{ movement.time }}
               </div>
             </div>
 

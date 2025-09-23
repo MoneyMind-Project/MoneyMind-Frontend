@@ -4,7 +4,7 @@
   margin: 0 auto;
   margin-top: 15px;
   background-color: #f8f9fa;
-  min-height: 100vh;
+  /*min-height: 80vh;*/
   display: grid;
   grid-template-columns: 350px 1fr;
   gap: 40px;
@@ -112,6 +112,7 @@
   background: white;
   border-radius: 16px;
   padding: 24px;
+  max-height: 932px;
 }
 
 .movements-header {
