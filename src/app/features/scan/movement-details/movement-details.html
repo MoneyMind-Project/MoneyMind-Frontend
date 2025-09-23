@@ -1,0 +1,25 @@
+<div class="dialog-header">
+  <h2>Detalles del movimiento</h2>
+  <button mat-icon-button (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div class="dialog-content">
+  <p><strong>Título:</strong> {{ movement.title }}</p>
+  <p><strong>Fecha:</strong> {{ movement.date }} {{ movement.time }}</p>
+  <p><strong>Monto:</strong> S/ {{ movement.total.toFixed(2) }}</p>
+
+  <ng-container *ngIf="movement.type === 'expense'">
+    <p><strong>Lugar:</strong> {{ movement.place }}</p>
+    <p><strong>Categoría:</strong> {{ movement.category }}</p>
+  </ng-container>
+
+  <ng-container *ngIf="movement.comment">
+    <p><strong>Comentario:</strong> {{ movement.comment }}</p>
+  </ng-container>
+</div>
+
+<div class="dialog-actions">
+  <button mat-button color="warn" (click)="confirmDelete()">Eliminar</button>
+</div>

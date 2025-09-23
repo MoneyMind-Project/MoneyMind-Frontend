@@ -3,6 +3,8 @@ import { NgFor, NgIf } from '@angular/common';
 import { DisplayableMovement} from '../../../shared/models/displayable-movement.model';
 import { Category} from '../../../shared/enums/category.enum';
 import { FormsModule } from '@angular/forms';
+import {MovementDetails} from '../movement-details/movement-details';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-all-movements',
@@ -30,6 +32,9 @@ export class AllMovements implements OnInit {
     { label: '90 días', value: '90' },
     { label: 'Todos', value: 'all' },
   ];
+
+  constructor(private dialog: MatDialog) {
+  }
 
   ngOnInit(): void {
     // Mock de movimientos locales
@@ -242,5 +247,20 @@ export class AllMovements implements OnInit {
   loadMore() {
     console.log('Cargar más movimientos...');
     // TODO: Llamar backend para traer más resultados
+  }
+
+  openDetails(movement: DisplayableMovement) {
+    const ref = this.dialog.open(MovementDetails, {
+      width: '400px',
+      data: movement
+    });
+
+    ref.componentInstance.deleted.subscribe((deletedMovement) => {
+      // 👉 Borrar localmente
+      this.movements = this.movements.filter(
+        m => !(m.id === deletedMovement.id && m.type === deletedMovement.type)
+      );
+      this.applyFilters();
+    });
   }
 }

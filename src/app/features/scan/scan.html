@@ -112,7 +112,7 @@
               <span [class]="getAmountClass(movement.type)">
                 {{ formatAmount(movement.total, movement.type) }}
               </span>
-              <i class="material-icons visibility-icon">visibility</i>
+              <i class="material-icons visibility-icon" (click)="openDetails(movement)">visibility</i>
             </div>
           </div>
         </div>

@@ -12,6 +12,7 @@ import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {ExpenseDialog} from './expense-dialog/expense-dialog';
 import {IncomeDialog} from './income-dialog/income-dialog';
 import { RouterModule } from '@angular/router';
+import { MovementDetails} from './movement-details/movement-details';
 
 
 @Component({
@@ -284,20 +285,19 @@ export class Scan implements OnInit {
     }));
   }
 
-  getGroupedMovements() {
-    const movements = this.getMovements(); // ya unificados
-    const grouped: { date: string; movements: DisplayableMovement[] }[] = [];
-
-    movements.forEach(movement => {
-      let group = grouped.find(g => g.date === movement.date);
-      if (!group) {
-        group = { date: movement.date, movements: [] };
-        grouped.push(group);
-      }
-      group.movements.push(movement);
+  openDetails(movement: DisplayableMovement) {
+    const ref = this.dialog.open(MovementDetails, {
+      width: '400px',
+      data: movement
     });
 
-    // Ordenar descendente por fecha
-    return grouped.sort((a, b) => (a.date < b.date ? 1 : -1));
+    ref.componentInstance.deleted.subscribe((deletedMovement) => {
+      // 👉 Borrar localmente
+      this.movements = this.movements.filter(
+        m => !(m.id === deletedMovement.id && m.type === deletedMovement.type)
+      );
+      this.updateGroupedMovements();
+      //this.applyFilters();
+    });
   }
 }
