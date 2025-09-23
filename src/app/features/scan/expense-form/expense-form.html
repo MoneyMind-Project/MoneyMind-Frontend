@@ -1,5 +1,5 @@
 <form [formGroup]="form" (ngSubmit)="submit()" class="expense-form">
-<mat-form-field appearance="fill" class="w-100">
+<mat-form-field appearance="outline" class="w-100">
     <mat-label>Category</mat-label>
     <mat-select formControlName="category">
       <mat-option *ngFor="let c of categories" [value]="c">
@@ -8,29 +8,29 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-100">
+  <mat-form-field appearance="outline" class="w-100">
     <mat-label>Place</mat-label>
     <input matInput formControlName="place" />
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-100">
+  <mat-form-field appearance="outline" class="w-100">
     <mat-label>Date</mat-label>
     <input matInput [matDatepicker]="picker" formControlName="date" />
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-100">
+  <mat-form-field appearance="outline" class="w-100">
     <mat-label>Time</mat-label>
     <input matInput type="time" formControlName="time" />
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-100">
+  <mat-form-field appearance="outline" class="w-100">
     <mat-label>Total</mat-label>
     <input matInput type="number" formControlName="total" />
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-100">
+  <mat-form-field appearance="outline" class="w-100">
     <mat-label>Comment</mat-label>
     <textarea matInput formControlName="comment"></textarea>
   </mat-form-field>

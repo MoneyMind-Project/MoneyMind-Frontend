@@ -11,27 +11,27 @@
       <div class="action-section">
         <h4>GASTOS</h4>
         <div class="buttons-row">
-          <button class="action-btn scan-btn">
+          <button class="action-btn scan-btn" (click)="openExpenseDialog('camera')">
             <div class="btn-icon">
               <i class="material-icons">camera_alt</i>
             </div>
-            <div class="btn-icon-text-container" (click)="openExpenseDialog('camera')">
+            <div class="btn-icon-text-container" >
               Escanear
             </div>
           </button>
-          <button class="action-btn upload-btn">
+          <button class="action-btn upload-btn" (click)="openExpenseDialog('upload')">
             <div class="btn-icon">
               <i class="material-icons">cloud_upload</i>
             </div>
-            <div class="btn-icon-text-container" (click)="openExpenseDialog('upload')">
+            <div class="btn-icon-text-container">
               Subir foto
             </div>
           </button>
-          <button class="action-btn manual-btn">
+          <button class="action-btn manual-btn" (click)="openExpenseDialog('manual')">
             <div class="btn-icon">
               <i class="material-icons">add</i>
             </div>
-            <div class="btn-icon-text-container" (click)="openExpenseDialog('manual')">
+            <div class="btn-icon-text-container" >
               Agregar manualmente
             </div>
           </button>
@@ -41,19 +41,19 @@
       <div class="action-section">
         <h4>INGRESOS</h4>
         <div class="buttons-row">
-          <button class="action-btn income-upload-btn">
+          <button class="action-btn income-upload-btn" (click)="openIncomeDialog('upload')">
             <div class="btn-icon">
               <i class="material-icons">cloud_upload</i>
             </div>
-            <div class="btn-icon-text-container" (click)="openIncomeDialog('upload')">
+            <div class="btn-icon-text-container" >
               Subir foto
             </div>
           </button>
-          <button class="action-btn income-manual-btn">
+          <button class="action-btn income-manual-btn" (click)="openIncomeDialog('manual')">
             <div class="btn-icon">
               <i class="material-icons">add</i>
             </div>
-            <div class="btn-icon-text-container" (click)="openIncomeDialog('manual')">
+            <div class="btn-icon-text-container" >
               Agregar manualmente
             </div>
           </button>
