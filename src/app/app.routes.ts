@@ -7,6 +7,7 @@ import {GuestGuard} from './core/guards/guest.guard';
 import {AuthGuard} from './core/guards/auth.guard';
 import {Home} from './features/home/home';
 import {Scan} from './features/scan/scan';
+import {AllMovements} from './features/scan/all-movements/all-movements';
 import {Dashboard} from './features/dashboard/dashboard';
 import {Profile} from './features/profile/profile';
 
@@ -23,7 +24,14 @@ export const routes: Routes = [
     canActivate: [AuthGuard], // solo accesible si estás logueado
     children: [
       { path: 'home', component: Home },
-      { path: 'scan', component: Scan },
+      {
+        path: 'scan',
+        component: Scan,
+      },
+      {
+        path: 'scan/all-movements',
+        component: AllMovements
+      },
       { path: 'dashboard', component: Dashboard },
       { path: 'profile', component: Profile },
       { path: '', redirectTo: 'home', pathMatch: 'full' }, // default después del login

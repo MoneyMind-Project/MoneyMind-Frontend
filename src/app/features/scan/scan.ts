@@ -8,10 +8,11 @@ import {DecimalPipe} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
-import {ChangeDetectionStrategy, inject, model, signal} from '@angular/core';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {ExpenseDialog} from './expense-dialog/expense-dialog';
 import {IncomeDialog} from './income-dialog/income-dialog';
+import { RouterModule } from '@angular/router';
+
 
 @Component({
   selector: 'app-scan',
@@ -21,7 +22,8 @@ import {IncomeDialog} from './income-dialog/income-dialog';
     MatButtonModule,
     MatDividerModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    RouterModule
   ],
   templateUrl: './scan.html',
   styleUrl: './scan.css'

@@ -1,0 +1,81 @@
+<div class="all-movements-container">
+  <!-- Header -->
+  <div class="all-movements-header">
+    <h2>Todos los movimientos ({{ filteredMovements.length }})</h2>
+  </div>
+
+  <!-- Search & Filters -->
+  <div class="filters-container">
+    <!-- Search bar -->
+    <div class="search-box">
+      <i class="material-icons search-icon">search</i>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+        placeholder="Buscar movimiento"
+        class="search-input"
+      />
+    </div>
+
+    <!-- Date range filters -->
+    <div class="date-filters">
+      <button
+        *ngFor="let option of dateOptions"
+        (click)="setDateFilter(option.value)"
+        [class.active]="activeDateFilter === option.value"
+        class="filter-btn"
+      >
+        {{ option.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Movements List -->
+  <div class="movements-list">
+    <ng-container *ngFor="let group of groupedFilteredMovements">
+      <div class="date-group">
+        <div class="date-header">{{ group.date }}</div>
+
+        <div class="expense-card" *ngFor="let movement of group.movements">
+          <div class="expense-icon">
+            <div
+              class="icon-circle"
+              [style.background-color]="getCategoryColor(movement.category)"
+            >
+              <i class="material-icons">
+                {{
+                  movement.type === 'expense'
+                    ? getCategoryIcon(movement.category)
+                    : 'attach_money'
+                }}
+              </i>
+            </div>
+          </div>
+
+          <div class="expense-details">
+            <div class="expense-place">
+              {{ movement.type === 'expense' ? movement.place : movement.title }}
+            </div>
+            <div class="expense-date">
+              {{ movement.time }} • {{ formatDate(movement.date) }}
+            </div>
+          </div>
+
+          <div class="expense-amount">
+            <span [class]="getAmountClass(movement.type)">
+              {{ formatAmount(movement.total, movement.type) }}
+            </span>
+            <i class="material-icons visibility-icon">visibility</i>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Lazy Loading Placeholder -->
+    <div class="lazy-load" *ngIf="hasMore">
+      <button (click)="loadMore()">Cargar más</button>
+      <!-- TODO: conectar con backend para lazy loading -->
+    </div>
+  </div>
+</div>
