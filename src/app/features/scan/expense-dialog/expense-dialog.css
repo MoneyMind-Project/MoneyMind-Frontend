@@ -237,6 +237,15 @@
     min-width: 70vw; /* Más ancho para formularios */
   }
 
+  .upload-step-1,
+  .camera-step-1 {
+    min-width: 80vw;
+  }
+  .upload-container{
+    width: 90%;
+    margin: auto;
+  }
+
   .expense-dialog {
     margin: 25px 5px;
   }

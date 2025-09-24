@@ -3,9 +3,9 @@
     <mat-icon>close</mat-icon>
   </button>
 
-  <div *ngIf="step === 1">
+  <div *ngIf="step === 1" class="upload-container">
     <!-- Modo upload con drag & drop -->
-    <ng-container *ngIf="mode === 'upload'">
+    <ng-container *ngIf="mode === 'upload'" class="upload-container-body">
       <h2 class="dialog-title">Sube tu recibo</h2>
 
       <div
