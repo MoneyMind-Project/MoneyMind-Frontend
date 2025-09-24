@@ -79,10 +79,12 @@
   .income-form {
     min-width: 100%;
     padding: 12px 0; /* Reducido */
+    align-items: center;
   }
 
   .full-width {
     font-size: 13px; /* Aún más pequeño en móvil */
+    width: 90%;
   }
 
   .income-form input,

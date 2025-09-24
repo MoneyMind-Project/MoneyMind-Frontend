@@ -31,6 +31,7 @@ export class ExpenseDialog implements AfterViewInit {
   parsedExpense: Partial<Expense> | null = null;
   loading = false;
   mode: 'upload' | 'camera' | 'manual' = 'upload';
+  isDragOver = false;
 
   photoFile: File | null = null;
 
@@ -54,9 +55,18 @@ export class ExpenseDialog implements AfterViewInit {
     }
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) this.selectedFile = input.files[0];
+  get dialogClass(): string {
+    const baseClass = 'expense-dialog';
+
+    if (this.mode === 'upload') {
+      return `${baseClass} upload-step-${this.step}`;
+    } else if (this.mode === 'camera') {
+      return `${baseClass} camera-step-${this.step}`;
+    } else if (this.mode === 'manual') {
+      return `${baseClass} manual-step-${this.step}`;
+    }
+
+    return baseClass;
   }
 
   processReceipt() {
@@ -175,6 +185,68 @@ export class ExpenseDialog implements AfterViewInit {
       this.expenseForm.resetForm();
       if (this.mode === 'camera') {
         this.startCamera(); // Reinicia la cámara si volvemos al paso 1
+      }
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      // Validar que sea una imagen
+      if (this.isValidImageFile(file)) {
+        this.selectedFile = file;
+      } else {
+        alert('Por favor selecciona un archivo de imagen válido (JPEG, JPG, PNG)');
+      }
+    }
+  }
+
+  private isValidImageFile(file: File): boolean {
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    return validTypes.includes(file.type);
+  }
+
+  removeFile(event: Event) {
+    event.stopPropagation(); // Evita que se abra el file picker
+    this.selectedFile = null;
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+// Modifica tu método onFileSelected existente para incluir validación:
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      const file = input.files[0];
+      if (this.isValidImageFile(file)) {
+        this.selectedFile = file;
+      } else {
+        alert('Por favor selecciona un archivo de imagen válido (JPEG, JPG, PNG)');
+        // Limpiar el input
+        input.value = '';
       }
     }
   }

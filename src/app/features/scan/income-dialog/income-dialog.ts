@@ -40,6 +40,20 @@ export class IncomeDialog {
     this.mode = data.mode;
   }
 
+  get dialogClass(): string {
+    const baseClass = 'expense-dialog';
+
+    if (this.mode === 'upload') {
+      return `${baseClass} upload-step-${this.step}`;
+    } else if (this.mode === 'camera') {
+      return `${baseClass} camera-step-${this.step}`;
+    } else if (this.mode === 'manual') {
+      return `${baseClass} manual-step-${this.step}`;
+    }
+
+    return baseClass;
+  }
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) this.selectedFile = input.files[0];

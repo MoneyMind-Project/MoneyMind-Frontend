@@ -9,7 +9,13 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .upload-step-2,
+  .camera-step-2,
+  .manual-step-2 {
+    min-width: 70vw; /* Más ancho para formularios */
+  }
+
   .expense-dialog {
-    min-width: 70vw
+    margin: 25px 5px;
   }
 }

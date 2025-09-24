@@ -71,12 +71,15 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .expense-form {
-    min-width: 100%;
     padding: 12px 0; /* Reducido */
+    min-width: 100%;
+    align-items: center;
   }
+
 
   .full-width {
     font-size: 13px; /* Aún más pequeño en móvil */
+    width: 90%;
   }
 
   .expense-form input,
