@@ -7,6 +7,8 @@ import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ViewChild } from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatButtonModule} from '@angular/material/button';
 
 
 @Component({
@@ -14,7 +16,9 @@ import {MatIconModule} from '@angular/material/icon';
   imports: [
     ExpenseForm,
     CommonModule,
-    MatIconModule
+    MatIconModule,
+    MatButtonModule,
+    MatDividerModule
   ],
   templateUrl: './expense-dialog.html',
   styleUrl: './expense-dialog.css'

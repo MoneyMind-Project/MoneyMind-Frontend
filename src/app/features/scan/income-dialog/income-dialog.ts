@@ -7,13 +7,17 @@ import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ViewChild } from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatButtonModule} from '@angular/material/button';
 
 @Component({
   selector: 'app-income-dialog',
     imports: [
         IncomeForm,
         CommonModule,
-        MatIconModule
+        MatIconModule,
+      MatButtonModule,
+      MatDividerModule
     ],
   templateUrl: './income-dialog.html',
   styleUrl: './income-dialog.css'

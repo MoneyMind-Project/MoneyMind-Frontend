@@ -1,0 +1,98 @@
+.income-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reducido de 16px */
+  padding: 16px;
+  min-width: 480px;
+}
+
+.full-width {
+  width: 100%;
+  font-size: 14px; /* Reduce el tamaño de fuente de todos los form-fields */
+}
+
+/* Campos más compactos - aplicado a todos los mat-form-field */
+.income-form .mat-mdc-form-field-infix {
+  min-height: 48px; /* Altura más pequeña */
+  padding: 8px 0; /* Padding reducido */
+}
+
+.income-form .mat-mdc-form-field-subscript-wrapper {
+  margin-top: 4px; /* Reduce espacio de error */
+}
+
+.income-form .mat-mdc-text-field-wrapper {
+  padding: 0 12px; /* Padding horizontal reducido */
+}
+
+/* Etiquetas más pequeñas */
+.income-form .mat-mdc-form-field-label {
+  font-size: 14px;
+}
+
+/* Inputs más pequeños */
+.income-form input,
+.income-form textarea,
+.income-form .mat-mdc-select {
+  font-size: 14px;
+}
+
+/* Mensajes de error más pequeños */
+.income-form .mat-mdc-form-field-error {
+  font-size: 12px;
+}
+
+/* Botones más compactos */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px; /* Reducido de 16px */
+  gap: 10px; /* Reducido de 12px */
+}
+
+.actions button {
+  flex: 1;
+  height: 40px; /* Altura reducida de botones */
+  font-size: 14px;
+}
+
+/* Ajustes específicos para el datepicker toggle */
+.income-form .mat-datepicker-toggle {
+  width: 20px;
+  height: 20px;
+}
+
+/* Timepicker compacto */
+.income-form .mat-timepicker-toggle {
+  width: 20px;
+  height: 20px;
+}
+
+.income-form .mat-timepicker-toggle .mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .income-form {
+    min-width: 100%;
+    padding: 12px 0; /* Reducido */
+  }
+
+  .full-width {
+    font-size: 13px; /* Aún más pequeño en móvil */
+  }
+
+  .income-form input,
+  .income-form textarea,
+  .income-form .mat-mdc-select {
+    font-size: 13px;
+  }
+
+  .actions button {
+    height: 36px; /* Más pequeños en móvil */
+    font-size: 13px;
+  }
+}

@@ -19,7 +19,7 @@
     <span class="nav-label">Inicio</span>
   </button>
 
-  <button mat-button class="nav-item" routerLink="/scan" routerLinkActive="active-mobile" #scanLink="routerLinkActive" [disableRipple]="true" [routerLinkActiveOptions]="{ exact: false }">>
+  <button mat-button class="nav-item" routerLink="/scan" routerLinkActive="active-mobile" #scanLink="routerLinkActive" [disableRipple]="true" [routerLinkActiveOptions]="{ exact: false }">
     <span [ngClass]="scanLink.isActive ? 'material-icons' : 'material-symbols-outlined'">photo_camera</span>
     <span class="nav-label">Escanear</span>
   </button>

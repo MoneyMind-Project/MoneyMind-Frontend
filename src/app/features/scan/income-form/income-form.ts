@@ -12,6 +12,7 @@ import {Category} from '../../../shared/enums/category.enum';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTimepickerModule } from '@angular/material/timepicker'; // 👈 NUEVO
 
 @Component({
   selector: 'app-income-form',
@@ -26,14 +27,14 @@ import { MatButtonModule } from '@angular/material/button';
     CommonModule,
     MatInputModule,
     MatDatepickerModule,
-    MatButtonModule
+    MatButtonModule,
+    MatTimepickerModule // 👈 NUEVO
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './income-form.html',
   styleUrl: './income-form.css'
 })
-export class IncomeForm implements OnInit{
-
+export class IncomeForm implements OnInit {
   @Input() initialData?: Partial<Income>;
   @Output() save = new EventEmitter<Income>();
   @Output() cancel = new EventEmitter<void>();
@@ -49,13 +50,14 @@ export class IncomeForm implements OnInit{
       title: ['', Validators.required],
       date: ['', Validators.required],
       time: ['', Validators.required],
-      total: [0, Validators.required],
+      total: [0, [Validators.required, Validators.min(0.01)]],
       comment: ['']
     });
 
     if (this.initialData) {
       const patchedData = {
         ...this.initialData,
+        time: this.initialData.time ? this.parseTimeString(this.initialData.time) : null // 👈 NUEVO
       };
       this.form.patchValue(patchedData);
     }
@@ -68,9 +70,13 @@ export class IncomeForm implements OnInit{
       // Asegurar formato de fecha YYYY-MM-DD
       const formattedDate = this.formatDate(rawValue.date);
 
+      // Convertir el tiempo de Date a string HH:mm 👈 NUEVO
+      const formattedTime = this.formatTime(rawValue.time);
+
       this.save.emit({
         ...rawValue,
-        date: formattedDate
+        date: formattedDate,
+        time: formattedTime // 👈 NUEVO
       } as Income);
     }
   }
@@ -85,6 +91,28 @@ export class IncomeForm implements OnInit{
     return `${year}-${month}-${day}`;
   }
 
+  // 👈 NUEVO: Convertir Date a string HH:mm
+  private formatTime(time: any): string {
+    if (!time) return '';
+
+    if (!(time instanceof Date)) {
+      time = new Date(time);
+    }
+
+    const hours = String(time.getHours()).padStart(2, '0');
+    const minutes = String(time.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  // 👈 NUEVO: Convertir string HH:mm a Date para el timepicker
+  private parseTimeString(timeString: string): Date | null {
+    if (!timeString) return null;
+
+    const [hours, minutes] = timeString.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    return date;
+  }
 
   onCancel() {
     this.cancel.emit();
@@ -93,5 +121,4 @@ export class IncomeForm implements OnInit{
   resetForm() {
     this.form.reset();
   }
-
 }

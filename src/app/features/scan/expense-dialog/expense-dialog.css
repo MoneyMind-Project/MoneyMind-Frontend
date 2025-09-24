@@ -6,3 +6,10 @@
   top: 8px;
   right: 8px;
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .expense-dialog {
+    min-width: 70vw
+  }
+}
