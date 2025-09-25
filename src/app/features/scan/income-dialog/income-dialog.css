@@ -1,11 +1,555 @@
-.expense-dialog{
-  margin:25px;
+.expense-dialog {
+  margin: 25px;
 }
+
 .close-btn {
   position: absolute;
   top: 8px;
   right: 8px;
+  z-index: 10;
 }
+
+.dialog-title {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+/* Drag & Drop Area */
+.drag-drop-area {
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drag-drop-area:hover {
+  border-color: #2196F3;
+  background: #f0f8ff;
+}
+
+.drag-drop-area.drag-over {
+  border-color: #2196F3;
+  background: #e3f2fd;
+  transform: scale(1.02);
+}
+
+.drag-drop-area.has-file {
+  border-color: #4CAF50;
+  background: #f1f8e9;
+}
+
+/* Upload Content */
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.upload-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #2196F3;
+  margin-bottom: 8px;
+}
+
+.upload-text {
+  text-align: center;
+}
+
+.primary-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.secondary-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+.browse-link {
+  color: #2196F3;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.file-types {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 8px 0 0 0;
+}
+
+/* File Preview */
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 300px;
+}
+
+.file-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #4CAF50;
+}
+
+.file-info {
+  flex: 1;
+  text-align: left;
+}
+
+.file-name {
+  font-weight: 500;
+  margin: 0 0 4px 0;
+  color: #333;
+  word-break: break-all;
+}
+
+.file-size {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+}
+
+.remove-file-btn {
+  color: #f44336;
+  width: 32px;
+  height: 32px;
+}
+
+/* Loading Content */
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #FF9800;
+  animation: pulse 2s infinite;
+}
+
+.loading-text {
+  font-size: 1.1rem;
+  color: #333;
+  margin: 0;
+}
+
+.loading-bar {
+  width: 200px;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loading-progress {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #2196F3, #21CBF3);
+  animation: loading-slide 2s infinite;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: center;
+}
+
+.cancel-btn, .process-btn {
+  min-width: 120px;
+  height: 40px;
+}
+
+.process-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Hidden Input */
+.hidden-input {
+  display: none;
+}
+
+/* Camera Container */
+.camera-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.camera-container video,
+.camera-container canvas {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.loading-message {
+  text-align: center;
+  margin-top: 16px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes loading-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Scanner Container */
+.scanner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+/* Camera Frame */
+.camera-frame {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: #000;
+}
+
+.camera-video {
+  display: block;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.hidden-canvas {
+  display: none;
+}
+
+.preview-canvas {
+  display: block;
+  border-radius: 16px;
+}
+
+/* Scanner Overlay */
+.scanner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Focus Frame */
+.focus-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(33, 150, 243, 0.8);
+  border-radius: 8px;
+  background: rgba(33, 150, 243, 0.1);
+}
+
+.corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #2196F3;
+  border-radius: 2px;
+}
+
+.corner.top-left {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner.top-right {
+  top: -2px;
+  right: -2px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.corner.bottom-left {
+  bottom: -2px;
+  left: -2px;
+  border-right: none;
+  border-top: none;
+}
+
+.corner.bottom-right {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Scan Line Animation */
+.scan-line {
+  position: absolute;
+  top: 20%;
+  left: 5%;
+  width: 90%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #2196F3, transparent);
+  animation: scanMove 2s ease-in-out infinite;
+  border-radius: 1px;
+  box-shadow: 0 0 10px #2196F3;
+}
+
+@keyframes scanMove {
+  0%, 100% {
+    top: 20%;
+    opacity: 0;
+  }
+  50% {
+    top: 50%;
+    opacity: 1;
+  }
+  100% {
+    top: 80%;
+    opacity: 0;
+  }
+}
+
+/* Camera Instructions */
+.camera-instructions {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+/* Captured Frame */
+.captured-frame {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Scanning Overlay */
+.scanning-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(33, 150, 243, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+/* Scanning Animation */
+.scanning-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scan-beam {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    #2196F3,
+    #21CBF3,
+    #2196F3,
+    transparent
+  );
+  transform: translateX(-50%);
+  animation: scanBeam 3s ease-in-out infinite;
+  box-shadow: 0 0 20px #2196F3;
+}
+
+@keyframes scanBeam {
+  0%, 100% {
+    left: 10%;
+    opacity: 0;
+  }
+  50% {
+    left: 50%;
+    opacity: 1;
+  }
+  100% {
+    left: 90%;
+    opacity: 0;
+  }
+}
+
+/* Scan Particles */
+.scan-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #2196F3;
+  border-radius: 50%;
+  animation: particleFloat 2s infinite ease-in-out;
+  box-shadow: 0 0 10px #2196F3;
+}
+
+.particle:nth-child(1) { top: 20%; left: 15%; animation-delay: 0s; }
+.particle:nth-child(2) { top: 40%; right: 20%; animation-delay: 0.3s; }
+.particle:nth-child(3) { bottom: 30%; left: 25%; animation-delay: 0.6s; }
+.particle:nth-child(4) { top: 60%; right: 15%; animation-delay: 0.9s; }
+.particle:nth-child(5) { bottom: 20%; right: 30%; animation-delay: 1.2s; }
+.particle:nth-child(6) { top: 80%; left: 40%; animation-delay: 1.5s; }
+
+@keyframes particleFloat {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) translateY(0px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) translateY(-20px);
+  }
+}
+
+/* Scanning Progress */
+.scanning-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 24px 32px;
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scanning-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #2196F3;
+  animation: pulse 2s infinite;
+}
+
+.scanning-text {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+/* Progress Dots */
+.progress-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #2196F3;
+  border-radius: 50%;
+  animation: dotPulse 1.5s infinite ease-in-out;
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Camera Actions */
+.camera-actions {
+  position: relative;
+  align-items: center;
+}
+
+.capture-btn {
+  width: 64px;
+  height: 64px;
+  margin: 0 20px;
+  box-shadow: 0 4px 16px rgba(33, 150, 243, 0.3);
+}
+
+.capture-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+.processing-btn {
+  min-width: 150px;
+  height: 48px;
+  margin: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
@@ -15,7 +559,165 @@
     min-width: 70vw; /* Más ancho para formularios */
   }
 
+  .upload-step-1,
+  .camera-step-1 {
+    min-width: 80vw;
+  }
+  .step-1-container{
+    width: 90%;
+    margin: auto;
+  }
+
   .expense-dialog {
     margin: 25px 5px;
+  }
+
+  .dialog-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+
+  .drag-drop-area {
+    padding: 30px 15px;
+    min-height: 160px;
+  }
+
+  .upload-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .primary-text {
+    font-size: 1rem;
+  }
+
+  .secondary-text {
+    font-size: 0.85rem;
+  }
+
+  .file-types {
+    font-size: 0.75rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cancel-btn, .process-btn {
+    width: 100%;
+    margin: 4px 0;
+  }
+
+  .camera-container video,
+  .camera-container canvas {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+  }
+
+  .file-preview {
+    max-width: 100%;
+  }
+
+  .loading-bar {
+    width: 150px;
+  }
+
+  .scanner-container.mobile-scanner .camera-frame,
+  .scanner-container.mobile-scanner .captured-frame {
+    width: 300px;
+    height: 400px;
+  }
+
+  .scanner-container.mobile-scanner .camera-video,
+  .scanner-container.mobile-scanner .preview-canvas {
+    width: 300px;
+    height: 400px;
+    object-fit: cover;
+  }
+
+  .focus-frame {
+    width: 100%;
+    height: 100%;
+  }
+
+  .camera-instructions {
+    bottom: 15px;
+    font-size: 0.7rem;
+    padding: 6px 12px;
+  }
+
+  .scanning-progress {
+    padding: 20px 24px;
+  }
+
+  .scanning-text {
+    font-size: 1rem;
+  }
+
+  .capture-btn {
+    width: 56px;
+    height: 56px;
+  }
+
+  .camera-actions {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .drag-drop-area {
+    padding: 25px 10px;
+    min-height: 140px;
+  }
+
+  .upload-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .dialog-title {
+    font-size: 1.2rem;
+  }
+
+  .scanner-container.mobile-scanner .camera-frame,
+  .scanner-container.mobile-scanner .captured-frame {
+    width: 280px;
+    height: 380px;
+  }
+
+  .scanner-container.mobile-scanner .camera-video,
+  .scanner-container.mobile-scanner .preview-canvas {
+    width: 280px;
+    height: 380px;
+  }
+
+  .scanning-progress {
+    padding: 16px 20px;
+    margin: 0 10px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 769px) {
+  .scanner-container:not(.mobile-scanner) .camera-frame,
+  .scanner-container:not(.mobile-scanner) .captured-frame {
+    width: 480px;
+    height: 320px;
+  }
+
+  .scanner-container:not(.mobile-scanner) .camera-video,
+  .scanner-container:not(.mobile-scanner) .preview-canvas {
+    width: 480px;
+    height: 320px;
+    object-fit: cover;
   }
 }
