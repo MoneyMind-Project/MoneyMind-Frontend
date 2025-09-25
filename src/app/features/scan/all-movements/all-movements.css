@@ -7,10 +7,20 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.01);
 }
 
+.view-all-link {
+  color: #1047d3;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 /* Header */
 .all-movements-header {
   margin-bottom: 1.5rem;
   text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .all-movements-header h2{
@@ -190,4 +200,44 @@
       background: #1565c0;
     }
   }
+}
+
+@media (max-width: 968px) {
+  .all-movements-container {
+    padding-bottom: 110px;
+    margin: 15px !important;
+  }
+
+}
+
+@media (max-width: 550px) {
+  .all-movements-header h2{
+    margin-bottom: 0.5rem;
+  }
+  .all-movements-header{
+    display: block;
+  }
+
+  .expense-place{
+    font-size: 14px !important;
+  }
+
+  .expense-amount{
+    font-size: 14px !important;
+  }
+
+  .expense-date{
+    font-size: 12px !important;
+  }
+
+  .icon-circle {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 18px !important;
+  }
+
+  .date-header{
+    font-size: 14px !important;
+  }
+
 }

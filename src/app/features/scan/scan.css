@@ -354,11 +354,10 @@
   }
 
   .scan-container {
-    padding: 16px;
+    padding: 16px 16px 80px 16px;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    margin-top: 0;
   }
 
   .header-section {

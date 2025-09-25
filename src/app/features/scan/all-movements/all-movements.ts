@@ -6,11 +6,12 @@ import { FormsModule } from '@angular/forms';
 import {MovementDetails} from '../movement-details/movement-details';
 import {MatDialog} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-all-movements',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf, MatIconModule],
+  imports: [FormsModule, NgFor, NgIf, MatIconModule, RouterLink],
   templateUrl: './all-movements.html',
   styleUrl: './all-movements.css'
 })
