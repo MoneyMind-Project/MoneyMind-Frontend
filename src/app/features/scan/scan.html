@@ -73,7 +73,12 @@
     <div class="search-container">
       <div class="search-box">
         <i class="material-icons search-icon">search</i>
-        <input type="text" placeholder="Buscar movimiento" class="search-input">
+        <input
+          type="text"
+          placeholder="Buscar movimiento"
+          class="search-input"
+          [(ngModel)]="searchText"
+          (ngModelChange)="onSearchChange($event)">
       </div>
     </div>
 
@@ -117,6 +122,14 @@
           </div>
         </div>
       </ng-container>
+    </div>
+
+    <div class="no-results" *ngIf="movements.length === 0 && searchText">
+      <i class="material-icons">search_off</i>
+      <p>No se encontraron movimientos que coincidan con "{{ searchText }}"</p>
+      <button class="clear-search-btn" (click)="clearSearch()">
+        Limpiar búsqueda
+      </button>
     </div>
 
   </div>

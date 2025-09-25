@@ -1,8 +1,7 @@
 .scan-container {
   padding: 20px;
   max-width: 1200px;
-  margin: 0 auto;
-  margin-top: 15px;
+  margin: 15px auto 40px auto;
   background-color: #f8f9fa;
   min-height: 80vh;
   display: grid;
@@ -142,12 +141,18 @@
 
 /* Search */
 .search-container {
-  margin-bottom: 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  width: 90%;
 }
 
 .search-box {
+  flex: 1;
   position: relative;
-  width: 90%;
+  width: 90% !important;
 }
 
 .search-icon {
@@ -161,16 +166,67 @@
 
 .search-input {
   width: 100%;
-  padding: 12px 12px 12px 44px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  padding: 12px 16px 12px 45px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.2s;
 }
 
 .search-input:focus {
-  border-color: #007bff;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 20px;
+}
+
+/* Botón para limpiar búsqueda */
+.clear-search-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  transition: background-color 0.2s;
+}
+
+.clear-search-btn:hover {
+  background-color: #f5f5f5;
+}
+
+/* Mensaje de no resultados */
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.no-results i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #ccc;
+}
+
+.no-results p {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+}
+
+.no-results .clear-search-btn {
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 /* Movements List */
@@ -281,6 +337,10 @@
 /* Mobile Responsive */
 @media (max-width: 968px) {
 
+  .search-container {
+    width: 90%;
+  }
+
   .action-buttons{
     gap: 20px;
     background-color: transparent;
@@ -373,6 +433,10 @@
 }
 
 @media (max-width: 550px) {
+  .search-container {
+    width: 80%;
+  }
+
   .movements-header h3 {
     font-size: 16px;
   }
@@ -383,7 +447,6 @@
 
   .search-box{
     max-width: none;
-    width: 81%;
   }
 
   .action-buttons{

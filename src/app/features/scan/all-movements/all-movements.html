@@ -35,7 +35,7 @@
   <div class="movements-list">
     <ng-container *ngFor="let group of groupedFilteredMovements">
       <div class="date-group">
-        <div class="date-header">{{ group.date }}</div>
+        <div class="date-header">{{ formatDate(group.date) }}</div>
 
         <div class="expense-card" *ngFor="let movement of group.movements">
           <div class="expense-icon">

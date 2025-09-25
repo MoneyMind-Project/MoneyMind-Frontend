@@ -5,11 +5,12 @@ import { Category} from '../../../shared/enums/category.enum';
 import { FormsModule } from '@angular/forms';
 import {MovementDetails} from '../movement-details/movement-details';
 import {MatDialog} from '@angular/material/dialog';
+import {MatIconModule} from '@angular/material/icon';
 
 @Component({
   selector: 'app-all-movements',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf],
+  imports: [FormsModule, NgFor, NgIf, MatIconModule],
   templateUrl: './all-movements.html',
   styleUrl: './all-movements.css'
 })
@@ -22,7 +23,7 @@ export class AllMovements implements OnInit {
   activeDateFilter: string = 'all';
 
   // TODO: implementar lazy loading con backend
-  hasMore = false;
+  hasMore = true;
 
   dateOptions = [
     { label: 'Hoy', value: 'today' },

@@ -1,25 +1,88 @@
-<div class="dialog-header">
-  <h2>Detalles del movimiento</h2>
-  <button mat-icon-button (click)="close()">
-    <mat-icon>close</mat-icon>
-  </button>
-</div>
+<div class="movement-details-container">
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="header-content">
+      <mat-icon class="movement-icon" [ngClass]="movement.type === 'expense' ? 'expense-icon' : 'income-icon'">
+        {{ movement.type === 'expense' ? 'trending_down' : 'trending_up' }}
+      </mat-icon>
+      <h2 class="dialog-title">Detalles del {{ movement.type === 'expense' ? 'gasto' : 'ingreso' }}</h2>
+    </div>
+    <button mat-icon-button class="close-btn" (click)="close()" aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<div class="dialog-content">
-  <p><strong>Título:</strong> {{ movement.title }}</p>
-  <p><strong>Fecha:</strong> {{ movement.date }} {{ movement.time }}</p>
-  <p><strong>Monto:</strong> S/ {{ movement.total.toFixed(2) }}</p>
+  <!-- Content -->
+  <div class="dialog-content">
+    <!-- Título -->
+    <div class="detail-item">
+      <div class="detail-label">
+        <mat-icon class="label-icon">title</mat-icon>
+        <span>Título</span>
+      </div>
+      <div class="detail-value title-value">{{ movement.title }}</div>
+    </div>
 
-  <ng-container *ngIf="movement.type === 'expense'">
-    <p><strong>Lugar:</strong> {{ movement.place }}</p>
-    <p><strong>Categoría:</strong> {{ movement.category }}</p>
-  </ng-container>
+    <!-- Fecha y hora -->
+    <div class="detail-item">
+      <div class="detail-label">
+        <mat-icon class="label-icon">schedule</mat-icon>
+        <span>Fecha y hora</span>
+      </div>
+      <div class="detail-value">{{ movement.date }} • {{ movement.time }}</div>
+    </div>
 
-  <ng-container *ngIf="movement.comment">
-    <p><strong>Comentario:</strong> {{ movement.comment }}</p>
-  </ng-container>
-</div>
+    <!-- Monto destacado -->
+    <div class="detail-item amount-item" [ngClass]="movement.type === 'expense' ? 'expense-amount' : 'income-amount'">
+      <div class="detail-label">
+        <mat-icon class="label-icon">monetization_on</mat-icon>
+        <span>Monto</span>
+      </div>
+      <div class="detail-value amount-value">
+        <span class="currency">S/</span>
+        <span class="amount">{{ movement.total.toFixed(2) }}</span>
+      </div>
+    </div>
 
-<div class="dialog-actions">
-  <button mat-button color="warn" (click)="confirmDelete()">Eliminar</button>
+    <!-- Campos específicos de gastos -->
+    <ng-container *ngIf="movement.type === 'expense'">
+      <div class="detail-item" *ngIf="movement.place">
+        <div class="detail-label">
+          <mat-icon class="label-icon">place</mat-icon>
+          <span>Lugar</span>
+        </div>
+        <div class="detail-value">{{ movement.place }}</div>
+      </div>
+
+      <div class="detail-item" *ngIf="movement.category">
+        <div class="detail-label">
+          <mat-icon class="label-icon">category</mat-icon>
+          <span>Categoría</span>
+        </div>
+        <div class="detail-value category-value">{{ movement.category }}</div>
+      </div>
+    </ng-container>
+
+    <!-- Comentario -->
+    <div class="detail-item comment-item" *ngIf="movement.comment">
+      <div class="detail-label">
+        <mat-icon class="label-icon">note</mat-icon>
+        <span>Comentario</span>
+      </div>
+      <div class="detail-value comment-value">{{ movement.comment }}</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="dialog-actions">
+    <button mat-stroked-button color="primary" (click)="close()" class="cancel-btn">
+      <mat-icon>arrow_back</mat-icon>
+      Volver
+    </button>
+
+    <button mat-flat-button color="warn" (click)="confirmDelete()" class="delete-btn">
+      <mat-icon>delete_outline</mat-icon>
+      Eliminar
+    </button>
+  </div>
 </div>

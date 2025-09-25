@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Expense} from '../../shared/models/expense.model';
 import { Income} from '../../shared/models/income.model';
 import { DisplayableMovement} from '../../shared/models/displayable-movement.model';
@@ -24,7 +25,8 @@ import { MovementDetails} from './movement-details/movement-details';
     MatDividerModule,
     MatIconModule,
     MatDialogModule,
-    RouterModule
+    RouterModule,
+    FormsModule,
   ],
   templateUrl: './scan.html',
   styleUrl: './scan.css'
@@ -35,13 +37,44 @@ export class Scan implements OnInit {
   movements: DisplayableMovement[] = [];
   groupedMovements: { date: string; movements: DisplayableMovement[] }[] = [];
 
+  // Nueva propiedad para el filtro
+  searchText: string = '';
+  allMovements: DisplayableMovement[] = []; // Guardar todos los movimientos sin filtrar
+
 
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.movements = this.getMovements();
+    this.allMovements = this.getMovements(); // Guardar todos los movimientos
+    this.movements = [...this.allMovements]; // Mostrar todos inicialmente
     this.calculateTotal();
     this.updateGroupedMovements();
+  }
+
+  // Nuevo método para filtrar movimientos
+  onSearchChange(searchTerm: string): void {
+    this.searchText = searchTerm.toLowerCase().trim();
+
+    if (this.searchText === '') {
+      this.movements = [...this.allMovements];
+    } else {
+      this.movements = this.allMovements.filter(movement => {
+        const searchIn = [
+          movement.title?.toLowerCase() || '',
+          movement.place?.toLowerCase() || '',
+          movement.comment?.toLowerCase() || ''
+        ].join(' ');
+
+        return searchIn.includes(this.searchText);
+      });
+    }
+
+    this.updateGroupedMovements();
+  }
+
+  clearSearch(): void {
+    this.searchText = '';
+    this.onSearchChange('');
   }
 
   getMovements(): DisplayableMovement[] {
@@ -179,7 +212,6 @@ export class Scan implements OnInit {
 
   // Reutilizable para income y expense
   private addNewMovement(type: 'income' | 'expense', movement: Income | Expense) {
-    console.log("addNewMovement");
     let displayable: DisplayableMovement;
 
     if (type === 'income') {
@@ -208,15 +240,22 @@ export class Scan implements OnInit {
       };
     }
 
-    this.movements = [displayable, ...this.movements].sort((a, b) => {
+    // Actualizar ambas listas
+    this.allMovements = [displayable, ...this.allMovements].sort((a, b) => {
       const d1 = new Date(`${a.date}T${a.time}`);
       const d2 = new Date(`${b.date}T${b.time}`);
       return d2.getTime() - d1.getTime();
     });
-    console.log(this.movements);
+
+    // Aplicar el filtro actual si existe
+    if (this.searchText === '') {
+      this.movements = [...this.allMovements];
+    } else {
+      this.onSearchChange(this.searchText);
+    }
 
     this.addMovementUpdateTotal(type, movement.total);
-    this.updateGroupedMovements(); // <<<<<< actualiza agrupados
+    this.updateGroupedMovements();
   }
 
   getCategoryColor(category?: Category): string {
@@ -288,17 +327,40 @@ export class Scan implements OnInit {
 
   openDetails(movement: DisplayableMovement) {
     const ref = this.dialog.open(MovementDetails, {
-      width: '400px',
+      width: '500px',
+      maxWidth: window.innerWidth <= 768 ? '75vw' : '500px',
+      maxHeight: '85vh',
       data: movement
     });
 
     ref.componentInstance.deleted.subscribe((deletedMovement) => {
-      // 👉 Borrar localmente
+      // Actualizar el total amount ANTES de filtrar
+      this.updateTotalOnDelete(deletedMovement.type, deletedMovement.total);
+
+      // Eliminar de ambas listas para mantener consistencia
+      this.allMovements = this.allMovements.filter(
+        m => !(m.id === deletedMovement.id && m.type === deletedMovement.type)
+      );
+
       this.movements = this.movements.filter(
         m => !(m.id === deletedMovement.id && m.type === deletedMovement.type)
       );
+
+      // Actualizar la vista agrupada
       this.updateGroupedMovements();
-      //this.applyFilters();
+
+      console.log(`Movimiento ${deletedMovement.type} eliminado. Nuevo total: ${this.totalAmount}`);
     });
+  }
+
+
+  private updateTotalOnDelete(type: 'income' | 'expense', amount: number): void {
+    if (type === 'expense') {
+      // Si elimino un gasto, sumo de vuelta al total (porque el gasto restaba)
+      this.totalAmount += amount;
+    } else {
+      // Si elimino un ingreso, resto del total (porque el ingreso sumaba)
+      this.totalAmount -= amount;
+    }
   }
 }
