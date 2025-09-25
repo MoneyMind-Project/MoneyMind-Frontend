@@ -3,9 +3,9 @@
     <mat-icon>close</mat-icon>
   </button>
 
-  <div *ngIf="step === 1" class="upload-container">
+  <div *ngIf="step === 1" class="step-1-container">
     <!-- Modo upload con drag & drop -->
-    <ng-container *ngIf="mode === 'upload'" class="upload-container-body">
+    <ng-container *ngIf="mode === 'upload'">
       <h2 class="dialog-title">Sube tu recibo</h2>
 
       <div
@@ -86,20 +86,118 @@
       </div>
     </ng-container>
 
-    <!-- Modo cámara (sin cambios) -->
+    <!-- Modo cámara mejorado -->
     <ng-container *ngIf="mode === 'camera'">
       <h2 class="dialog-title">Escanea tu recibo</h2>
-      <div class="camera-container">
-        <video #video width="300" height="200" autoplay *ngIf="!loading"></video>
-        <canvas #canvas width="300" height="200" [style.display]="loading ? 'block' : 'none'"></canvas>
+
+      <!-- Container principal del escáner -->
+      <div class="scanner-container" [class.mobile-scanner]="isMobileDevice">
+
+        <!-- Área de captura de video -->
+        <div class="camera-frame" *ngIf="!loading">
+          <video
+            #video
+            [width]="cameraWidth"
+            [height]="cameraHeight"
+            autoplay
+            playsinline
+            class="camera-video"
+          ></video>
+
+          <!-- Overlay del escáner -->
+          <div class="scanner-overlay">
+            <!-- Marco de enfoque -->
+            <div class="focus-frame">
+              <div class="corner top-left"></div>
+              <div class="corner top-right"></div>
+              <div class="corner bottom-left"></div>
+              <div class="corner bottom-right"></div>
+            </div>
+
+            <!-- Línea de escaneo -->
+            <div class="scan-line"></div>
+          </div>
+
+          <!-- Instrucciones -->
+          <div class="camera-instructions">
+            <p>Centra el recibo en el marco</p>
+          </div>
+        </div>
+
+        <!-- Canvas oculto para captura -->
+        <canvas
+          #canvas
+          [width]="cameraWidth"
+          [height]="cameraHeight"
+          class="hidden-canvas"
+        ></canvas>
+
+        <!-- Vista de imagen capturada durante el procesamiento -->
+        <div class="captured-frame" *ngIf="loading">
+          <canvas
+            #previewCanvas
+            [width]="cameraWidth"
+            [height]="cameraHeight"
+            class="preview-canvas"
+          ></canvas>
+
+          <!-- Overlay de escaneo con animación -->
+          <div class="scanning-overlay">
+            <div class="scanning-animation">
+              <div class="scan-beam"></div>
+              <div class="scan-particles">
+                <div class="particle" *ngFor="let i of [1,2,3,4,5,6]"></div>
+              </div>
+            </div>
+
+            <!-- Indicador de progreso -->
+            <div class="scanning-progress">
+              <mat-icon class="scanning-icon">search</mat-icon>
+              <p class="scanning-text">Analizando recibo...</p>
+              <div class="progress-dots">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="action-buttons">
-        <button mat-stroked-button color="warn" (click)="close()">Cancelar</button>
-        <button mat-flat-button color="primary" (click)="capturePhoto()" [disabled]="loading">
-          {{ loading ? 'Procesando...' : 'Capturar foto' }}
+
+      <!-- Botones de acción -->
+      <div class="action-buttons camera-actions">
+        <button
+          mat-stroked-button
+          color="warn"
+          (click)="close()"
+          [disabled]="loading"
+          class="cancel-btn"
+        >
+          Cancelar
+        </button>
+
+        <button
+          mat-fab
+          color="primary"
+          (click)="capturePhoto()"
+          [disabled]="loading"
+          class="capture-btn"
+          *ngIf="!loading"
+        >
+          <mat-icon>camera_alt</mat-icon>
+        </button>
+
+        <button
+          mat-stroked-button
+          color="primary"
+          [disabled]="true"
+          class="processing-btn"
+          *ngIf="loading"
+        >
+          <mat-icon>hourglass_empty</mat-icon>
+          Procesando...
         </button>
       </div>
-      <div *ngIf="loading" class="loading-message">Procesando con Gemini...</div>
     </ng-container>
   </div>
 

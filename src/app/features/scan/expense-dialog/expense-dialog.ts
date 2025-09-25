@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Inject} from '@angular/core';
+import {AfterViewInit, Component, Inject, ElementRef, NgZone } from '@angular/core';
 import { Expense } from '../../../shared/models/expense.model';
 import { HttpClient } from '@angular/common/http';
 import {MatDialogRef} from '@angular/material/dialog';
@@ -32,26 +32,55 @@ export class ExpenseDialog implements AfterViewInit {
   loading = false;
   mode: 'upload' | 'camera' | 'manual' = 'upload';
   isDragOver = false;
+  isMobileDevice = false;
+  cameraWidth = 480;
+  cameraHeight = 320;
 
   photoFile: File | null = null;
 
   @ViewChild(ExpenseForm) expenseForm!: ExpenseForm;
   @ViewChild('video', { static: false }) videoElementRef!: any;
   @ViewChild('canvas', { static: false }) canvasElementRef!: any;
+  @ViewChild('previewCanvas', { static: false }) previewCanvasRef!: ElementRef<HTMLCanvasElement>;
 
 
   constructor(
     private http: HttpClient,
     private dialogRef: MatDialogRef<ExpenseDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: 'upload' | 'camera' | 'manual' }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: 'upload' | 'camera' | 'manual' },
+    private zone: NgZone
   ) {
     if (data.mode === 'manual') this.step = 2;
     this.mode = data.mode;
+
+    // Detectar dispositivo móvil
+    this.detectMobileDevice();
   }
 
   ngAfterViewInit() {
     if (this.mode === 'camera') {
       this.startCamera();
+    }
+  }
+
+  // Agregar este fun para detectar dispositivos móviles:
+  private detectMobileDevice() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = window.innerWidth <= 768;
+
+    this.isMobileDevice = isMobile || (hasTouch && isSmallScreen);
+
+    // Ajustar dimensiones de cámara según el dispositivo
+    if (this.isMobileDevice) {
+      // Modo vertical para móviles
+      this.cameraWidth = 300;
+      this.cameraHeight = 400;
+    } else {
+      // Modo horizontal para desktop
+      this.cameraWidth = 480;
+      this.cameraHeight = 320;
     }
   }
 
@@ -91,16 +120,38 @@ export class ExpenseDialog implements AfterViewInit {
       });
   }
 
+  // Modifica el fun startCamera para mejor configuración:
   startCamera() {
     const video: HTMLVideoElement = this.videoElementRef.nativeElement;
-    navigator.mediaDevices.getUserMedia({ video: true })
+
+    // Configuraciones de cámara según el dispositivo
+    const constraints: MediaStreamConstraints = {
+      video: {
+        width: { ideal: this.cameraWidth },
+        height: { ideal: this.cameraHeight },
+        facingMode: this.isMobileDevice ? 'environment' : 'user', // Cámara trasera en móviles
+        aspectRatio: this.isMobileDevice ? { ideal: 0.75 } : { ideal: 1.5 }
+      }
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints)
       .then(stream => {
-        this.stream = stream; // Guarda referencia al stream
+        this.stream = stream;
         video.srcObject = stream;
         video.play();
       })
       .catch(err => {
-        alert('No se pudo acceder a la cámara');
+        console.error('Error accessing camera:', err);
+        // Fallback: intentar con configuración básica
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            this.stream = stream;
+            video.srcObject = stream;
+            video.play();
+          })
+          .catch(() => {
+            alert('No se pudo acceder a la cámara. Verifica los permisos.');
+          });
       });
   }
 
@@ -111,58 +162,118 @@ export class ExpenseDialog implements AfterViewInit {
     }
   }
 
+  // Modifica el fun capturePhoto para incluir la animación:
   capturePhoto() {
+    console.log('[capturePhoto] Iniciando captura...');
+
     const video: HTMLVideoElement = this.videoElementRef.nativeElement;
     const canvas: HTMLCanvasElement = this.canvasElementRef.nativeElement;
+
     const context = canvas.getContext('2d');
-    context?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Detener la cámara primero
+    if (!context) {
+      alert('Error al procesar la imagen');
+      console.error('[capturePhoto] No se pudo obtener el contexto del canvas');
+      return;
+    }
+
+    // Capturar la imagen en el canvas principal
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    console.log('[capturePhoto] Imagen dibujada en el canvas principal');
+
+    // Detener la cámara
     this.stopCamera();
-    this.loading = true;
+    console.log('[capturePhoto] Cámara detenida');
 
-    // Usar Promise para manejar el blob
-    new Promise<File>((resolve, reject) => {
+    // Activar loading
+    this.loading = true;
+    console.log('[capturePhoto] Loading activado, preparando animación...');
+
+    // Después de activar loading, copiar la imagen al preview canvas
+    setTimeout(() => {
+      console.log('[capturePhoto] Ejecutando callback de setTimeout');
+
+      const previewCanvas: HTMLCanvasElement = this.previewCanvasRef?.nativeElement;
+      if (previewCanvas) {
+        const previewContext = previewCanvas.getContext('2d');
+        if (previewContext) {
+          previewContext.drawImage(canvas, 0, 0, previewCanvas.width, previewCanvas.height);
+          console.log('[capturePhoto] Imagen copiada al preview canvas');
+        } else {
+          console.error('[capturePhoto] No se pudo obtener contexto del preview canvas');
+        }
+      } else {
+        console.warn('[capturePhoto] previewCanvasRef no definido');
+      }
+
+      // Procesar la imagen
+      console.log('[capturePhoto] Enviando imagen a processReceiptAsync...');
       canvas.toBlob(blob => {
         if (blob) {
-          resolve(new File([blob], 'photo.jpg', { type: 'image/jpeg' }));
+          console.log('[capturePhoto] Blob generado correctamente');
+          const file = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
+          this.photoFile = file;
+          this.selectedFile = file;
+
+          this.processReceiptAsync(file)
+            .then(() => console.log('[capturePhoto] processReceiptAsync finalizó OK'))
+            .catch(error => {
+              console.error('[capturePhoto] Error en processReceiptAsync:', error);
+              this.loading = false;
+              alert('Error procesando la imagen');
+              if (this.mode === 'camera') {
+                this.startCamera();
+              }
+            });
         } else {
-          reject('Error creating blob');
+          console.error('[capturePhoto] No se pudo generar blob del canvas');
+          this.loading = false;
+          alert('Error capturando la imagen');
+          if (this.mode === 'camera') {
+            this.startCamera();
+          }
         }
-      }, 'image/jpeg');
-    })
-      .then(file => {
-        this.photoFile = file;
-        this.selectedFile = file;
-        return this.processReceiptAsync(file); // Convertir processReceipt a Promise
-      })
-      .catch(error => {
-        this.loading = false;
-        alert('Error procesando la imagen');
-      });
+      }, 'image/jpeg', 0.9);
+    }, 100);
   }
 
-  // Nuevo método que retorna una Promise
+
+  // Nuevo fun que retorna una Promise
   private processReceiptAsync(file: File): Promise<void> {
+    console.log('[processReceiptAsync] Iniciando con file:', file.name, file.size, file.type);
+
     const formData = new FormData();
     formData.append('file', file, file.name);
 
     return new Promise((resolve, reject) => {
-      this.http.post<{ data: Partial<Expense> }>('http://127.0.0.1:8000/api/movements/analyze-expense/', formData)
-        .subscribe({
-          next: (res) => {
+      console.log('[processReceiptAsync] Enviando petición HTTP al backend...');
+
+      this.http.post<{ data: Partial<Expense> }>(
+        'http://127.0.0.1:8000/api/movements/analyze-expense/',
+        formData
+      ).subscribe({
+        next: (res) => {
+          console.log('[processReceiptAsync] Respuesta recibida del backend:', res);
+
+          this.zone.run(() => {   // 👈 Forzamos a Angular a enterarse
             this.parsedExpense = res.data;
             this.step = 2;
             this.loading = false;
-            resolve();
-          },
-          error: (err) => {
+          });
+
+          resolve();
+        },
+        error: (err) => {
+          this.zone.run(() => {
             this.loading = false;
-            reject(err);
-          }
-        });
+          });
+          console.error('[processReceiptAsync] Error recibido del backend:', err);
+          reject(err);
+        }
+      });
     });
   }
+
 
 
   onSave(expense: Expense) {
@@ -177,14 +288,24 @@ export class ExpenseDialog implements AfterViewInit {
   }
 
 
+  // fun mejorado para reiniciar la cámara al cancelar:
   onCancel() {
     if (this.mode === 'manual') {
       this.close();
     } else {
       this.step = 1;
-      this.expenseForm.resetForm();
+      this.loading = false; // Asegurar que loading esté en false
+      this.selectedFile = null; // Limpiar archivo seleccionado
+
+      if (this.expenseForm) {
+        this.expenseForm.resetForm();
+      }
+
       if (this.mode === 'camera') {
-        this.startCamera(); // Reinicia la cámara si volvemos al paso 1
+        // Esperar un momento antes de reiniciar la cámara
+        setTimeout(() => {
+          this.startCamera();
+        }, 300);
       }
     }
   }
