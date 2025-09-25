@@ -113,7 +113,7 @@ export class Scan implements OnInit {
     return [
       {
         id: '1',
-        category: Category.TRANSPORT,
+        category: Category.FINANCIEROS,
         place: 'YAPE a 370',
         date: '2025-09-15',
         time: '14:30',
@@ -122,7 +122,7 @@ export class Scan implements OnInit {
       },
       {
         id: '2',
-        category: Category.ENTERTAINMENT,
+        category: Category.GASTOS_PERSONALES,
         place: 'PASSLINE',
         date: '2025-09-14',
         time: '16:45',
@@ -167,20 +167,21 @@ export class Scan implements OnInit {
 
   getCategoryIcon(category?: Category): string {
     if (!category) {
-      return 'attach_money'; // ícono para incomes
+      return 'attach_money'; // ícono para ingresos
     }
 
     switch (category) {
-      case Category.FOOD:
-        return 'restaurant';
-      case Category.TRANSPORT:
-        return 'directions_car';
-      case Category.ENTERTAINMENT:
-        return 'movie';
-      case Category.HEALTH:
-        return 'local_hospital';
+      case Category.GASTOS_ESENCIALES:
+        return 'home'; // puede ser comida, vivienda, transporte → algo esencial
+      case Category.GASTOS_PERSONALES:
+        return 'person'; // ocio, compras, bienestar
+      case Category.FINANCIEROS:
+        return 'account_balance'; // bancos, préstamos, etc.
+      case Category.EDUCACION:
+        return 'school'; // estudios, cursos
+      case Category.OTROS:
       default:
-        return 'account_balance_wallet';
+        return 'category'; // ícono genérico
     }
   }
 
@@ -265,17 +266,19 @@ export class Scan implements OnInit {
     }
 
     switch (category) {
-      case Category.FOOD:
-        return '#FF6B35';
-      case Category.TRANSPORT:
-        return '#4ECDC4';
-      case Category.ENTERTAINMENT:
-        return '#45B7D1';
-      case Category.HEALTH:
-        return '#FFEAA7';
+      case Category.GASTOS_ESENCIALES:
+        return '#FF6B35'; // naranja fuerte
+      case Category.GASTOS_PERSONALES:
+        return '#4ECDC4'; // turquesa
+      case Category.FINANCIEROS:
+        return '#45B7D1'; // azul
+      case Category.EDUCACION:
+        return '#FFEAA7'; // amarillo suave
+      case Category.OTROS:
       default:
-        return '#DDA0DD';
+        return '#DDA0DD'; // púrpura
     }
+
   }
 
   formatDate(dateString: string): string {

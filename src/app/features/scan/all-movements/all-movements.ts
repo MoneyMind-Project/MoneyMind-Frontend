@@ -48,7 +48,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-22',
         time: '10:30',
         total: 120.5,
-        category: Category.FOOD,
+        category: Category.GASTOS_ESENCIALES,
       },
       {
         id: '2',
@@ -57,7 +57,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-20',
         time: '09:00',
         total: 2500,
-        category: Category.OTHER,
+        category: Category.OTROS,
       },
       {
         id: '3',
@@ -67,7 +67,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-19',
         time: '18:45',
         total: 180,
-        category: Category.TRANSPORT,
+        category: Category.GASTOS_PERSONALES,
       },
       {
         id: '4',
@@ -77,7 +77,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-18',
         time: '20:15',
         total: 75,
-        category: Category.FOOD,
+        category: Category.GASTOS_ESENCIALES,
       },
       {
         id: '5',
@@ -86,7 +86,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-17',
         time: '14:00',
         total: 800,
-        category: Category.OTHER,
+        category: Category.OTROS,
       },
       {
         id: '6',
@@ -96,7 +96,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-15',
         time: '11:20',
         total: 45,
-        category: Category.HEALTH,
+        category: Category.GASTOS_ESENCIALES,
       },
       {
         id: '7',
@@ -106,7 +106,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-14',
         time: '22:00',
         total: 30,
-        category: Category.ENTERTAINMENT,
+        category: Category.GASTOS_PERSONALES,
       },
       {
         id: '8',
@@ -115,7 +115,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-10',
         time: '16:30',
         total: 200,
-        category: Category.OTHER,
+        category: Category.OTROS,
       },
       {
         id: '9',
@@ -125,7 +125,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-08',
         time: '12:00',
         total: 150,
-        category: Category.HOUSE,
+        category: Category.GASTOS_PERSONALES,
       },
       {
         id: '10',
@@ -135,7 +135,7 @@ export class AllMovements implements OnInit {
         date: '2025-09-05',
         time: '08:30',
         total: 20,
-        category: Category.TRANSPORT,
+        category: Category.GASTOS_PERSONALES,
       },
     ];
 
@@ -196,35 +196,38 @@ export class AllMovements implements OnInit {
     }
 
     switch (category) {
-      case Category.FOOD:
-        return '#FF6B35';
-      case Category.TRANSPORT:
-        return '#4ECDC4';
-      case Category.ENTERTAINMENT:
-        return '#45B7D1';
-      case Category.HEALTH:
-        return '#FFEAA7';
+      case Category.GASTOS_ESENCIALES:
+        return '#FF6B35'; // naranja fuerte
+      case Category.GASTOS_PERSONALES:
+        return '#4ECDC4'; // turquesa
+      case Category.FINANCIEROS:
+        return '#45B7D1'; // azul
+      case Category.EDUCACION:
+        return '#FFEAA7'; // amarillo suave
+      case Category.OTROS:
       default:
-        return '#DDA0DD';
+        return '#DDA0DD'; // púrpura
     }
+
   }
 
   getCategoryIcon(category?: Category): string {
     if (!category) {
-      return 'attach_money'; // ícono para incomes
+      return 'attach_money'; // ícono para ingresos
     }
 
     switch (category) {
-      case Category.FOOD:
-        return 'restaurant';
-      case Category.TRANSPORT:
-        return 'directions_car';
-      case Category.ENTERTAINMENT:
-        return 'movie';
-      case Category.HEALTH:
-        return 'local_hospital';
+      case Category.GASTOS_ESENCIALES:
+        return 'home'; // puede ser comida, vivienda, transporte → algo esencial
+      case Category.GASTOS_PERSONALES:
+        return 'person'; // ocio, compras, bienestar
+      case Category.FINANCIEROS:
+        return 'account_balance'; // bancos, préstamos, etc.
+      case Category.EDUCACION:
+        return 'school'; // estudios, cursos
+      case Category.OTROS:
       default:
-        return 'account_balance_wallet';
+        return 'category'; // ícono genérico
     }
   }
 
