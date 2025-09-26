@@ -24,4 +24,13 @@ export class CryptoService {
       return null;
     }
   }
+
+  getCurrentUserId(): number | null {
+    const encryptedUser = localStorage.getItem('mm-current-user');
+    if (!encryptedUser) return null;
+
+    const currentUser = this.decrypt<{ token: string; user: { id: number } }>(encryptedUser);
+    return currentUser?.user?.id ?? null;
+  }
+
 }
