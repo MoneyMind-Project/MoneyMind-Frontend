@@ -29,7 +29,7 @@ export class UserService {
         of({
           success: false,
           message: error.error?.message || 'Error en el registro',
-          data: null
+          data: undefined
         })
       )
     );

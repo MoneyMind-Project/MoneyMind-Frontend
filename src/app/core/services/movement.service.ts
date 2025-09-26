@@ -7,8 +7,15 @@ import { DisplayableMovement} from '../../shared/models/displayable-movement.mod
 import { CryptoService} from './crypto.service';
 import { catchError, map } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
-import { ApiResponse, DashboardResponse, PaginatedMovementsResponse} from '../../shared/models/response.model';
+import { ApiResponse, DashboardResponse, PaginatedMovementsResponse, CreateExpenseApiResponse} from '../../shared/models/response.model';
 
+const categoryMapper = {
+  'GASTOS_ESENCIALES': 'gastos_esenciales',
+  'GASTOS_PERSONALES': 'gastos_personales',
+  'FINANCIEROS': 'financieros',
+  'EDUCACION': 'educacion',
+  'OTROS': 'otros'
+};
 
 @Injectable({
   providedIn: 'root'
@@ -20,19 +27,25 @@ export class MovementService{
 
   createExpense(data: Expense): Observable<ApiResponse<Expense>> {
     const userId = this.crypto.getCurrentUserId();
-    const payload = { ...data, user_id: userId };
 
-    return this.http.post<Expense>(`${this.apiUrl}/movements/expense/create/`, payload).pipe(
-      map((expense) => ({
+    const payload = {
+      ...data,
+      user_id: userId,
+      category: categoryMapper[data.category] || 'otros', // Mapear categoría
+      time: data.time.length === 5 ? `${data.time}:00` : data.time // "12:51" → "12:51:00"
+    };
+
+    return this.http.post<CreateExpenseApiResponse>(`${this.apiUrl}/movements/expense/create/`, payload).pipe(
+      map((response) => ({
         success: true,
-        message: 'Gasto creado exitosamente',
-        data: expense
+        message: response.message,
+        data: response.expense // <- aquí ya aseguras que data es un Expense
       })),
       catchError((error) =>
         of({
           success: false,
           message: error.error?.message || 'Error al crear el gasto',
-          data: null
+          data: undefined
         })
       )
     );
@@ -66,7 +79,7 @@ export class MovementService{
         of({
           success: false,
           message: error.error?.message || 'Error al eliminar el ingreso',
-          data: null
+          data: undefined
         })
       )
     );
@@ -77,21 +90,29 @@ export class MovementService{
     const userId = this.crypto.getCurrentUserId();
     const payload = { ...data, user_id: userId };
 
-    return this.http.post<Income>(`${this.apiUrl}/movements/income/create/`, payload).pipe(
-      map((income) => ({
-        success: true,
-        message: 'Ingreso creado exitosamente',
-        data: income
-      })),
+    return this.http.post<any>(`${this.apiUrl}/movements/income/create/`, payload).pipe(
+      map((response) => {
+        const income = {
+          ...response.income,
+          total: parseFloat(response.income.total) // 👈 aseguramos que sea number
+        } as Income;
+
+        return {
+          success: true,
+          message: response.message || 'Ingreso creado exitosamente',
+          data: income
+        };
+      }),
       catchError((error) =>
         of({
           success: false,
           message: error.error?.message || 'Error al crear el ingreso',
-          data: null
+          data: undefined
         })
       )
     );
   }
+
 
 
   getScanDashboard(): Observable<ApiResponse<DashboardResponse>> {
@@ -128,7 +149,7 @@ export class MovementService{
           of({
             success: false,
             message: error.error?.message || 'Error al cargar dashboard',
-            data: null
+            data: undefined
           })
         )
       );

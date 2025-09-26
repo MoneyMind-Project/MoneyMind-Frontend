@@ -4,13 +4,14 @@
     <mat-label>Categoría</mat-label>
     <mat-select formControlName="category">
       <mat-option *ngFor="let c of categories" [value]="c">
-        {{ c | titlecase }}
+        {{ formatCategory(c) | titlecase }}
       </mat-option>
     </mat-select>
     <mat-error *ngIf="form.get('category')?.hasError('required')">
       La categoría es obligatoria
     </mat-error>
   </mat-form-field>
+
 
   <!-- Lugar -->
   <mat-form-field appearance="outline" class="full-width">

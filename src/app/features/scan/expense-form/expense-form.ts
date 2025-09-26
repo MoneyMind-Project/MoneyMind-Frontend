@@ -2,9 +2,9 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Expense} from '../../../shared/models/expense.model';
 import { CommonModule } from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import {MatOption, MatOptionModule} from '@angular/material/core';
+import {MatOption} from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 import {TitleCasePipe} from '@angular/common';
@@ -13,6 +13,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTimepickerModule } from '@angular/material/timepicker';
+import { MovementService} from '../../../core/services/movement.service';
 
 
 @Component({
@@ -43,10 +44,11 @@ export class ExpenseForm implements OnInit {
   @Output() cancel = new EventEmitter<void>();
 
   categories: Category[] = Object.values(Category);
-
-  constructor(private fb: FormBuilder) {}
-
   form!: FormGroup;
+  loading = false;
+  errorMessage: string | null = null;
+
+  constructor(private fb: FormBuilder, private expenseService: MovementService) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -68,22 +70,41 @@ export class ExpenseForm implements OnInit {
     }
   }
 
+  formatCategory(cat: string): string {
+    return cat.replace(/_/g, ' ').toLowerCase();
+  }
+
   submit() {
-    if (this.form.valid) {
-      const rawValue = this.form.value;
+    if (this.form.invalid) return;
 
-      // Asegurar formato de fecha YYYY-MM-DD
-      const formattedDate = this.formatDate(rawValue.date);
+    this.loading = true;
+    this.errorMessage = null;
 
-      // Convertir el tiempo de Date a string HH:mm 👈 NUEVO
-      const formattedTime = this.formatTime(rawValue.time);
+    const rawValue = this.form.value;
 
-      this.save.emit({
-        ...rawValue,
-        date: formattedDate,
-        time: formattedTime // 👈 NUEVO
-      } as Expense);
-    }
+    const formattedDate = this.formatDate(rawValue.date);
+    const formattedTime = this.formatTime(rawValue.time);
+
+    const expense: Expense = {
+      ...rawValue,
+      date: formattedDate,
+      time: formattedTime
+    };
+
+    this.expenseService.createExpense(expense).subscribe({
+      next: (res) => {
+        this.loading = false;
+        if (res.success) {
+          this.save.emit(res.data);
+        } else {
+          this.errorMessage = res.message;
+        }
+      },
+      error: () => {
+        this.loading = false;
+        this.errorMessage = 'Error inesperado al crear el gasto';
+      }
+    });
   }
 
   private formatDate(date: any): string {

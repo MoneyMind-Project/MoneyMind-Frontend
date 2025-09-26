@@ -1,9 +1,10 @@
 import { DisplayableMovement } from './displayable-movement.model';
+import { Expense} from './expense.model';
 
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
-  data?: T | null;
+  data?: T;
   meta?: {
     hasMore: boolean;
     nextPage: number | null;
@@ -24,4 +25,10 @@ export interface PaginatedMovementsResponse {
   totalMovements: number;
   loadedCount: number;
   nextPage: number | null;
+}
+
+export interface CreateExpenseApiResponse {
+  message: string;
+  expense: Expense;
+  new_balance: string;
 }
