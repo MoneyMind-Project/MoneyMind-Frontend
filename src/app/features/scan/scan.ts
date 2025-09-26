@@ -14,6 +14,8 @@ import {ExpenseDialog} from './expense-dialog/expense-dialog';
 import {IncomeDialog} from './income-dialog/income-dialog';
 import { RouterModule } from '@angular/router';
 import { MovementDetails} from './movement-details/movement-details';
+import { DashboardResponse} from '../../shared/models/response.model';
+import { MovementService } from '../../core/services/movement.service';
 
 
 @Component({
@@ -33,25 +35,41 @@ import { MovementDetails} from './movement-details/movement-details';
 })
 export class Scan implements OnInit {
 
-  totalAmount: number = 433.53;
+  totalAmount: number = 0;
   movements: DisplayableMovement[] = [];
   groupedMovements: { date: string; movements: DisplayableMovement[] }[] = [];
 
-  // Nueva propiedad para el filtro
   searchText: string = '';
-  allMovements: DisplayableMovement[] = []; // Guardar todos los movimientos sin filtrar
+  allMovements: DisplayableMovement[] = [];
 
-
-  constructor(private dialog: MatDialog) { }
+  constructor(
+    private dialog: MatDialog,
+    private movementService: MovementService
+  ) {}
 
   ngOnInit(): void {
-    this.allMovements = this.getMovements(); // Guardar todos los movimientos
-    this.movements = [...this.allMovements]; // Mostrar todos inicialmente
-    this.calculateTotal();
-    this.updateGroupedMovements();
+    this.loadDashboard();
   }
 
-  // Nuevo método para filtrar movimientos
+  loadDashboard(): void {
+    this.movementService.getScanDashboard().subscribe((res) => {
+      if (res.success && res.data) {
+        const dashboard: DashboardResponse = res.data;
+
+        this.totalAmount = dashboard.currentBalance;
+        this.allMovements = dashboard.recentMovements.sort((a, b) => {
+          const d1 = new Date(`${a.date}T${a.time}`);
+          const d2 = new Date(`${b.date}T${b.time}`);
+          return d2.getTime() - d1.getTime();
+        });
+        this.movements = [...this.allMovements];
+        this.updateGroupedMovements();
+      } else {
+        console.error(res.message);
+      }
+    });
+  }
+
   onSearchChange(searchTerm: string): void {
     this.searchText = searchTerm.toLowerCase().trim();
 
@@ -75,85 +93,6 @@ export class Scan implements OnInit {
   clearSearch(): void {
     this.searchText = '';
     this.onSearchChange('');
-  }
-
-  getMovements(): DisplayableMovement[] {
-    const expenses = this.getExpenses().map(e => ({
-      id: e.id,
-      type: 'expense' as const,
-      title: e.place,
-      date: e.date,
-      time: e.time,
-      total: e.total,
-      comment: e.comment,
-      category: e.category,
-      place: e.place
-    }));
-
-    const incomes = this.getIncomes().map(i => ({
-      id: i.id,
-      type: 'income' as const,
-      title: i.title,
-      date: i.date,
-      time: i.time,
-      total: i.total,
-      comment: i.comment,
-    }));
-
-    // Unir ambos y ordenar por fecha/hora descendente
-    return [...expenses, ...incomes].sort((a, b) => {
-      const d1 = new Date(`${a.date}T${a.time}`);
-      const d2 = new Date(`${b.date}T${b.time}`);
-      return d2.getTime() - d1.getTime();
-    });
-  }
-
-
-  getExpenses(): Expense[] {
-    return [
-      {
-        id: '1',
-        category: Category.FINANCIEROS,
-        place: 'YAPE a 370',
-        date: '2025-09-15',
-        time: '14:30',
-        total: 1.00,
-        comment: 'Pago'
-      },
-      {
-        id: '2',
-        category: Category.GASTOS_PERSONALES,
-        place: 'PASSLINE',
-        date: '2025-09-14',
-        time: '16:45',
-        total: 17.25
-      }
-    ];
-  }
-
-  getIncomes(): Income[] {
-    return [
-      {
-        id: '10',
-        title: 'Pago de amigo',
-        date: '2025-09-14',
-        time: '09:00',
-        total: 350.00,
-        comment: 'Pago mensual'
-      },
-      {
-        id: '11',
-        title: 'Venta laptop',
-        date: '2025-09-13',
-        time: '16:00',
-        total: 2000.00
-      }
-    ];
-  }
-
-
-  private calculateTotal(): void {
-    //this.totalAmount = this.totalAmount
   }
 
   private addMovementUpdateTotal(type: 'income' | 'expense', amount: number): void {

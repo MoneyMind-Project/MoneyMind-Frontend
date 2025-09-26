@@ -98,7 +98,7 @@ export class MovementService{
     const userId = this.crypto.getCurrentUserId();
 
     return this.http
-      .get<any>(`${this.apiUrl}/scan/dashboard/${userId}/`)
+      .get<any>(`${this.apiUrl}/movements/scan/dashboard/${userId}/`)
       .pipe(
         map((res) => {
           // adaptamos los nombres snake_case -> camelCase
