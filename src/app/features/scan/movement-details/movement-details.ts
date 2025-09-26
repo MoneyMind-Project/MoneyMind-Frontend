@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule, NgIf } from '@angular/common';
 import { DisplayableMovement} from '../../../shared/models/displayable-movement.model';
 import { ConfirmDeleteDialog } from '../confirm-delete-dialog/confirm-delete-dialog';
+import { MovementService} from '../../../core/services/movement.service';
 
 @Component({
   selector: 'app-movement-details',
@@ -19,7 +20,8 @@ export class MovementDetails {
   constructor(
     private dialogRef: MatDialogRef<MovementDetails>,
     @Inject(MAT_DIALOG_DATA) public movement: DisplayableMovement,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private movementService: MovementService
   ) {}
 
   close() {
@@ -31,12 +33,24 @@ export class MovementDetails {
 
     confirmRef.afterClosed().subscribe((result) => {
       if (result === true) {
-        // 👉 Aquí iría la llamada a tu API para borrar
-        // this.api.deleteMovement(this.movement.id).subscribe(...)
+        let request$;
 
-        // Emitimos al padre para borrar también localmente
-        this.deleted.emit(this.movement);
-        this.dialogRef.close();
+        if (this.movement.type === 'income') {
+          request$ = this.movementService.deleteIncome(this.movement.id);
+        } else if (this.movement.type === 'expense') {
+          request$ = this.movementService.deleteExpense(this.movement.id);
+        }
+
+        if (request$) {
+          request$.subscribe((res) => {
+            if (res.success) {
+              this.deleted.emit(this.movement); // avisa al padre
+              this.dialogRef.close();
+            } else {
+              console.error(res.message);
+            }
+          });
+        }
       }
     });
   }

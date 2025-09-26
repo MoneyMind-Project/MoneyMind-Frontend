@@ -2,7 +2,7 @@
 import {Category} from '../enums/category.enum';
 
 export interface Expense {
-  id: string;          // Unique identifier (UUID or incremental)
+  id: number;          // Unique identifier (UUID or incremental)
   category: Category;  // Enum for classification (e.g., FOOD, TRANSPORT, ENTERTAINMENT)
   place: string;       // Store, company, or location
   date: string;        // ISO date string "2025-09-13"

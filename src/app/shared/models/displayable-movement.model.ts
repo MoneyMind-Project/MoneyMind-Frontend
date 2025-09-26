@@ -2,7 +2,7 @@
 import { Category } from '../enums/category.enum';
 
 export interface DisplayableMovement {
-  id: string;
+  id: number;
   type: 'expense' | 'income';  // Diferenciar qué es
   title: string;               // Puede ser "place" en Expense o "title" en Income
   date: string;
