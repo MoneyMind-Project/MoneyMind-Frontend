@@ -7,7 +7,7 @@ import { DisplayableMovement} from '../../shared/models/displayable-movement.mod
 import { CryptoService} from './crypto.service';
 import { catchError, map } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
-import { ApiResponse, DashboardResponse} from '../../shared/models/response.model';
+import { ApiResponse, DashboardResponse, PaginatedMovementsResponse} from '../../shared/models/response.model';
 
 
 @Injectable({
@@ -135,20 +135,32 @@ export class MovementService{
   }
 
 
-  getAllMovements(page: number, pageSize: number): Observable<ApiResponse<DisplayableMovement[]>> {
+  getAllMovements(page: number, pageSize: number): Observable<ApiResponse<PaginatedMovementsResponse>> {
     const userId = this.crypto.getCurrentUserId();
 
     return this.http
-      .get<{ movements: DisplayableMovement[]; has_more: boolean; next_page: number | null }>(
-        `${this.apiUrl}/movements/all/${userId}/?page=${page}&page_size=${pageSize}`
-      )
+      .get<any>(`${this.apiUrl}/movements/scan/all/${userId}/?page=${page}&page_size=${pageSize}`)
       .pipe(
         map((res) => ({
           success: true,
           message: 'Movimientos obtenidos correctamente',
-          data: res.movements,
-          meta: {
+          data: {
+            movements: res.movements.map((m: any) => ({
+              id: m.id,
+              type: m.type,
+              title: m.type === 'expense' ? m.place : m.title,
+              date: m.date,
+              time: m.time,
+              total: parseFloat(m.total),
+              comment: m.comment,
+              category: m.category,
+              place: m.place
+            })),
             hasMore: res.has_more,
+            page: res.page,
+            pageSize: res.page_size,
+            totalMovements: res.total_movements,
+            loadedCount: res.loaded_count,
             nextPage: res.next_page
           }
         })),
@@ -156,15 +168,20 @@ export class MovementService{
           of({
             success: false,
             message: error.error?.message || 'Error al obtener movimientos',
-            data: [],
-            meta: {
+            data: {
+              movements: [],
               hasMore: false,
+              page: page,
+              pageSize: pageSize,
+              totalMovements: 0,
+              loadedCount: 0,
               nextPage: null
             }
           })
         )
       );
   }
+
 
 
 }

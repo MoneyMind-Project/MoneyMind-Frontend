@@ -7,6 +7,8 @@ import {MovementDetails} from '../movement-details/movement-details';
 import {MatDialog} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import {RouterLink} from '@angular/router';
+import { MovementService} from '../../../core/services/movement.service';
+import { PaginatedMovementsResponse} from '../../../shared/models/response.model';
 
 @Component({
   selector: 'app-all-movements',
@@ -23,7 +25,9 @@ export class AllMovements implements OnInit {
   searchTerm = '';
   activeDateFilter: string = 'all';
 
-  // TODO: implementar lazy loading con backend
+  // Paginación
+  page = 1;
+  pageSize = 20;
   hasMore = true;
 
   dateOptions = [
@@ -35,112 +39,40 @@ export class AllMovements implements OnInit {
     { label: 'Todos', value: 'all' },
   ];
 
-  constructor(private dialog: MatDialog) {
-  }
+  constructor(
+    private dialog: MatDialog,
+    private movementService: MovementService
+  ) {}
+
 
   ngOnInit(): void {
-    // Mock de movimientos locales
-    this.movements = [
-      {
-        id: '1',
-        title : 'Compra semanal',
-        type: 'expense',
-        place: 'Supermercado',
-        date: '2025-09-22',
-        time: '10:30',
-        total: 120.5,
-        category: Category.GASTOS_ESENCIALES,
-      },
-      {
-        id: '2',
-        type: 'income',
-        title: 'Sueldo',
-        date: '2025-09-20',
-        time: '09:00',
-        total: 2500,
-        category: Category.OTROS,
-      },
-      {
-        id: '3',
-        title : 'Llenado de tanque',
-        type: 'expense',
-        place: 'Gasolinera',
-        date: '2025-09-19',
-        time: '18:45',
-        total: 180,
-        category: Category.GASTOS_PERSONALES,
-      },
-      {
-        id: '4',
-        title : 'Cena con amigos',
-        type: 'expense',
-        place: 'Restaurante',
-        date: '2025-09-18',
-        time: '20:15',
-        total: 75,
-        category: Category.GASTOS_ESENCIALES,
-      },
-      {
-        id: '5',
-        type: 'income',
-        title: 'Freelance',
-        date: '2025-09-17',
-        time: '14:00',
-        total: 800,
-        category: Category.OTROS,
-      },
-      {
-        id: '6',
-        title : 'Medicinas',
-        type: 'expense',
-        place: 'Farmacia',
-        date: '2025-09-15',
-        time: '11:20',
-        total: 45,
-        category: Category.GASTOS_ESENCIALES,
-      },
-      {
-        id: '7',
-        title : 'Película',
-        type: 'expense',
-        place: 'Cine',
-        date: '2025-09-14',
-        time: '22:00',
-        total: 30,
-        category: Category.GASTOS_PERSONALES,
-      },
-      {
-        id: '8',
-        type: 'income',
-        title: 'Regalo',
-        date: '2025-09-10',
-        time: '16:30',
-        total: 200,
-        category: Category.OTROS,
-      },
-      {
-        id: '9',
-        title: 'Ropa nueva',
-        type: 'expense',
-        place: 'Tienda de ropa',
-        date: '2025-09-08',
-        time: '12:00',
-        total: 150,
-        category: Category.GASTOS_PERSONALES,
-      },
-      {
-        id: '10',
-        title: 'Viaje en taxi',
-        type: 'expense',
-        place: 'Uber',
-        date: '2025-09-05',
-        time: '08:30',
-        total: 20,
-        category: Category.GASTOS_PERSONALES,
-      },
-    ];
+    this.loadMovements();
+  }
 
-    this.applyFilters();
+  loadMovements(): void {
+    this.movementService.getAllMovements(this.page, this.pageSize).subscribe((res) => {
+      if (res.success && res.data) {
+        const response: PaginatedMovementsResponse = res.data;
+
+        // Agregar los movimientos nuevos
+        this.movements = [...this.movements, ...response.movements];
+
+        // Actualizar paginación
+        this.hasMore = response.hasMore;
+        this.page = response.nextPage ?? this.page;
+
+        // Aplicar filtros sobre todos los movimientos
+        this.applyFilters();
+      } else {
+        console.error(res.message);
+      }
+    });
+  }
+
+  loadMore(): void {
+    if (this.hasMore) {
+      this.loadMovements();
+    }
   }
 
   applyFilters() {
@@ -177,16 +109,19 @@ export class AllMovements implements OnInit {
     this.applyFilters();
   }
 
-  groupByDate(movements: DisplayableMovement[]) {
-    const grouped: { [key: string]: DisplayableMovement[] } = {};
+  private groupByDate(movements: DisplayableMovement[]) {
+    const grouped: { [date: string]: DisplayableMovement[] } = {};
     movements.forEach((m) => {
-      if (!grouped[m.date]) grouped[m.date] = [];
+      if (!grouped[m.date]) {
+        grouped[m.date] = [];
+      }
       grouped[m.date].push(m);
     });
 
-    return Object.keys(grouped)
-      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-      .map((date) => ({ date, movements: grouped[date] }));
+    return Object.keys(grouped).map((date) => ({
+      date,
+      movements: grouped[date]
+    }));
   }
 
   // Helpers (reutilizar los que ya tengas en Scan)
@@ -246,12 +181,6 @@ export class AllMovements implements OnInit {
       month: 'short',
       year: 'numeric',
     });
-  }
-
-  // Lazy loading placeholder
-  loadMore() {
-    console.log('Cargar más movimientos...');
-    // TODO: Llamar backend para traer más resultados
   }
 
   openDetails(movement: DisplayableMovement) {

@@ -118,6 +118,7 @@
   background: #f8f9fa;
   border-radius: 14px;
   padding: 16px;
+  margin-bottom: 0.8rem;
 
   .expense-icon {
     margin-right: 1rem;
