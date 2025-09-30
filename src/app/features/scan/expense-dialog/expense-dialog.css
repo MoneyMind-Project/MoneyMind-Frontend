@@ -556,7 +556,7 @@
   .upload-step-2,
   .camera-step-2,
   .manual-step-2 {
-    min-width: 70vw; /* Más ancho para formularios */
+    max-width: 560px !important;
   }
 
   .upload-step-1,
@@ -671,7 +671,22 @@
 
 }
 
+@media (max-width: 580px) {
+
+  .upload-step-2,
+  .camera-step-2,
+  .manual-step-2 {
+    width: 80vw !important;
+  }
+
+}
+
 @media (max-width: 480px) {
+
+  .drag-drop-area {
+    padding: 25px 10px;
+    min-height: 140px;
+  }
 
   .drag-drop-area {
     padding: 25px 10px;

@@ -9,12 +9,11 @@ import { MatInputModule } from '@angular/material/input';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 import {TitleCasePipe} from '@angular/common';
 import {Category} from '../../../shared/enums/category.enum';
-import { provideNativeDateAdapter } from '@angular/material/core';
+import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MovementService} from '../../../core/services/movement.service';
-
 
 @Component({
   selector: 'app-expense-form',
@@ -34,7 +33,10 @@ import { MovementService} from '../../../core/services/movement.service';
     MatButtonModule,
     MatTimepickerModule
   ],
-  providers: [provideNativeDateAdapter()],
+  providers: [
+    provideNativeDateAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: 'es-PE' }
+  ],
   templateUrl: './expense-form.html',
   styleUrl: './expense-form.css'
 })
@@ -61,12 +63,15 @@ export class ExpenseForm implements OnInit {
     });
 
     if (this.initialData) {
+      console.log('Abriendo el form tengo como initial data:', this.initialData.date);
       const patchedData = {
         ...this.initialData,
         category: this.initialData.category ?? null,
-        time: this.initialData.time ? this.parseTimeString(this.initialData.time) : null // 👈 NUEVO
+        date: this.initialData.date ? this.parseDateString(this.initialData.date as string) : null, // 👈 AGREGADO
+        time: this.initialData.time ? this.parseTimeString(this.initialData.time) : null
       };
       this.form.patchValue(patchedData);
+      console.log('Abriendo el form.date tengo:', this.form.value.date);
     }
   }
 
@@ -117,7 +122,6 @@ export class ExpenseForm implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  // 👈 NUEVO: Convertir Date a string HH:mm
   private formatTime(time: any): string {
     if (!time) return '';
 
@@ -130,14 +134,21 @@ export class ExpenseForm implements OnInit {
     return `${hours}:${minutes}`;
   }
 
-  // 👈 NUEVO: Convertir string HH:mm a Date para el timepicker
   private parseTimeString(timeString: string): Date | null {
     if (!timeString) return null;
 
     const [hours, minutes] = timeString.split(':');
     const date = new Date();
-    date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
     return date;
+  }
+
+  // 👈 NUEVO: Convertir string YYYY-MM-DD a Date local (sin desfase de zona horaria)
+  private parseDateString(dateString: string): Date | null {
+    if (!dateString) return null;
+
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
   }
 
   onCancel() {
@@ -148,4 +159,3 @@ export class ExpenseForm implements OnInit {
     this.form.reset();
   }
 }
-

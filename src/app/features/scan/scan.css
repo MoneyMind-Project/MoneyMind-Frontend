@@ -1,3 +1,12 @@
+/* Desktop - ocultar completamente */
+.title-section {
+  display: none;
+  color: #1033d3;
+  font-weight: bold;
+  font-size: 22px;
+  margin-left: 5px;
+}
+
 .scan-container {
   padding: 20px;
   max-width: 1200px;
@@ -30,6 +39,8 @@
   margin-bottom: 8px;
   font-weight: 500;
   color: #212121;
+  display: flex;
+  justify-content: space-between;
 }
 
 .total-amount {
@@ -430,7 +441,28 @@
   }
 }
 
+@media (max-width: 769px) {
+
+  .title-section {
+    display: block;
+  }
+}
+
 @media (max-width: 550px) {
+
+  .total-amount-card {
+    order: 2; /* Mover al final */
+  }
+
+  .action-buttons {
+    order: 1; /* Mover al principio */
+  }
+
+  .total-amount{
+    display: flex;
+    justify-content: right;
+  }
+
   .search-container {
     width: 80%;
   }

@@ -36,6 +36,7 @@ import { MovementService } from '../../core/services/movement.service';
 export class Scan implements OnInit {
 
   totalAmount: number = 0;
+  isTotalAmountVisible: boolean = false;
   movements: DisplayableMovement[] = [];
   groupedMovements: { date: string; movements: DisplayableMovement[] }[] = [];
 
@@ -124,9 +125,14 @@ export class Scan implements OnInit {
     }
   }
 
+  setTotalAmountVisibility(){
+    this.isTotalAmountVisible = !this.isTotalAmountVisible;
+  }
+
   openExpenseDialog(mode: 'upload' | 'camera' | 'manual') {
     const dialogRef = this.dialog.open(ExpenseDialog, {
-      data: { mode }
+      data: { mode },
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe((newExpense: Expense | null) => {
@@ -139,7 +145,8 @@ export class Scan implements OnInit {
 
   openIncomeDialog(mode: 'upload' | 'manual') {
     const dialogRef = this.dialog.open(IncomeDialog, {
-      data: { mode }
+      data: { mode },
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe((newIncome: Income | null) => {
@@ -152,6 +159,7 @@ export class Scan implements OnInit {
 
   // Reutilizable para income y expense
   private addNewMovement(type: 'income' | 'expense', movement: Income | Expense) {
+
     let displayable: DisplayableMovement;
 
     if (type === 'income') {
@@ -162,7 +170,7 @@ export class Scan implements OnInit {
         title: income.title,
         date: income.date,
         time: income.time,
-        total: income.total,
+        total: Number(income.total),
         comment: income.comment,
       };
     } else {
@@ -173,7 +181,7 @@ export class Scan implements OnInit {
         title: expense.place,
         date: expense.date,
         time: expense.time,
-        total: expense.total,
+        total: Number(expense.total),
         comment: expense.comment,
         category: expense.category,
         place: expense.place,
@@ -194,8 +202,10 @@ export class Scan implements OnInit {
       this.onSearchChange(this.searchText);
     }
 
-    this.addMovementUpdateTotal(type, movement.total);
+    // Asegurar que el total sea número antes de pasarlo
+    this.addMovementUpdateTotal(type, Number(movement.total));
     this.updateGroupedMovements();
+
   }
 
   getCategoryColor(category?: Category): string {
@@ -270,7 +280,7 @@ export class Scan implements OnInit {
   openDetails(movement: DisplayableMovement) {
     const ref = this.dialog.open(MovementDetails, {
       width: '500px',
-      maxWidth: window.innerWidth <= 768 ? '75vw' : '500px',
+      maxWidth: window.innerWidth <= 768 ? '85vw' : '500px',
       maxHeight: '85vh',
       data: movement
     });

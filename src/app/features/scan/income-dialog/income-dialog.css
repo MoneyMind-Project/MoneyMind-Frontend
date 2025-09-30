@@ -556,7 +556,7 @@
   .upload-step-2,
   .camera-step-2,
   .manual-step-2 {
-    min-width: 70vw; /* Más ancho para formularios */
+    max-width: 560px !important;
   }
 
   .upload-step-1,
@@ -667,6 +667,16 @@
     justify-content: center;
     flex-wrap: wrap;
     gap: 16px;
+  }
+
+}
+
+@media (max-width: 580px) {
+
+  .upload-step-2,
+  .camera-step-2,
+  .manual-step-2 {
+    width: 80vw !important;
   }
 
 }

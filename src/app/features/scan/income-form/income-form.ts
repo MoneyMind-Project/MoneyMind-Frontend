@@ -6,7 +6,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
-import { provideNativeDateAdapter } from '@angular/material/core';
+import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTimepickerModule } from '@angular/material/timepicker';
@@ -27,9 +27,12 @@ import {ApiResponse} from '../../../shared/models/response.model';
     MatInputModule,
     MatDatepickerModule,
     MatButtonModule,
-    MatTimepickerModule // 👈 NUEVO
+    MatTimepickerModule
   ],
-  providers: [provideNativeDateAdapter()],
+  providers: [
+    provideNativeDateAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: 'es-PE' }
+  ],
   templateUrl: './income-form.html',
   styleUrl: './income-form.css'
 })
@@ -56,7 +59,8 @@ export class IncomeForm implements OnInit {
     if (this.initialData) {
       const patchedData = {
         ...this.initialData,
-        time: this.initialData.time ? this.parseTimeString(this.initialData.time) : null // 👈 NUEVO
+        date: this.initialData.date ? this.parseDateString(this.initialData.date as string) : null, // 👈 AGREGADO
+        time: this.initialData.time ? this.parseTimeString(this.initialData.time) : null
       };
       this.form.patchValue(patchedData);
     }
@@ -105,7 +109,6 @@ export class IncomeForm implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  // 👈 NUEVO: Convertir Date a string HH:mm
   private formatTime(time: any): string {
     if (!time) return '';
 
@@ -118,7 +121,6 @@ export class IncomeForm implements OnInit {
     return `${hours}:${minutes}`;
   }
 
-  // 👈 NUEVO: Convertir string HH:mm a Date para el timepicker
   private parseTimeString(timeString: string): Date | null {
     if (!timeString) return null;
 
@@ -126,6 +128,14 @@ export class IncomeForm implements OnInit {
     const date = new Date();
     date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
     return date;
+  }
+
+  // 👈 NUEVO: Convertir string YYYY-MM-DD a Date local (sin desfase de zona horaria)
+  private parseDateString(dateString: string): Date | null {
+    if (!dateString) return null;
+
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
   }
 
   onCancel() {

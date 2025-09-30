@@ -1,9 +1,19 @@
 <div class="scan-container">
+  <div class="title-section">
+    Mis movimientos
+  </div>
   <!-- Header Section -->
   <div class="header-section">
     <div class="total-amount-card">
-      <div class="amount-label">Monto total</div>
-      <div class="total-amount">S/ {{ totalAmount | number:'1.2-2' }}</div>
+      <div class="amount-label">
+        Monto total
+        <i class="material-icons visibility-icon" (click)="setTotalAmountVisibility()">
+          {{ isTotalAmountVisible ? 'visibility' : 'visibility_off' }}
+        </i>
+      </div>
+      <div class="total-amount">
+        {{ isTotalAmountVisible ? ('S/ ' + (totalAmount | number:'1.2-2')) : 'S/ ****' }}
+      </div>
     </div>
 
     <!-- Action Buttons -->
@@ -61,7 +71,6 @@
       </div>
     </div>
   </div>
-
   <!-- Recent Movements Section -->
   <div class="movements-section">
     <div class="movements-header">
