@@ -31,7 +31,7 @@ export class MovementService{
     const payload = {
       ...data,
       user_id: userId,
-      category: categoryMapper[data.category] || 'otros', // Mapear categoría
+      category: data.category, // Ya no necesitas mapear, los valores coinciden con el backend
       time: data.time.length === 5 ? `${data.time}:00` : data.time // "12:51" → "12:51:00"
     };
 
@@ -39,7 +39,7 @@ export class MovementService{
       map((response) => ({
         success: true,
         message: response.message,
-        data: response.expense // <- aquí ya aseguras que data es un Expense
+        data: response.expense
       })),
       catchError((error) =>
         of({

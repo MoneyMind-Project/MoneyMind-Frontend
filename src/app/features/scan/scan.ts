@@ -16,6 +16,7 @@ import { RouterModule } from '@angular/router';
 import { MovementDetails} from './movement-details/movement-details';
 import { DashboardResponse} from '../../shared/models/response.model';
 import { MovementService } from '../../core/services/movement.service';
+import {CategoryUtils} from '../../shared/utils/category.utils';
 
 
 @Component({
@@ -106,23 +107,7 @@ export class Scan implements OnInit {
 
 
   getCategoryIcon(category?: Category): string {
-    if (!category) {
-      return 'attach_money'; // ícono para ingresos
-    }
-
-    switch (category) {
-      case Category.GASTOS_ESENCIALES:
-        return 'home'; // puede ser comida, vivienda, transporte → algo esencial
-      case Category.GASTOS_PERSONALES:
-        return 'person'; // ocio, compras, bienestar
-      case Category.FINANCIEROS:
-        return 'account_balance'; // bancos, préstamos, etc.
-      case Category.EDUCACION:
-        return 'school'; // estudios, cursos
-      case Category.OTROS:
-      default:
-        return 'category'; // ícono genérico
-    }
+    return CategoryUtils.getCategoryIcon(category);
   }
 
   setTotalAmountVisibility(){
@@ -209,25 +194,7 @@ export class Scan implements OnInit {
   }
 
   getCategoryColor(category?: Category): string {
-    if (!category) {
-      // Si no hay categoría (es un income), devolvemos un color por defecto
-      return '#4caf50'; // verde para ingresos
-    }
-
-    switch (category) {
-      case Category.GASTOS_ESENCIALES:
-        return '#FF6B35'; // naranja fuerte
-      case Category.GASTOS_PERSONALES:
-        return '#4ECDC4'; // turquesa
-      case Category.FINANCIEROS:
-        return '#45B7D1'; // azul
-      case Category.EDUCACION:
-        return '#FFEAA7'; // amarillo suave
-      case Category.OTROS:
-      default:
-        return '#DDA0DD'; // púrpura
-    }
-
+    return CategoryUtils.getCategoryColor(category);
   }
 
   formatDate(dateString: string): string {
