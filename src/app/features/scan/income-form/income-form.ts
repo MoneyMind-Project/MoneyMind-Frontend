@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MovementService} from '../../../core/services/movement.service';
 import {ApiResponse} from '../../../shared/models/response.model';
+import {NgToastService} from 'ng-angular-popup';
 
 @Component({
   selector: 'app-income-form',
@@ -43,9 +44,10 @@ export class IncomeForm implements OnInit {
 
   form!: FormGroup;
   loading = false;
+  isDuplicated = false;
   errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private incomeService: MovementService) {}
+  constructor(private fb: FormBuilder, private incomeService: MovementService, private toast: NgToastService) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -71,6 +73,7 @@ export class IncomeForm implements OnInit {
 
     this.loading = true;
     this.errorMessage = null;
+    this.isDuplicated = false;
 
     const rawValue = this.form.value;
 
@@ -89,7 +92,16 @@ export class IncomeForm implements OnInit {
         if (res.success && res.data) {
           this.save.emit(res.data);
         } else {
-          this.errorMessage = res.message;
+          if (res.message === 'DUPLICATED') {
+            this.isDuplicated = true; // 👈 activamos alerta en el form
+            this.toast.danger(
+              'No se pudo crear el registro porque ya existe otro con las mismas características.',
+              'Error',
+              3000
+            );
+          } else {
+            this.errorMessage = res.message;
+          }
         }
       },
       error: () => {

@@ -14,6 +14,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MovementService} from '../../../core/services/movement.service';
+import {NgToastService} from 'ng-angular-popup';
 
 @Component({
   selector: 'app-expense-form',
@@ -48,9 +49,10 @@ export class ExpenseForm implements OnInit {
   categories: Category[] = Object.values(Category);
   form!: FormGroup;
   loading = false;
+  isDuplicated = false;
   errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private expenseService: MovementService) {}
+  constructor(private fb: FormBuilder, private expenseService: MovementService, private toast: NgToastService) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -84,6 +86,7 @@ export class ExpenseForm implements OnInit {
 
     this.loading = true;
     this.errorMessage = null;
+    this.isDuplicated = false;
 
     const rawValue = this.form.value;
 
@@ -102,7 +105,16 @@ export class ExpenseForm implements OnInit {
         if (res.success) {
           this.save.emit(res.data);
         } else {
-          this.errorMessage = res.message;
+          if (res.message === 'DUPLICATED') {
+            this.isDuplicated = true; // 👈 activamos alerta en el form
+            this.toast.danger(
+              'No se pudo crear el registro porque ya existe otro con las mismas características.',
+              'Error',
+              3000
+            );
+          } else {
+            this.errorMessage = res.message;
+          }
         }
       },
       error: () => {

@@ -75,7 +75,6 @@
 }
 
 .detail-item:last-child {
-  border-bottom: none;
   padding-bottom: 8px;
 }
 
@@ -357,13 +356,6 @@
 .dialog-actions button:focus-visible {
   outline: 2px solid #2196f3;
   outline-offset: 2px;
-}
-
-/* Hover effects adicionales para mejorar UX */
-.detail-item:hover {
-  background-color: rgba(0, 0, 0, 0.02);
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
 }
 
 .category-value:hover {

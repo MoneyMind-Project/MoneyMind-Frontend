@@ -26,7 +26,6 @@ export class MovementDetails implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.movement);
     this.checkIfCanDelete();
   }
 
@@ -55,16 +54,6 @@ export class MovementDetails implements OnInit {
     const now = new Date();
     const diffInMs = now.getTime() - createdDate.getTime();
     const diffInMinutes = diffInMs / (1000 * 60);
-
-    console.log('=== DEBUG ELIMINAR ===');
-    console.log('created_at (string):', this.movement.created_at);
-    console.log('createdDate (Date):', createdDate);
-    console.log('createdDate (ISO):', createdDate.toISOString());
-    console.log('now (Date):', now);
-    console.log('now (ISO):', now.toISOString());
-    console.log('diffInMs:', diffInMs);
-    console.log('diffInMinutes:', diffInMinutes);
-    console.log('canDelete (<=5 min):', diffInMinutes <= 5);
 
     this.canDelete = diffInMinutes <= 5;
   }

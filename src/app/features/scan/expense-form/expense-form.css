@@ -108,6 +108,15 @@
   }
 }
 
+.form-error {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #fdecea;
+  color: #b71c1c;
+  font-size: 14px;
+}
+
 @media (max-width: 580px) {
   .expense-form {
     min-width: 80vw!important;

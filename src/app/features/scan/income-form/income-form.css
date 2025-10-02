@@ -74,6 +74,15 @@
   font-size: 18px;
 }
 
+.form-error {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #fdecea;
+  color: #b71c1c;
+  font-size: 14px;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .income-form {
@@ -113,6 +122,8 @@
     font-size: 13px;
   }
 }
+
+
 
 @media (max-width: 580px) {
   .income-form {

@@ -31,7 +31,7 @@ export class MovementService{
     const payload = {
       ...data,
       user_id: userId,
-      category: data.category, // Ya no necesitas mapear, los valores coinciden con el backend
+      category: data.category,
       time: data.time.length === 5 ? `${data.time}:00` : data.time // "12:51" → "12:51:00"
     };
 
@@ -44,12 +44,42 @@ export class MovementService{
       catchError((error) =>
         of({
           success: false,
+          // 👇 mandamos exactamente lo que el backend puso en "message"
           message: error.error?.message || 'Error al crear el gasto',
           data: undefined
         })
       )
     );
   }
+
+  createIncome(data: Income): Observable<ApiResponse<Income>> {
+    const userId = this.crypto.getCurrentUserId();
+    const payload = { ...data, user_id: userId };
+
+    return this.http.post<any>(`${this.apiUrl}/movements/income/create/`, payload).pipe(
+      map((response) => {
+        const income = {
+          ...response.income,
+          total: parseFloat(response.income.total) // aseguramos number
+        } as Income;
+
+        return {
+          success: true,
+          message: response.message || 'Ingreso creado exitosamente',
+          data: income
+        };
+      }),
+      catchError((error) =>
+        of({
+          success: false,
+          // 👇 aquí también propagamos el mensaje tal cual
+          message: error.error?.message || 'Error al crear el ingreso',
+          data: undefined
+        })
+      )
+    );
+  }
+
 
   deleteExpense(id: number): Observable<ApiResponse<null>> {
     return this.http.delete<void>(`${this.apiUrl}/movements/expense/delete/${id}/`).pipe(
@@ -84,36 +114,6 @@ export class MovementService{
       )
     );
   }
-
-
-  createIncome(data: Income): Observable<ApiResponse<Income>> {
-    const userId = this.crypto.getCurrentUserId();
-    const payload = { ...data, user_id: userId };
-
-    return this.http.post<any>(`${this.apiUrl}/movements/income/create/`, payload).pipe(
-      map((response) => {
-        const income = {
-          ...response.income,
-          total: parseFloat(response.income.total) // 👈 aseguramos que sea number
-        } as Income;
-
-        return {
-          success: true,
-          message: response.message || 'Ingreso creado exitosamente',
-          data: income
-        };
-      }),
-      catchError((error) =>
-        of({
-          success: false,
-          message: error.error?.message || 'Error al crear el ingreso',
-          data: undefined
-        })
-      )
-    );
-  }
-
-
 
   getScanDashboard(): Observable<ApiResponse<DashboardResponse>> {
     const userId = this.crypto.getCurrentUserId();

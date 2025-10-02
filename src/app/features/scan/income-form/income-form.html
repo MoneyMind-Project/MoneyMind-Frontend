@@ -48,6 +48,10 @@
     <textarea matInput formControlName="comment"></textarea>
   </mat-form-field>
 
+  <div *ngIf="isDuplicated" class="form-error">
+    No se pudo crear el registro porque ya existe otro con las mismas características.
+  </div>
+
   <!-- Acciones -->
   <div class="actions">
     <button mat-stroked-button color="warn" type="button" (click)="onCancel()">

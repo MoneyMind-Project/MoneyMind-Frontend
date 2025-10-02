@@ -247,7 +247,6 @@ export class Scan implements OnInit {
   }
 
   openDetails(movement: DisplayableMovement) {
-    console.log("enviando:",movement);
     const ref = this.dialog.open(MovementDetails, {
       width: '500px',
       maxWidth: window.innerWidth <= 768 ? '85vw' : '500px',
