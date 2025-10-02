@@ -11,4 +11,5 @@ export interface DisplayableMovement {
   comment?: string;
   category?: Category; //   <-- ahora es Category (opcional)
   place?: string;           // Solo para expenses
+  created_at?: string;
 }

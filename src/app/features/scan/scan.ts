@@ -157,6 +157,7 @@ export class Scan implements OnInit {
         time: income.time,
         total: Number(income.total),
         comment: income.comment,
+        created_at: income.created_at
       };
     } else {
       const expense = movement as Expense;
@@ -170,6 +171,7 @@ export class Scan implements OnInit {
         comment: expense.comment,
         category: expense.category,
         place: expense.place,
+        created_at: expense.created_at
       };
     }
 
@@ -245,6 +247,7 @@ export class Scan implements OnInit {
   }
 
   openDetails(movement: DisplayableMovement) {
+    console.log("enviando:",movement);
     const ref = this.dialog.open(MovementDetails, {
       width: '500px',
       maxWidth: window.innerWidth <= 768 ? '85vw' : '500px',

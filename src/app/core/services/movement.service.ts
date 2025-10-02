@@ -134,7 +134,8 @@ export class MovementService{
               total: parseFloat(m.total),
               comment: m.comment,
               category: m.category,
-              place: m.place
+              place: m.place,
+              created_at: m.created_at,
             })),
             totalMovements: res.total_movements
           };
@@ -175,7 +176,8 @@ export class MovementService{
               total: parseFloat(m.total),
               comment: m.comment,
               category: m.category,
-              place: m.place
+              place: m.place,
+              created_at: m.created_at,
             })),
             hasMore: res.has_more,
             page: res.page,

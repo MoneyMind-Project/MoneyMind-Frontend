@@ -9,4 +9,5 @@ export interface Expense {
   time: string;        // "14:35" or in HH:mm format
   total: number;       // Amount spent
   comment?: string;    // Optional notes
+  created_at?: string;
 }

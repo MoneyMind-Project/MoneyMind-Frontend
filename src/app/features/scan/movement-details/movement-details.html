@@ -74,13 +74,19 @@
   </div>
 
   <!-- Actions -->
+  <!-- Actions -->
   <div class="dialog-actions">
     <button mat-stroked-button color="primary" (click)="close()" class="cancel-btn">
       <mat-icon>arrow_back</mat-icon>
       Volver
     </button>
 
-    <button mat-flat-button color="warn" (click)="confirmDelete()" class="delete-btn">
+    <button
+      *ngIf="canDelete"
+      mat-flat-button
+      color="warn"
+      (click)="confirmDelete()"
+      class="delete-btn">
       <mat-icon>delete_outline</mat-icon>
       Eliminar
     </button>

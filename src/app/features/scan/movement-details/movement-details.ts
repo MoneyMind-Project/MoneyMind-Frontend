@@ -1,4 +1,4 @@
-import { Component, Inject, Output, EventEmitter } from '@angular/core';
+import { Component, Inject, Output, EventEmitter, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,15 +14,60 @@ import { MovementService} from '../../../core/services/movement.service';
   templateUrl: './movement-details.html',
   styleUrl: './movement-details.css'
 })
-export class MovementDetails {
+export class MovementDetails implements OnInit {
   @Output() deleted = new EventEmitter<DisplayableMovement>();
+  canDelete: boolean = true;
 
   constructor(
     private dialogRef: MatDialogRef<MovementDetails>,
     @Inject(MAT_DIALOG_DATA) public movement: DisplayableMovement,
     private dialog: MatDialog,
-    private movementService: MovementService
+    private movementService: MovementService,
   ) {}
+
+  ngOnInit(): void {
+    console.log(this.movement);
+    this.checkIfCanDelete();
+  }
+
+  checkIfCanDelete(): void {
+    if (!this.movement.created_at) {
+      this.canDelete = true;
+      return;
+    }
+
+    const createdDate = new Date(this.movement.created_at);
+    const now = new Date();
+    const diffInMs = now.getTime() - createdDate.getTime();
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+    this.canDelete = diffInDays <= 2;
+  }
+
+  checkIfCanDelete5Minutes(): void {
+    if (!this.movement.created_at) {
+      this.canDelete = true;
+      console.log('No created_at, canDelete set to true');
+      return;
+    }
+
+    const createdDate = new Date(this.movement.created_at);
+    const now = new Date();
+    const diffInMs = now.getTime() - createdDate.getTime();
+    const diffInMinutes = diffInMs / (1000 * 60);
+
+    console.log('=== DEBUG ELIMINAR ===');
+    console.log('created_at (string):', this.movement.created_at);
+    console.log('createdDate (Date):', createdDate);
+    console.log('createdDate (ISO):', createdDate.toISOString());
+    console.log('now (Date):', now);
+    console.log('now (ISO):', now.toISOString());
+    console.log('diffInMs:', diffInMs);
+    console.log('diffInMinutes:', diffInMinutes);
+    console.log('canDelete (<=5 min):', diffInMinutes <= 5);
+
+    this.canDelete = diffInMinutes <= 5;
+  }
 
   close() {
     this.dialogRef.close();
@@ -44,7 +89,7 @@ export class MovementDetails {
         if (request$) {
           request$.subscribe((res) => {
             if (res.success) {
-              this.deleted.emit(this.movement); // avisa al padre
+              this.deleted.emit(this.movement);
               this.dialogRef.close();
             } else {
               console.error(res.message);
