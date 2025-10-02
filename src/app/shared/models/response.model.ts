@@ -1,6 +1,12 @@
 import { DisplayableMovement } from './displayable-movement.model';
 import { Expense} from './expense.model';
 
+export interface BasicApiResponse<T = any> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
+
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;

@@ -35,6 +35,8 @@ export class ExpenseDialog implements AfterViewInit {
   isMobileDevice = false;
   cameraWidth = 480;
   cameraHeight = 320;
+  isImageWrong = false;
+  errorMessage = 'Hubo un error procesando la imagen.';
 
   photoFile: File | null = null;
 
@@ -96,28 +98,6 @@ export class ExpenseDialog implements AfterViewInit {
     }
 
     return baseClass;
-  }
-
-  processReceipt() {
-    if (!this.selectedFile) return;
-    this.loading = true;
-
-    const formData = new FormData();
-    formData.append('file', this.selectedFile, this.selectedFile.name);
-
-    this.http.post<{ data: Partial<Expense> }>('http://127.0.0.1:8000/api/movements/analyze-expense/', formData)
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.parsedExpense = res.data;
-          this.step = 2;
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
-          alert('Error procesando con Gemini');
-        }
-      });
   }
 
   // Modifica el fun startCamera para mejor configuración:
@@ -218,15 +198,14 @@ export class ExpenseDialog implements AfterViewInit {
           this.processReceiptAsync(file)
             .then(() => console.log('[capturePhoto] processReceiptAsync finalizó OK'))
             .catch(error => {
-              console.error('[capturePhoto] Error en processReceiptAsync:', error);
+              console.log('[capturePhoto] Error en processReceiptAsync:', error);
               this.loading = false;
-              alert('Error procesando la imagen');
               if (this.mode === 'camera') {
                 this.startCamera();
               }
             });
         } else {
-          console.error('[capturePhoto] No se pudo generar blob del canvas');
+          console.log('[capturePhoto] No se pudo generar blob del canvas');
           this.loading = false;
           alert('Error capturando la imagen');
           if (this.mode === 'camera') {
@@ -237,9 +216,36 @@ export class ExpenseDialog implements AfterViewInit {
     }, 100);
   }
 
+  processReceipt() {
+    this.isImageWrong = false;
 
-  // Nuevo fun que retorna una Promise
+    if (!this.selectedFile) return;
+    this.loading = true;
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile, this.selectedFile.name);
+
+    this.http.post<{ data: Partial<Expense> }>('http://127.0.0.1:8000/api/movements/analyze-expense/', formData)
+      .subscribe({
+        next: (res) => {
+          console.log('Respuesta del análisis:', res);
+          this.parsedExpense = res.data;
+          this.step = 2;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.loading = false;
+          console.log('Error del backend:', err);
+
+          this.isImageWrong = true;
+          this.errorMessage = err.error.message;
+        }
+      });
+  }
+
   private processReceiptAsync(file: File): Promise<void> {
+
+    this.isImageWrong = false;
     console.log('[processReceiptAsync] Iniciando con file:', file.name, file.size, file.type);
 
     const formData = new FormData();
@@ -255,7 +261,7 @@ export class ExpenseDialog implements AfterViewInit {
         next: (res) => {
           console.log('[processReceiptAsync] Respuesta recibida del backend:', res);
 
-          this.zone.run(() => {   // 👈 Forzamos a Angular a enterarse
+          this.zone.run(() => {
             this.parsedExpense = res.data;
             this.step = 2;
             this.loading = false;
@@ -264,22 +270,25 @@ export class ExpenseDialog implements AfterViewInit {
           resolve();
         },
         error: (err) => {
-          this.zone.run(() => {
+          console.log('[processReceiptAsync] Error recibido del backend:', err);
+
+          this.zone.run(() => {   // 👈 importante
             this.loading = false;
+            this.isImageWrong = true;
+            this.errorMessage = err.error?.error || err.error?.message || "Ocurrió un error inesperado";
+            console.log(this.isImageWrong, this.errorMessage);
           });
-          console.error('[processReceiptAsync] Error recibido del backend:', err);
+
           reject(err);
         }
+
       });
     });
   }
 
-
-
   onSave(expense: Expense) {
     this.dialogRef.close(expense);
   }
-
 
   // Asegúrate de detener la cámara al cerrar el diálogo
   close() {

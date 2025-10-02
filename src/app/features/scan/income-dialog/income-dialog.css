@@ -17,6 +17,18 @@
   font-weight: 500;
 }
 
+.form-error {
+  margin-top: 20px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #fdecea;
+  color: #b71c1c;
+  font-size: 14px;
+  justify-content: center;
+  text-align: center;
+}
+
 /* Drag & Drop Area */
 .drag-drop-area {
   border: 2px dashed #ddd;
@@ -136,6 +148,16 @@
   color: #f44336;
   width: 32px;
   height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+
+.remove-file-btn mat-icon{
+  justify-content: center;
+  align-items: center;
+  align-content: center;
 }
 
 /* Loading Content */
@@ -549,6 +571,8 @@
   align-items: center;
   gap: 8px;
 }
+
+
 
 
 /* Mobile Responsive */

@@ -34,6 +34,8 @@ export class IncomeDialog implements AfterViewInit{
   isMobileDevice = false;
   cameraWidth = 480;
   cameraHeight = 320;
+  isImageWrong = false;
+  errorMessage = 'Hubo un error procesando la imagen.';
 
   photoFile: File | null = null;
 
@@ -96,28 +98,6 @@ export class IncomeDialog implements AfterViewInit{
     }
 
     return baseClass;
-  }
-
-  processReceipt() {
-    if (!this.selectedFile) return;
-    this.loading = true;
-
-    const formData = new FormData();
-    formData.append('file', this.selectedFile, this.selectedFile.name);
-
-    this.http.post<{ data: Partial<Income> }>('http://127.0.0.1:8000/api/movements/analyze-income/', formData)
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.parsedIncome = res.data;
-          this.step = 2;
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
-          alert('Error procesando con Gemini');
-        }
-      });
   }
 
   // Modifica el fun startCamera para mejor configuración:
@@ -237,21 +217,48 @@ export class IncomeDialog implements AfterViewInit{
     }, 100);
   }
 
-  // Nuevo fun que retorna una Promise
-  private processReceiptAsync(file: File): Promise<void> {
+  processReceipt() {
+    if (!this.selectedFile) return;
+    this.loading = true;
 
+    const formData = new FormData();
+    formData.append('file', this.selectedFile, this.selectedFile.name);
+
+    this.http.post<{ data: Partial<Income> }>('http://127.0.0.1:8000/api/movements/analyze-income/', formData)
+      .subscribe({
+        next: (res) => {
+          console.log('Respuesta del análisis:', res);
+          this.parsedIncome = res.data;
+          this.step = 2;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.loading = false;
+          console.error('Error del backend:', err);
+
+          let errorMessage = 'Error procesando la imagen';
+
+          if (err.status === 400 && err.error) {
+            errorMessage = err.error.message || this.getErrorMessageByCode(err.error.code);
+          }
+
+          this.isImageWrong = true;
+          this.errorMessage = errorMessage;
+        }
+      });
+  }
+
+  private processReceiptAsync(file: File): Promise<void> {
     const formData = new FormData();
     formData.append('file', file, file.name);
 
     return new Promise((resolve, reject) => {
-
       this.http.post<{ data: Partial<Income> }>(
         'http://127.0.0.1:8000/api/movements/analyze-income/',
         formData
       ).subscribe({
         next: (res) => {
-
-          this.zone.run(() => {   // 👈 Forzamos a Angular a enterarse
+          this.zone.run(() => {
             this.parsedIncome = res.data;
             this.step = 2;
             this.loading = false;
@@ -260,14 +267,39 @@ export class IncomeDialog implements AfterViewInit{
           resolve();
         },
         error: (err) => {
+          console.error('Error recibido del backend:', err);
+
           this.zone.run(() => {
             this.loading = false;
           });
 
-          reject(err);
+          let errorMessage = 'Error procesando la imagen';
+
+          if (err.status === 400 && err.error) {
+            errorMessage = err.error.message || this.getErrorMessageByCode(err.error.code);
+          }
+
+          this.isImageWrong = true;
+          this.errorMessage = errorMessage;
+
+          reject(new Error(errorMessage));
         }
       });
     });
+  }
+
+  private getErrorMessageByCode(code: string): string {
+    const errorMessages: { [key: string]: string } = {
+      'INVALID_IMAGE': 'La imagen no es válida. Verifica que sea un comprobante legible.',
+      'INVALID_CATEGORY': 'No se pudo determinar la categoría.',
+      'NO_IMAGE': 'No se envió ninguna imagen.',
+      'EMPTY_RESPONSE': 'No se obtuvo respuesta del análisis.',
+      'INVALID_JSON': 'Error en el formato de respuesta.',
+      'MALFORMED_JSON': 'Respuesta malformada del servidor.',
+      'UNEXPECTED_ERROR': 'Error inesperado durante el análisis.'
+    };
+
+    return errorMessages[code] || 'Error desconocido al procesar la imagen';
   }
 
   onSave(income: Income) {

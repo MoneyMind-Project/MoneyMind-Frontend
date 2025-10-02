@@ -136,6 +136,16 @@
   color: #f44336;
   width: 32px;
   height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+
+.remove-file-btn mat-icon{
+  justify-content: center;
+  align-items: center;
+  align-content: center;
 }
 
 /* Loading Content */
@@ -548,6 +558,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.form-error {
+  margin-top: 20px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #fdecea;
+  color: #b71c1c;
+  font-size: 14px;
+  justify-content: center;
+  text-align: center;
 }
 
 

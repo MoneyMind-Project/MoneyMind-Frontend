@@ -63,6 +63,10 @@
         class="hidden-input"
       />
 
+      <div *ngIf="isImageWrong" class="form-error">
+        {{ errorMessage }}
+      </div>
+
       <!-- Botones de acción -->
       <div class="action-buttons">
         <button
@@ -162,6 +166,10 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div *ngIf="isImageWrong" class="form-error">
+        {{ errorMessage }}
       </div>
 
       <!-- Botones de acción -->
