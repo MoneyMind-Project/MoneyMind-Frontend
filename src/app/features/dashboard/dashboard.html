@@ -1,6 +1,157 @@
-<p>dashboard works!</p>
-<p>Gráficos de barras o torta con categorías (comida, transporte, salud, etc.).</p>
+<!-- dashboard.html -->
+<div class="dashboard-container">
 
-<p>Comparación de gastos entre meses.</p>
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="welcome-message">
+      <h1>Hola {{ userName }}</h1>
+      <p class="subtitle">Here's an overview of your system.</p>
+    </div>
 
-<p>Predicciones simples de IA para próximos gastos.</p>
+    <button mat-icon-button class="notifications-btn" (click)="viewNotifications()">
+      <mat-icon [matBadge]="unreadNotifications" matBadgeColor="warn" [matBadgeHidden]="unreadNotifications === 0">
+        notifications
+      </mat-icon>
+    </button>
+  </div>
+
+  <!-- KPIs Grid -->
+  <div class="kpis-grid">
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Total gastado este mes</div>
+        <div class="kpi-value">S/ {{ totalGastadoMes }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Categoría más alta</div>
+        <div class="kpi-value category">{{ categoriaMasAlta }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Presupuesto restante</div>
+        <div class="kpi-value">S/ {{ presupuestoRestante }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Proyección del próximo mes</div>
+        <div class="kpi-value">
+          S/ {{ proyeccionProximoMes }}
+          <button mat-button class="ver-mas-btn">ver más</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Charts Grid -->
+  <mat-grid-list [cols]="gridCols" rowHeight="400px" [gutterSize]="'20px'">
+
+    <!-- Distribución de gastos por minicategorías -->
+    <mat-grid-tile [colspan]="mainChartCols" [rowspan]="1">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Distribución de gastos por minicategorías</mat-card-title>
+          <button mat-button class="filter-btn">Past 30 Days ▼</button>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <!-- Aquí irá el chart de barras -->
+            <canvas id="categoriasChart"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <!-- Evolución de gastos -->
+    <mat-grid-tile [colspan]="sideChartCols" [rowspan]="1">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Evolución de gastos</mat-card-title>
+          <button mat-button class="filter-btn">Past 24h ▼</button>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <!-- Aquí irá el chart de lista -->
+            <div class="evolution-list">
+              <div class="evolution-item">
+                <span class="evolution-name">NONE</span>
+                <div class="evolution-bar" style="width: 90%"></div>
+                <span class="evolution-count">45</span>
+              </div>
+              <div class="evolution-item">
+                <span class="evolution-name">YUBIKEY</span>
+                <div class="evolution-bar" style="width: 30%"></div>
+                <span class="evolution-count">3</span>
+              </div>
+              <div class="evolution-item">
+                <span class="evolution-name">PIN</span>
+                <div class="evolution-bar" style="width: 30%"></div>
+                <span class="evolution-count">3</span>
+              </div>
+              <div class="evolution-item">
+                <span class="evolution-name">SMSLINK</span>
+                <div class="evolution-bar" style="width: 20%"></div>
+                <span class="evolution-count">2</span>
+              </div>
+              <div class="evolution-item">
+                <span class="evolution-name">PHONE</span>
+                <div class="evolution-bar" style="width: 20%"></div>
+                <span class="evolution-count">2</span>
+              </div>
+            </div>
+            <button mat-button class="view-all-btn">View all</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Proporción de categorías padres</mat-card-title>
+          <button mat-button class="filter-btn">Past 24h ▼</button>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas id="proporcionChart"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Predicción de gastos por mes</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas id="prediccionChart"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="lastChartCols" [rowspan]="1">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Gastos esenciales vs no esenciales</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas id="esencialesChart"></canvas>
+          </div>
+          <button mat-button class="view-all-btn">View all</button>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+  </mat-grid-list>
+
+</div>
