@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +18,8 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     MatCardModule,
     MatIconModule,
     MatBadgeModule,
-    MatButtonModule
+    MatButtonModule,
+    MatMenuModule
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'

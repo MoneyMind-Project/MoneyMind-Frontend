@@ -26,8 +26,35 @@
   margin: 0;
 }
 
+.notifications-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .notifications-btn {
-  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f5f5f5;
+  border-radius: 24px;
+  border: none;
+}
+
+.notifications-btn mat-icon {
+  margin: 0;
+}
+
+.notifications-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.notifications-btn ::ng-deep .mat-badge-content {
+  background-color: #4caf50;
+  color: white;
 }
 
 /* KPIs Grid */

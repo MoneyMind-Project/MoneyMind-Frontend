@@ -8,11 +8,22 @@
       <p class="subtitle">Here's an overview of your system.</p>
     </div>
 
-    <button mat-icon-button class="notifications-btn" (click)="viewNotifications()">
-      <mat-icon [matBadge]="unreadNotifications" matBadgeColor="warn" [matBadgeHidden]="unreadNotifications === 0">
-        notifications
-      </mat-icon>
-    </button>
+    <div class="notifications-section">
+      <button mat-stroked-button class="notifications-btn" (click)="viewNotifications()">
+        <mat-icon [matBadge]="unreadNotifications" matBadgeColor="accent" [matBadgeHidden]="unreadNotifications === 0">
+          inbox
+        </mat-icon>
+        <span class="notifications-text">{{ unreadNotifications }} unread</span>
+      </button>
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item>Ver todas</button>
+        <button mat-menu-item>Marcar como leídas</button>
+        <button mat-menu-item>Configuración</button>
+      </mat-menu>
+    </div>
   </div>
 
   <!-- KPIs Grid -->
