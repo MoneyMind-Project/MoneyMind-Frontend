@@ -10,6 +10,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Chart, registerables } from 'chart.js';
 import { Category, CategoryParent, CATEGORY_LABELS, CATEGORY_PARENT_LABELS } from '../../shared/enums/category.enum';
+import { MovementService } from '../../core/services/movement.service';
+import {ReportService} from '../../core/services/report.service';
 
 // Registrar todos los componentes de Chart.js
 Chart.register(...registerables);
@@ -53,7 +55,7 @@ export class Dashboard implements OnInit, AfterViewInit {
   prediccionChart: any;
   esencialesChart: any;
 
-  constructor(private breakpointObserver: BreakpointObserver) {}
+  constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService) {}
 
   ngOnInit(): void {
     this.breakpointObserver.observe([
@@ -94,11 +96,233 @@ export class Dashboard implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.createCategoriasChart();
-      this.createProporcionChart();
+      this.loadCategoriasData();
+      this.loadProporcionData();
       this.createPrediccionChart();
-      this.createEsencialesChart();
+      this.loadEsencialesData();
     }, 0);
+  }
+
+  loadCategoriasData(): void {
+    const currentDate = new Date();
+    const month = currentDate.getMonth() + 1; // getMonth() retorna 0-11
+    const year = currentDate.getFullYear();
+
+    this.reportService.getExpensesByCategory( month, year).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.createCategoriasChartWithData(response.data);
+        } else {
+          console.error('Error en la respuesta:', response);
+          this.createCategoriasChart(); // Usar datos de prueba si falla
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando datos:', error);
+        this.createCategoriasChart(); // Usar datos de prueba si falla
+      }
+    });
+  }
+
+  loadProporcionData(): void {
+    const currentDate = new Date();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+
+    this.reportService.getExpensesByParentCategory(month, year).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.createProporcionChartWithData(response.data);
+        } else {
+          console.error('Error en la respuesta:', response);
+          this.createProporcionChart(); // Fallback con datos aleatorios
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando datos de proporción:', error);
+        this.createProporcionChart(); // Fallback con datos aleatorios
+      }
+    });
+  }
+
+  loadEsencialesData(): void {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+
+    this.reportService.getEssentialVsNonEssential(year).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.createEsencialesChartWithData(response.data);
+        } else {
+          console.error('Error en la respuesta:', response);
+          this.createEsencialesChart(); // Fallback
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando datos esenciales:', error);
+        this.createEsencialesChart(); // Fallback
+      }
+    });
+  }
+
+  createEsencialesChartWithData(data: Array<{month: number, esencial: number, no_esencial: number}>): void {
+    const ctx = document.getElementById('esencialesChart') as HTMLCanvasElement;
+
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    this.esencialesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(item => monthNames[item.month - 1]),
+        datasets: [
+          {
+            label: 'Gastos Esenciales',
+            data: data.map(item => item.esencial),
+            backgroundColor: '#FF6B35',
+            borderRadius: 4
+          },
+          {
+            label: 'Gastos No Esenciales',
+            data: data.map(item => item.no_esencial),
+            backgroundColor: '#4ECDC4',
+            borderRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.dataset.label}: S/ ${context.parsed.y.toFixed(2)}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: false
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => `S/ ${value}`
+            }
+          }
+        }
+      }
+    });
+  }
+
+  createCategoriasChartWithData(data: Array<{category: string, total: number}>): void {
+    const ctx = document.getElementById('categoriasChart') as HTMLCanvasElement;
+
+    // Mapear los datos del backend a labels y valores
+    const categoriesData = data.map(item => ({
+      label: CATEGORY_LABELS[item.category as Category],
+      value: item.total
+    }));
+
+    this.categoriasChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: categoriesData.map(c => c.label),
+        datasets: [{
+          label: 'Gasto en S/',
+          data: categoriesData.map(c => c.value),
+          backgroundColor: '#00d4aa',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `S/ ${context.parsed.y.toFixed(2)}`
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => `S/ ${value}`
+            }
+          }
+        }
+      }
+    });
+  }
+
+  createProporcionChartWithData(data: Array<{parent_category: string, total: number}>): void {
+    const ctx = document.getElementById('proporcionChart') as HTMLCanvasElement;
+
+    // Colores por categoría padre
+    const colors: Record<string, string> = {
+      'gastos_esenciales': '#FF6B35',
+      'gastos_personales': '#4ECDC4',
+      'financieros': '#45B7D1',
+      'educacion': '#FFEAA7',
+      'otros': '#DDA0DD'
+    };
+
+    // Mapear categorías padre a sus labels
+    const parentLabelsMap: Record<string, string> = {
+      'gastos_esenciales': 'Gastos Esenciales',
+      'gastos_personales': 'Gastos Personales',
+      'financieros': 'Financieros',
+      'educacion': 'Educación',
+      'otros': 'Otros'
+    };
+
+    const chartData = data.map(item => ({
+      label: parentLabelsMap[item.parent_category] || item.parent_category,
+      value: item.total,
+      color: colors[item.parent_category] || '#999999'
+    }));
+
+    this.proporcionChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: chartData.map(c => c.label),
+        datasets: [{
+          data: chartData.map(c => c.value),
+          backgroundColor: chartData.map(c => c.color),
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `S/ ${context.parsed.y.toFixed(2)}`
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => `S/ ${value}`
+            }
+          }
+        }
+      }
+    });
   }
 
   createCategoriasChart(): void {
