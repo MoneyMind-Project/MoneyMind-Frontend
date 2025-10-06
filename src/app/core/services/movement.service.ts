@@ -80,7 +80,6 @@ export class MovementService{
     );
   }
 
-
   deleteExpense(id: number): Observable<ApiResponse<null>> {
     return this.http.delete<void>(`${this.apiUrl}/movements/expense/delete/${id}/`).pipe(
       map(() => ({
@@ -156,7 +155,6 @@ export class MovementService{
       );
   }
 
-
   getAllMovements(page: number, pageSize: number): Observable<ApiResponse<PaginatedMovementsResponse>> {
     const userId = this.crypto.getCurrentUserId();
 
@@ -204,7 +202,5 @@ export class MovementService{
         )
       );
   }
-
-
 
 }

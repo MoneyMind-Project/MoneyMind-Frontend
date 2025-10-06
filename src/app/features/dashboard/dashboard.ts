@@ -100,7 +100,40 @@ export class Dashboard implements OnInit, AfterViewInit {
       this.loadProporcionData();
       this.createPrediccionChart();
       this.loadEsencialesData();
+      this.loadDashboardOverview();
+      this.loadUserAlerts();
     }, 0);
+  }
+
+  loadDashboardOverview(): void {
+    const currentDate = new Date();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+
+    this.reportService.getDashboardOverview(month, year).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.totalGastadoMes = response.data.total_gastado_mes;
+          this.categoriaMasAlta = response.data.categoria_mas_alta?.label || 'N/A';
+          this.presupuestoRestante = response.data.presupuesto_restante;
+          this.proyeccionProximoMes = response.data.proyeccion_proximo_mes;
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando overview:', error);
+      }
+    });
+  }
+
+  loadUserAlerts(): void {
+
+    this.reportService.getUserAlerts(false).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.unreadNotifications = response.unread_count;
+        }
+      }
+    });
   }
 
   loadCategoriasData(): void {

@@ -80,5 +80,51 @@ export class ReportService{
     );
   }
 
+  getDashboardOverview(month: number, year: number): Observable<any> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return of({ success: false, data: [] });
+    }
+
+    return this.http.get(`${this.apiUrl}/reports/dashboard-overview/`, {
+      params: {
+        user_id: userId.toString(),
+        month: month.toString(),
+        year: year.toString()
+      }
+    }).pipe(
+      catchError((error) => {
+        console.error('Error obteniendo overview del dashboard:', error);
+        return of({ success: false, data: null });
+      })
+    );
+  }
+
+  getUserAlerts(seen?: boolean): Observable<any> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return of({ success: false, data: [] });
+    }
+
+    const params: any = { user_id: userId.toString() };
+    if (seen !== undefined) {
+      params.seen = seen.toString();
+    }
+
+    return this.http.get(`${this.apiUrl}/alerts/user-alerts/`, { params }).pipe(
+      catchError((error) => {
+        console.error('Error obteniendo alertas:', error);
+        return of({ success: false, data: [], unread_count: 0 });
+      })
+    );
+  }
+
+  markAlertsAsSeen(alertIds: number[]): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/reports/user-alerts/`, { alert_ids: alertIds });
+  }
 
 }
