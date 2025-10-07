@@ -36,10 +36,10 @@ export class Dashboard implements OnInit, AfterViewInit {
   unreadNotifications: number = 2;
 
   // KPIs
-  totalGastadoMes: number = 780;
-  categoriaMasAlta: string = 'COLEGIO';
-  presupuestoRestante: number = 130;
-  proyeccionProximoMes: number = 1380;
+  totalGastadoMes: number = 0;
+  categoriaMasAlta: string = '';
+  presupuestoRestante: number = 0;
+  proyeccionProximoMes: number = 0;
 
   // Responsive grid columns
   gridCols: number = 3;
@@ -98,7 +98,7 @@ export class Dashboard implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.loadCategoriasData();
       this.loadProporcionData();
-      this.createPrediccionChart();
+      this.loadPrediccionData();
       this.loadEsencialesData();
       this.loadDashboardOverview();
       this.loadUserAlerts();
@@ -147,7 +147,6 @@ export class Dashboard implements OnInit, AfterViewInit {
           this.createCategoriasChartWithData(response.data);
         } else {
           console.error('Error en la respuesta:', response);
-          this.createCategoriasChart(); // Usar datos de prueba si falla
         }
       },
       error: (error) => {
@@ -174,6 +173,26 @@ export class Dashboard implements OnInit, AfterViewInit {
       error: (error) => {
         console.error('Error cargando datos de proporción:', error);
         this.createProporcionChart(); // Fallback con datos aleatorios
+      }
+    });
+  }
+
+  loadPrediccionData(): void {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+
+    this.reportService.getMonthlyPrediction( year).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.createPrediccionChartWithData(response.data);
+        } else {
+          console.error('Error en la respuesta:', response);
+          this.createPrediccionChart(); // Fallback
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando datos de predicción:', error);
+        this.createPrediccionChart(); // Fallback
       }
     });
   }
@@ -296,6 +315,68 @@ export class Dashboard implements OnInit, AfterViewInit {
     });
   }
 
+  createPrediccionChartWithData(data: Array<{month: number, real: number | null, prediction: number | null}>): void {
+    const ctx = document.getElementById('prediccionChart') as HTMLCanvasElement;
+
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    this.prediccionChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: monthNames,
+        datasets: [
+          {
+            label: 'Gasto Real',
+            data: data.map(item => item.real),
+            borderColor: '#1976d2',
+            backgroundColor: 'transparent',
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#1976d2',
+            pointBorderWidth: 2
+          },
+          {
+            label: 'Predicción',
+            data: data.map(item => item.prediction),
+            borderColor: '#ff9800',
+            backgroundColor: 'transparent',
+            borderDash: [8, 4],
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#ff9800',
+            pointBorderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const value = context.parsed.y;
+                return value !== null ? `${context.dataset.label}: S/ ${value.toFixed(2)}` : '';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => `S/ ${value}`
+            }
+          }
+        }
+      }
+    });
+  }
+
   createProporcionChartWithData(data: Array<{parent_category: string, total: number}>): void {
     const ctx = document.getElementById('proporcionChart') as HTMLCanvasElement;
 
@@ -367,7 +448,7 @@ export class Dashboard implements OnInit, AfterViewInit {
     // Datos de ejemplo por categoría (en soles)
     const categoriesData = allCategories.map(category => ({
       label: CATEGORY_LABELS[category],
-      value: this.generateRandomExpense(category)
+      value: this.generateNullExpense()
     }));
 
     this.categoriasChart = new Chart(ctx, {
@@ -414,7 +495,7 @@ export class Dashboard implements OnInit, AfterViewInit {
 
     const parentCategoriesData = allParentCategories.map(parent => ({
       label: CATEGORY_PARENT_LABELS[parent],
-      value: this.generateRandomParentExpense(parent)
+      value: this.generateRandomParentExpense()
     }));
 
     // Colores por categoría padre
@@ -461,43 +542,13 @@ export class Dashboard implements OnInit, AfterViewInit {
     });
   }
 
-// Métodos auxiliares para generar datos de prueba realistas
-  private generateRandomExpense(category: Category): number {
-    // Generar valores realistas según el tipo de categoría
-    const ranges = {
-      [Category.VIVIENDA]: [500, 1200],
-      [Category.SERVICIOS_BASICOS]: [200, 400],
-      [Category.ALIMENTACION]: [300, 600],
-      [Category.TRANSPORTE]: [150, 400],
-      [Category.SALUD]: [100, 500],
-      [Category.ENTRETENIMIENTO]: [50, 200],
-      [Category.STREAMING_SUSCRIPCIONES]: [30, 100],
-      [Category.MASCOTAS]: [50, 200],
-      [Category.CUIDADO_PERSONAL]: [50, 150],
-      [Category.DEUDAS_PRESTAMOS]: [200, 800],
-      [Category.AHORRO_INVERSION]: [0, 500],
-      [Category.SEGUROS]: [100, 300],
-      [Category.EDUCACION_DESARROLLO]: [200, 800],
-      [Category.REGALOS_CELEBRACIONES]: [0, 300],
-      [Category.VIAJES_VACACIONES]: [0, 1000],
-      [Category.IMPREVISTOS]: [0, 400]
-    };
-
-    const [min, max] = ranges[category];
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  // Métodos auxiliares para generar datos de prueba realistas
+  private generateNullExpense(): number {
+    return 0;
   }
 
-  private generateRandomParentExpense(parent: CategoryParent): number {
-    const ranges = {
-      [CategoryParent.GASTOS_ESENCIALES]: [1500, 2500],
-      [CategoryParent.GASTOS_PERSONALES]: [300, 600],
-      [CategoryParent.FINANCIEROS]: [400, 1200],
-      [CategoryParent.EDUCACION]: [200, 800],
-      [CategoryParent.OTROS]: [100, 500]
-    };
-
-    const [min, max] = ranges[parent];
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  private generateRandomParentExpense(): number {
+    return 0;
   }
 
   createPrediccionChart(): void {
@@ -576,13 +627,13 @@ export class Dashboard implements OnInit, AfterViewInit {
         datasets: [
           {
             label: 'Gastos Esenciales',
-            data: [1850, 2100, 1900, 2250, 2050, 1880, 2400, 2150, 2300],
+            data: new Array(meses.length).fill(0),
             backgroundColor: '#FF6B35',
             borderRadius: 4
           },
           {
             label: 'Gastos No Esenciales',
-            data: [950, 1100, 1000, 1150, 1050, 970, 1200, 1150, 1150],
+            data: new Array(meses.length).fill(0),
             backgroundColor: '#4ECDC4',
             borderRadius: 4
           }

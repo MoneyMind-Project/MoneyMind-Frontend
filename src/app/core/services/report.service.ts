@@ -123,6 +123,27 @@ export class ReportService{
     );
   }
 
+  getMonthlyPrediction(year: number): Observable<any> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return of({ success: false, data: [] });
+    }
+
+    return this.http.get(`${this.apiUrl}/reports/monthly-prediction/`, {
+      params: {
+        user_id: userId.toString(),
+        year: year.toString()
+      }
+    }).pipe(
+      catchError((error) => {
+        console.error('Error obteniendo predicción mensual:', error);
+        return of({ success: false, data: [] });
+      })
+    );
+  }
+
   markAlertsAsSeen(alertIds: number[]): Observable<any> {
     return this.http.patch(`${this.apiUrl}/reports/user-alerts/`, { alert_ids: alertIds });
   }
