@@ -55,6 +55,12 @@ export class Dashboard implements OnInit, AfterViewInit {
   prediccionChart: any;
   esencialesChart: any;
 
+  showBackCategorias = false;
+  showBackAhorro = false;
+  showBackProyeccion = false;
+  showBackEsenciales = false;
+  showBackPadres = false;
+
   constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService) {}
 
   ngOnInit(): void {
@@ -104,6 +110,16 @@ export class Dashboard implements OnInit, AfterViewInit {
       this.loadDashboardOverview();
       this.loadUserAlerts();
     }, 0);
+  }
+
+  toggleFlip(chart: string): void {
+    switch (chart) {
+      case 'categorias': this.showBackCategorias = !this.showBackCategorias; break;
+      case 'ahorro': this.showBackAhorro = !this.showBackAhorro; break;
+      case 'proyeccion': this.showBackProyeccion = !this.showBackProyeccion; break;
+      case 'esenciales': this.showBackEsenciales = !this.showBackEsenciales; break;
+      case 'padres': this.showBackPadres = !this.showBackPadres; break;
+    }
   }
 
   loadDashboardOverview(): void {
