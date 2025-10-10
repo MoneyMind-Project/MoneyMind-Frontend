@@ -16,6 +16,8 @@ import 'moment/locale/es';
 import {UserService} from '../../../../core/services/user.service';
 import { RegisterRequest} from '../../../../shared/models/register-request.model';
 import {NgToastService} from 'ng-angular-popup';
+import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import {Terms} from '../terms/terms';
 
 
 @Component({
@@ -35,6 +37,7 @@ import {NgToastService} from 'ng-angular-popup';
     RouterLink,
     MatDatepickerModule,
     MatMomentDateModule,
+    MatDialogModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './register.html',
@@ -44,7 +47,8 @@ export class Register {
   registerForm: FormGroup;
   currentStep: number = 1;
 
-  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private toast: NgToastService) {
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService,
+              private toast: NgToastService, private dialog: MatDialog) {
     this.registerForm = this.fb.group({
       // Paso 1: Información Personal
       firstName: ['', Validators.required],
@@ -58,7 +62,8 @@ export class Register {
       monthlyIncome: [''],
       preferNotToSayIncome: [false],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required]
+      confirmPassword: ['', Validators.required],
+      termsAccepted: [false, Validators.requiredTrue]
     }, {
       validators: this.passwordMatchValidator
     });
@@ -79,6 +84,22 @@ export class Register {
       return null;
     }
   }
+
+  openTermsDialog(event: Event): void {
+    event.preventDefault();
+
+    const isMobile = window.innerWidth <= 768;
+
+    const ref = this.dialog.open(Terms, {
+      width: isMobile ? '85vw' : '600px',
+      maxWidth: '85vw',
+      panelClass: 'terms-dialog-panel',
+      autoFocus: false,
+      hasBackdrop: true,
+      disableClose: false
+    });
+  }
+
 
   // Navegación entre pasos
   nextStep(): void {
@@ -105,8 +126,9 @@ export class Register {
     const passwordValid = this.registerForm.get('password')?.valid ?? false;
     const confirmPasswordValid = this.registerForm.get('confirmPassword')?.valid ?? false;
     const passwordsMatch = !this.registerForm.hasError('passwordMismatch');
+    const termsAccepted = this.registerForm.get('termsAccepted')?.value === true;
 
-    return currentMoneyValid && passwordValid && confirmPasswordValid;
+    return currentMoneyValid && passwordValid && confirmPasswordValid&& termsAccepted;
   }
 
 

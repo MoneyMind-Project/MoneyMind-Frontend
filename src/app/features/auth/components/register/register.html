@@ -126,6 +126,16 @@
         </mat-error>
       </mat-form-field>
 
+      <div class="terms-container">
+        <mat-checkbox formControlName="termsAccepted">
+          He leído y acepto los
+          <a href="#" (click)="openTermsDialog($event)">Términos y Condiciones</a>
+        </mat-checkbox>
+        <mat-error *ngIf="registerForm.get('termsAccepted')?.hasError('required') && registerForm.get('termsAccepted')?.touched">
+          Debes aceptar los términos y condiciones
+        </mat-error>
+      </div>
+
       <div class="button-group">
         <button mat-flat-button class="back-btn" type="button" (click)="previousStep()">
           Volver

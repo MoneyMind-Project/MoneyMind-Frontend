@@ -179,6 +179,11 @@
   text-align: center;
 }
 
+.terms-container{
+  margin-top:-10px;
+  margin-bottom: 20px;
+}
+
 .login-text {
   font-size: 14px;
   color: #666666;
