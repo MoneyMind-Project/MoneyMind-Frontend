@@ -100,6 +100,7 @@ export class Dashboard implements OnInit, AfterViewInit {
       this.loadProporcionData();
       this.loadPrediccionData();
       this.loadEsencialesData();
+      this.loadAhorroData();
       this.loadDashboardOverview();
       this.loadUserAlerts();
     }, 0);
@@ -173,6 +174,45 @@ export class Dashboard implements OnInit, AfterViewInit {
       error: (error) => {
         console.error('Error cargando datos de proporción:', error);
         this.createProporcionChart(); // Fallback con datos aleatorios
+      }
+    });
+  }
+
+  loadAhorroData(): void {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+
+    this.reportService.getSavingsEvolution(year).subscribe({
+      next: (response) => {
+        // Preparamos los 12 meses
+        const fullYearData = Array.from({ length: 12 }, (_, i) => ({
+          month: i + 1,
+          date: `${year}-${String(i + 1).padStart(2, '0')}-01`,
+          balance: 0,
+          saving: 0
+        }));
+
+        if (response.success && response.data.length > 0) {
+          response.data.forEach((item: any) => {
+            const idx = item.month - 1;
+            fullYearData[idx] = { ...fullYearData[idx], ...item };
+          });
+        }
+
+        // 🔹 Ahora graficamos el balance, no el saving
+        this.createAhorroChartWithData(fullYearData);
+      },
+      error: (error) => {
+        console.error('Error cargando datos de ahorro:', error);
+
+        const emptyData = Array.from({ length: 12 }, (_, i) => ({
+          month: i + 1,
+          date: `${year}-${String(i + 1).padStart(2, '0')}-01`,
+          balance: 0,
+          saving: 0
+        }));
+
+        this.createAhorroChartWithData(emptyData);
       }
     });
   }
@@ -308,6 +348,50 @@ export class Dashboard implements OnInit, AfterViewInit {
             beginAtZero: true,
             ticks: {
               callback: (value) => `S/ ${value}`
+            }
+          }
+        }
+      }
+    });
+  }
+
+  createAhorroChartWithData(
+    data: Array<{ month: number; date: string; balance: number; saving: number }>
+  ): void {
+    const ctx = document.getElementById('ahorroCanvas') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    if (Chart.getChart(ctx)) {
+      Chart.getChart(ctx)?.destroy();
+    }
+
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+      'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: monthNames,
+        datasets: [
+          {
+            label: 'Balance mensual (S/)',
+            data: data.map(d => d.balance), // 👈 ahora usamos balance
+            backgroundColor: '#4caf50',
+            borderRadius: 8,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const value = context.raw as number;
+                return `S/ ${value.toFixed(2)}`;
+              }
             }
           }
         }
@@ -666,5 +750,11 @@ export class Dashboard implements OnInit, AfterViewInit {
         }
       }
     });
+  }
+
+  get isPresupuestoCritico(): boolean {
+    const presupuestoTotal = this.presupuestoRestante + this.totalGastadoMes;
+    const limite = (2 / 3) * presupuestoTotal;
+    return this.totalGastadoMes >= limite;
   }
 }

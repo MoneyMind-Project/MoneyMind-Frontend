@@ -7,6 +7,7 @@
 
 /* Header Section */
 .header-section {
+  margin-top: 20px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -102,6 +103,11 @@
   font-size: 24px;
 }
 
+.kpi-value.critico {
+  color: red;
+  font-weight: bold;
+}
+
 .ver-mas-btn {
   font-size: 12px;
   color: #1976d2;
@@ -128,6 +134,16 @@ mat-grid-list {
   align-items: center;
   padding: 20px 20px 0;
   margin-bottom: 16px;
+}
+
+.evolution-count.positive {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.evolution-count.negative {
+  color: #f44336;
+  font-weight: 600;
 }
 
 .chart-card mat-card-title {
@@ -234,6 +250,7 @@ mat-grid-list {
   }
 
   .header-section {
+    margin-top: 20px;
     margin-bottom: 24px;
   }
 

@@ -80,6 +80,27 @@ export class ReportService{
     );
   }
 
+  getSavingsEvolution(year: number): Observable<any> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return of({ success: false, data: [] });
+    }
+
+    return this.http.get(`${this.apiUrl}/reports/saving-evolution/`, {
+      params: {
+        user_id: userId.toString(),
+        year: year.toString()
+      }
+    }).pipe(
+      catchError((error) => {
+        console.error('Error obteniendo evolución de ahorro:', error);
+        return of({ success: false, data: [] });
+      })
+    );
+  }
+
   getDashboardOverview(month: number, year: number): Observable<any> {
     const userId = this.crypto.getCurrentUserId();
 
