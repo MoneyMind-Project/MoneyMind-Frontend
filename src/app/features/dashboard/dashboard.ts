@@ -14,6 +14,7 @@ import { MovementService } from '../../core/services/movement.service';
 import {ReportService} from '../../core/services/report.service';
 import {NotificationsPanel} from './notifications-panel/notifications-panel';
 import {MatDialogModule, MatDialog} from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 // Registrar todos los componentes de Chart.js
 Chart.register(...registerables);
@@ -29,14 +30,16 @@ Chart.register(...registerables);
     MatBadgeModule,
     MatButtonModule,
     MatMenuModule,
-    MatDialogModule
+    MatDialogModule,
+    NotificationsPanel
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit, AfterViewInit {
   userName: string = 'Diego';
-  unreadNotifications: number = 2;
+  unreadNotifications: number = 0;
+  showNotificationPanel = false;
 
   // KPIs
   totalGastadoMes: number = 0;
@@ -64,7 +67,7 @@ export class Dashboard implements OnInit, AfterViewInit {
   showBackEsenciales = false;
   showBackPadres = false;
 
-  constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService, private dialog: MatDialog,) {}
+  constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService, private dialog: MatDialog, private router: Router) {}
 
   ngOnInit(): void {
     this.breakpointObserver.observe([
@@ -100,10 +103,17 @@ export class Dashboard implements OnInit, AfterViewInit {
   }
 
   viewNotifications(): void {
-
+    this.showNotificationPanel = !this.showNotificationPanel;
   }
 
+  closeNotificationPanel(): void {
+    this.showNotificationPanel = false;
+  }
 
+  viewAllNotifications(): void {
+    this.dialog.closeAll(); // Cierra el panel si está abierto
+    this.router.navigate(['/dashboard/notifications']);
+  }
 
   ngAfterViewInit(): void {
     setTimeout(() => {

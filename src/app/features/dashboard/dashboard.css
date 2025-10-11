@@ -305,3 +305,71 @@ mat-grid-list {
     margin-bottom: 16px;
   }
 }
+
+
+
+
+
+
+
+.notifications-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notifications-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+}
+
+.notifications-btn.active {
+  background-color: #e7f3ff;
+  border-color: #1877f2;
+  color: #1877f2;
+}
+
+.notifications-btn:hover {
+  background-color: #f0f2f5;
+}
+
+.notifications-text {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Ajuste para el panel de notificaciones en el dashboard */
+.notifications-section app-notifications-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .notifications-text {
+    display: none;
+  }
+
+  .notifications-btn {
+    padding: 8px;
+  }
+
+  .notifications-section app-notifications-panel {
+    right: -20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notifications-section app-notifications-panel {
+    right: 0;
+    left: 0;
+    transform: translateX(-50%);
+    margin-left: 50%;
+  }
+}

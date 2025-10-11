@@ -19,10 +19,15 @@
         <mat-icon>more_vert</mat-icon>
       </button>
       <mat-menu #menu="matMenu">
-        <button mat-menu-item>Ver todas</button>
+        <button mat-menu-item (click)="viewAllNotifications()">Ver todas</button>
         <button mat-menu-item>Marcar como leídas</button>
-        <button mat-menu-item>Configuración</button>
       </mat-menu>
+      <!-- Panel de notificaciones -->
+      <app-notifications-panel
+        *ngIf="showNotificationPanel"
+        (closePanel)="closeNotificationPanel()">
+      </app-notifications-panel>
+
     </div>
   </div>
 

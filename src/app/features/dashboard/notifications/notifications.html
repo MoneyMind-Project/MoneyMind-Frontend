@@ -1,1 +1,91 @@
-<p>notifications works!</p>
+<div class="notifications-container">
+  <div class="notifications-header">
+    <h2>Notificaciones</h2>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>Marcar como leídas</button>
+    </mat-menu>
+  </div>
+
+  <div class="tabs">
+    <button
+      class="tab"
+      [class.active]="activeTab === 'all'"
+      (click)="setActiveTab('all')">
+      Todas
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'unread'"
+      (click)="setActiveTab('unread')">
+      No leídas
+      <span *ngIf="unreadCount > 0" class="badge">{{ unreadCount }}</span>
+    </button>
+  </div>
+
+  <div class="notifications-content" *ngIf="!loading">
+    <!-- Hoy -->
+    <div *ngIf="groupedNotifications.today.length > 0" class="notification-section">
+      <h3 class="section-title">Hoy</h3>
+      <div
+        *ngFor="let notification of groupedNotifications.today"
+        class="notification-item"
+        [class.unread]="!notification.seen"
+        (click)="markAsRead(notification)">
+
+        <div class="notification-icon" [ngClass]="getAlertClass(notification.alert_type)">
+          <span>{{ getAlertIcon(notification.alert_type) }}</span>
+        </div>
+
+        <div class="notification-content">
+          <p class="notification-message">{{ notification.message }}</p>
+          <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+        </div>
+
+        <div class="notification-indicator" *ngIf="!notification.seen"></div>
+      </div>
+    </div>
+
+    <!-- Anteriores -->
+    <div *ngIf="groupedNotifications.earlier.length > 0" class="notification-section">
+      <h3 class="section-title">Anteriores</h3>
+      <div
+        *ngFor="let notification of groupedNotifications.earlier"
+        class="notification-item"
+        [class.unread]="!notification.seen"
+        (click)="markAsRead(notification)">
+
+        <div class="notification-icon" [ngClass]="getAlertClass(notification.alert_type)">
+          <span>{{ getAlertIcon(notification.alert_type) }}</span>
+        </div>
+
+        <div class="notification-content">
+          <p class="notification-message">{{ notification.message }}</p>
+          <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+        </div>
+
+        <div class="notification-indicator" *ngIf="!notification.seen"></div>
+      </div>
+    </div>
+
+    <!-- Sin notificaciones -->
+    <div *ngIf="notifications.length === 0" class="empty-state">
+      <div class="empty-icon">🔔</div>
+      <p class="empty-title">No hay notificaciones</p>
+      <p class="empty-subtitle">Te notificaremos cuando haya actualizaciones importantes</p>
+    </div>
+
+    <!-- Ver anteriores -->
+    <button *ngIf="notifications.length > 0" class="view-all-button">
+      Ver notificaciones anteriores
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando notificaciones...</p>
+  </div>
+</div>

@@ -10,6 +10,7 @@ import {Scan} from './features/scan/scan';
 import {AllMovements} from './features/scan/all-movements/all-movements';
 import {Dashboard} from './features/dashboard/dashboard';
 import {Profile} from './features/profile/profile';
+import {Notifications} from './features/dashboard/notifications/notifications';
 
 export const routes: Routes = [
   {
@@ -34,6 +35,7 @@ export const routes: Routes = [
       },
       { path: 'dashboard', component: Dashboard },
       { path: 'profile', component: Profile },
+      { path: 'dashboard/notifications', component: Notifications },
       { path: '', redirectTo: 'home', pathMatch: 'full' }, // default después del login
     ],
   },
