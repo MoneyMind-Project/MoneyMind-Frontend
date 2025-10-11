@@ -38,3 +38,17 @@ export interface CreateExpenseApiResponse {
   expense: Expense;
   new_balance: string;
 }
+
+export interface PaginatedNotificationsResponse {
+  success: boolean;
+  data: Notification[];
+  unread_count: number;
+  pagination: {
+    page: number;
+    page_size: number;
+    total_alerts: number;
+    loaded_count: number;
+    has_more: boolean;
+    next_page: number | null;
+  };
+}

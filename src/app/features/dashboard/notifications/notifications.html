@@ -16,13 +16,6 @@
       (click)="setActiveTab('all')">
       Todas
     </button>
-    <button
-      class="tab"
-      [class.active]="activeTab === 'unread'"
-      (click)="setActiveTab('unread')">
-      No leídas
-      <span *ngIf="unreadCount > 0" class="badge">{{ unreadCount }}</span>
-    </button>
   </div>
 
   <div class="notifications-content" *ngIf="!loading">
@@ -50,7 +43,6 @@
 
     <!-- Anteriores -->
     <div *ngIf="groupedNotifications.earlier.length > 0" class="notification-section">
-      <h3 class="section-title">Anteriores</h3>
       <div
         *ngFor="let notification of groupedNotifications.earlier"
         class="notification-item"

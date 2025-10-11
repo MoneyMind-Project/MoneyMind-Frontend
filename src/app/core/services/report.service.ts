@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from './environment';
 import { Expense } from '../../shared/models/expense.model';
 import { Income} from '../../shared/models/income.model';
+import {PaginatedNotificationsResponse} from '../../shared/models/response.model';
 import { CryptoService} from './crypto.service';
 import { catchError, map } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';

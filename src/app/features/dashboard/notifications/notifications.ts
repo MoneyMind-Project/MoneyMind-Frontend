@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
-import { ReportService } from '../../../core/services/report.service';
+import { AlertService} from '../../../core/services/alert.service';
 import { Notification} from '../../../shared/models/notification.model';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatIconButton} from '@angular/material/button';
@@ -27,7 +27,7 @@ export class Notifications implements OnInit {
   activeTab: 'all' | 'unread' = 'all';
 
   constructor(
-    private reportService: ReportService,
+    private alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -36,7 +36,7 @@ export class Notifications implements OnInit {
 
   loadNotifications(): void {
     this.loading = true;
-    this.reportService.getUserAlerts().subscribe({
+    this.alertService.getUserAlertsPagination(1, 6).subscribe({
       next: (response: any) => {
         if (response.success) {
           this.notifications = response.data;

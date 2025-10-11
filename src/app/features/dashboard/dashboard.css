@@ -339,6 +339,7 @@ mat-grid-list {
 .notifications-text {
   font-weight: 600;
   font-size: 14px;
+  margin-left: 5px;
 }
 
 /* Ajuste para el panel de notificaciones en el dashboard */
