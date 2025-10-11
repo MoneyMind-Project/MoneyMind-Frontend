@@ -12,6 +12,8 @@ import { Chart, registerables } from 'chart.js';
 import { Category, CategoryParent, CATEGORY_LABELS, CATEGORY_PARENT_LABELS } from '../../shared/enums/category.enum';
 import { MovementService } from '../../core/services/movement.service';
 import {ReportService} from '../../core/services/report.service';
+import {NotificationsPanel} from './notifications-panel/notifications-panel';
+import {MatDialogModule, MatDialog} from '@angular/material/dialog';
 
 // Registrar todos los componentes de Chart.js
 Chart.register(...registerables);
@@ -26,7 +28,8 @@ Chart.register(...registerables);
     MatIconModule,
     MatBadgeModule,
     MatButtonModule,
-    MatMenuModule
+    MatMenuModule,
+    MatDialogModule
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -61,7 +64,7 @@ export class Dashboard implements OnInit, AfterViewInit {
   showBackEsenciales = false;
   showBackPadres = false;
 
-  constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService) {}
+  constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService, private dialog: MatDialog,) {}
 
   ngOnInit(): void {
     this.breakpointObserver.observe([
@@ -97,8 +100,10 @@ export class Dashboard implements OnInit, AfterViewInit {
   }
 
   viewNotifications(): void {
-    console.log('Ver notificaciones');
+
   }
+
+
 
   ngAfterViewInit(): void {
     setTimeout(() => {
