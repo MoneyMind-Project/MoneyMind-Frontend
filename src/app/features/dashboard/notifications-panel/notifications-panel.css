@@ -34,6 +34,17 @@
   }
 }
 
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .panel-header {
   display: flex;
   justify-content: space-between;
@@ -244,13 +255,20 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .notification-panel-overlay {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
   .notification-panel {
-    top: 60px;
-    right: 2.5%;
-    left: 2.5%;
-    width: auto;
-    max-width: none;
-    max-height: 90vh;
+    top: 70px;     /* <-- Esta debería ponerlo arriba */
+    bottom: auto;
+    right: 0;
+    left: 0;
+    width: 100%;
+    margin: auto;
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 16px;
   }
 
   .notification-item {
@@ -258,7 +276,7 @@
   }
 
   .panel-header {
-    padding: 14px 16px;
+    padding: 16px;
   }
 
   .panel-header h3 {
@@ -266,18 +284,22 @@
   }
 
   .notification-message {
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 
 @media (max-width: 480px) {
   .notification-panel {
-    top: 55px;
+    max-height: 80vh;
   }
 
   .notification-icon {
     width: 36px;
     height: 36px;
     font-size: 18px;
+  }
+
+  .panel-header {
+    padding: 14px 16px;
   }
 }
