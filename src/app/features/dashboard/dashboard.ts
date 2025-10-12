@@ -10,7 +10,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Chart, registerables } from 'chart.js';
 import { Category, CategoryParent, CATEGORY_LABELS, CATEGORY_PARENT_LABELS } from '../../shared/enums/category.enum';
-import { MovementService } from '../../core/services/movement.service';
+import { AlertService} from '../../core/services/alert.service';
 import {ReportService} from '../../core/services/report.service';
 import {NotificationsPanel} from './notifications-panel/notifications-panel';
 import {MatDialogModule, MatDialog} from '@angular/material/dialog';
@@ -67,7 +67,8 @@ export class Dashboard implements OnInit, AfterViewInit {
   showBackEsenciales = false;
   showBackPadres = false;
 
-  constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService, private dialog: MatDialog, private router: Router) {}
+  constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService,
+              private dialog: MatDialog, private router: Router, private  alertService: AlertService) {}
 
   ngOnInit(): void {
     this.breakpointObserver.observe([
@@ -787,5 +788,21 @@ export class Dashboard implements OnInit, AfterViewInit {
     const presupuestoTotal = this.presupuestoRestante + this.totalGastadoMes;
     const limite = (2 / 3) * presupuestoTotal;
     return this.totalGastadoMes >= limite;
+  }
+
+  markAllAsRead(): void {
+    this.alertService.markAllRiskAlertsAsSeen().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.unreadNotifications=0;
+          console.log(`✅ ${res.updated_count} alertas de tipo 'risk' marcadas como vistas.`);
+        } else {
+          console.warn('⚠️ No se pudieron marcar las alertas como vistas.');
+        }
+      },
+      error: (err) => {
+        console.error('❌ Error al marcar todas las alertas risk como vistas:', err);
+      }
+    });
   }
 }

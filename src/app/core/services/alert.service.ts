@@ -67,5 +67,36 @@ export class AlertService{
     );
   }
 
+  markAlertAsSeen(alertId: number): Observable<any> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return of({ success: false, data: [] });
+    }
+
+    return this.http.patch(`${this.apiUrl}/alerts/mark-seen/${userId}/${alertId}/`, {}).pipe(
+      catchError((error) => {
+        console.error(`Error marcando alerta ${alertId} como vista:`, error);
+        return of({ success: false, error });
+      })
+    );
+  }
+
+  markAllRiskAlertsAsSeen(): Observable<any> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return of({ success: false, message: 'Usuario no autenticado' });
+    }
+
+    return this.http.patch(`${this.apiUrl}/alerts/mark-all-risk-seen/${userId}/`, {}).pipe(
+      catchError((error) => {
+        console.error(`Error marcando alertas de tipo 'risk' como vistas para el usuario ${userId}:`, error);
+        return of({ success: false, error });
+      })
+    );
+  }
 
 }

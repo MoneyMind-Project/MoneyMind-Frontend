@@ -20,7 +20,7 @@
       </button>
       <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="viewAllNotifications()">Ver todas</button>
-        <button mat-menu-item>Marcar como leídas</button>
+        <button mat-menu-item (click)="markAllAsRead()">Marcar como leídas</button>
       </mat-menu>
       <!-- Panel de notificaciones -->
       <app-notifications-panel

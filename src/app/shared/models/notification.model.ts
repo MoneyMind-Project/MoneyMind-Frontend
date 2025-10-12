@@ -8,9 +8,3 @@ export interface Notification {
   created_at: string;
 }
 
-export interface NotificationResponse {
-  success: boolean;
-  data: Notification[];
-  unread_count: number;
-}
-

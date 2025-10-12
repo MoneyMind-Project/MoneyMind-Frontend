@@ -5,7 +5,7 @@
       <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item>Marcar como leídas</button>
+      <button mat-menu-item (click)="markAllAsRead()">Marcar como leídas</button>
     </mat-menu>
   </div>
 
@@ -70,9 +70,13 @@
     </div>
 
     <!-- Ver anteriores -->
-    <button *ngIf="notifications.length > 0" class="view-all-button">
+    <button
+      *ngIf="notifications.length > 0 && hasMore"
+      (click)="loadMore()"
+      class="view-all-button">
       Ver notificaciones anteriores
     </button>
+
   </div>
 
   <!-- Loading -->

@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ReportService } from '../../../core/services/report.service';
+import { AlertService} from '../../../core/services/alert.service';
 import { Notification} from '../../../shared/models/notification.model';
 import { Router } from '@angular/router';
 
@@ -19,7 +19,7 @@ export class NotificationsPanel implements OnInit {
   loading = false;
   unreadCount = 0;
 
-  constructor(private reportService: ReportService, private router: Router) {}
+  constructor(private alertService: AlertService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadNotifications();
@@ -36,7 +36,7 @@ export class NotificationsPanel implements OnInit {
 
   loadNotifications(): void {
     this.loading = true;
-    this.reportService.getUserAlerts().subscribe({
+    this.alertService.getUserAlertsPagination(1,5).subscribe({
       next: (response: any) => {
         if (response.success) {
           // Tomar solo las primeras 5 notificaciones
@@ -54,9 +54,20 @@ export class NotificationsPanel implements OnInit {
   markAsRead(notification: Notification, event: Event): void {
     event.stopPropagation();
     if (!notification.seen) {
-      // Aquí llamarías a tu servicio para marcar como leída
-      notification.seen = true;
-      this.unreadCount = Math.max(0, this.unreadCount - 1);
+      this.alertService.markAlertAsSeen(notification.id).subscribe({
+        next: (res) => {
+          if (res.success) {
+            notification.seen = true;
+            this.unreadCount = Math.max(0, this.unreadCount - 1);
+            console.log(`✅ Alerta ${notification.id} marcada como vista.`);
+          } else {
+            console.warn(`⚠️ No se pudo marcar la alerta ${notification.id} como vista.`);
+          }
+        },
+        error: (err) => {
+          console.error(`❌ Error al marcar la alerta ${notification.id} como vista:`, err);
+        }
+      });
     }
   }
 

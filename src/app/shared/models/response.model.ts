@@ -1,5 +1,6 @@
 import { DisplayableMovement } from './displayable-movement.model';
 import { Expense} from './expense.model';
+import { Notification} from './notification.model';
 
 export interface BasicApiResponse<T = any> {
   success: boolean;

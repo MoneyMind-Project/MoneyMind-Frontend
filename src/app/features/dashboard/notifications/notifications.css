@@ -1,6 +1,6 @@
 .notifications-container {
   max-width: 600px;
-  margin: 50px auto 0 auto;
+  margin: 50px auto;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -89,7 +89,6 @@
 }
 
 .notifications-content {
-  max-height: 600px;
   overflow-y: auto;
 }
 
