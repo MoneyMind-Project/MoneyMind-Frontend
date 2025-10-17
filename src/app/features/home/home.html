@@ -1,8 +1,151 @@
-<p>home works!</p>
-<p>Resumen rápido en graficos del mes: gasto total, cuánto queda del presupuesto.</p>
+<div class="home-container">
+  <!-- Header con mensaje de bienvenida -->
+  <div class="welcome-section">
+    <h1 class="welcome-title">{{ welcomeMessage }}</h1>
+    <p class="welcome-subtitle">Aquí está el resumen de tus finanzas</p>
+  </div>
 
-<p>Notificación si ya alcanzaste 2/3 del presupuesto.</p>
+  <!-- Tip de la semana -->
+  <mat-card class="tip-card" appearance="outlined">
+    <div class="tip-content">
+      <div class="tip-icon">{{ weeklyTip.icon }}</div>
+      <div class="tip-text">
+        <h3 class="tip-title">{{ weeklyTip.title }}</h3>
+        <p class="tip-message">{{ weeklyTip.message }}</p>
+      </div>
+    </div>
+  </mat-card>
 
-<p>Acceso directo a “Escanear Recibo”.</p>
+  <!-- KPIs y Gráfico de gastos -->
+  <div class="dashboard-grid">
+    <!-- Presupuesto restante -->
+    <mat-card class="budget-card" appearance="outlined">
+      <div class="card-header">
+        <mat-icon class="card-icon">account_balance_wallet</mat-icon>
+        <h3 class="card-title">Presupuesto de {{ currentMonth }}</h3>
+      </div>
 
-<p>Recordatorios de pagos/deudas.</p>
+      <div class="budget-content">
+        <div class="budget-amount">
+          <span class="amount-label">Restante</span>
+          <span class="amount-value" [class.low]="spentPercentage > 80">
+            {{ formatCurrency(remaining) }}
+          </span>
+        </div>
+
+        <div class="budget-bar">
+          <div class="budget-bar-fill" [style.width.%]="spentPercentage"></div>
+        </div>
+
+        <div class="budget-details">
+          <span class="detail-item">
+            <span class="detail-label">Gastado:</span>
+            <span class="detail-value">{{ formatCurrency(spent) }}</span>
+          </span>
+          <span class="detail-item">
+            <span class="detail-label">Total:</span>
+            <span class="detail-value">{{ formatCurrency(totalBudget) }}</span>
+          </span>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Gráfico de gastos diarios -->
+    <mat-card class="chart-card" appearance="outlined">
+      <div class="card-header">
+        <mat-icon class="card-icon">show_chart</mat-icon>
+        <h3 class="card-title">Gastos diarios de {{ currentMonth }}</h3>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-canvas-wrapper">
+          <canvas #dailyExpensesChart></canvas>
+        </div>
+        <div class="chart-summary">
+      <span class="summary-text">
+        Total gastado hasta hoy: <strong>{{ formatCurrency(spent) }}</strong>
+      </span>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Acceso directo a escaneo -->
+  <mat-card class="scanner-card" appearance="outlined">
+    <div class="scanner-content">
+      <div class="scanner-info">
+        <mat-icon class="scanner-icon">qr_code_scanner</mat-icon>
+        <div class="scanner-text">
+          <h3 class="scanner-title">Registra tus gastos rápidamente</h3>
+          <p class="scanner-description">Escanea tus recibos y registra automáticamente</p>
+        </div>
+      </div>
+      <button mat-raised-button color="primary" class="scanner-button" (click)="goToScanner()">
+        <mat-icon>camera_alt</mat-icon>
+        Escanear ahora
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Recordatorios de pagos/deudas -->
+  <div class="debts-section">
+    <div class="section-header">
+      <div class="section-title-wrapper">
+        <mat-icon class="section-icon">notifications_active</mat-icon>
+        <h2 class="section-title">Próximos pagos</h2>
+        <h2 class="debt-count">{{ debts.length }}</h2>
+      </div>
+      <button mat-stroked-button color="primary" (click)="openAddDebtDialog()">
+        <mat-icon>add</mat-icon>
+        Agregar pago
+      </button>
+    </div>
+
+    <div class="debts-list">
+      <mat-card
+        *ngFor="let debt of debts"
+        class="debt-card"
+        [ngClass]="getDebtUrgencyClass(debt.daysUntilDue)"
+        appearance="outlined">
+        <div class="debt-content">
+          <div class="debt-info">
+            <div class="debt-urgency-indicator"></div>
+            <div class="debt-details">
+              <h4 class="debt-name">{{ debt.name }}</h4>
+              <div class="debt-meta">
+                <span class="debt-date">
+                  <mat-icon class="meta-icon">event</mat-icon>
+                  {{ debt.dueDate | date:'dd/MM/yyyy' }}
+                </span>
+                <span class="debt-days" [ngClass]="getDebtUrgencyClass(debt.daysUntilDue)">
+                  <mat-icon class="meta-icon">schedule</mat-icon>
+                  {{ debt.daysUntilDue }} días restantes
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="debt-actions">
+            <span class="debt-amount">{{ formatCurrency(debt.amount) }}</span>
+            <button
+              mat-flat-button
+              color="primary"
+              class="pay-button"
+              (click)="openPaymentDialog(debt)">
+              <mat-icon>payment</mat-icon>
+              Pagar
+            </button>
+          </div>
+        </div>
+      </mat-card>
+
+      <div *ngIf="debts.length === 0" class="empty-debts">
+        <mat-icon class="empty-icon">check_circle</mat-icon>
+        <p class="empty-text">No tienes pagos pendientes</p>
+        <button mat-stroked-button color="primary" (click)="openAddDebtDialog()">
+          Agregar tu primer pago
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
