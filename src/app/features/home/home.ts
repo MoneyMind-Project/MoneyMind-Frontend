@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -6,6 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { Router } from '@angular/router';
+import { User } from '../../shared/models/user.model';
+import { CryptoService } from '../../core/services/crypto.service';
+import { ReportService } from '../../core/services/report.service';
+import { HomeDashboardResponse, DailyExpense } from '../../shared/models/home-dashboard.model';
 
 Chart.register(...registerables);
 
@@ -16,11 +20,6 @@ interface Debt {
   dueDate: Date;
   isPaid: boolean;
   daysUntilDue: number;
-}
-
-interface DailyExpense {
-  day: number;
-  amount: number;
 }
 
 @Component({
@@ -36,51 +35,18 @@ interface DailyExpense {
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
-export class Home implements OnInit {
-  // Usuario
-  userName = 'Diego';
-  userGender: 'male' | 'female' = 'male';
+export class Home implements OnInit, AfterViewInit {
 
-  // Tip de la semana
-  weeklyTip = {
-    title: 'Consejo de ahorro',
-    message: 'Has gastado 45% más en "Entretenimiento" este mes. Considera reducir salidas y usar alternativas gratuitas como parques.',
-    icon: '💡'
-  };
-
-  // KPIs del mes actual
-  currentMonth = 'Octubre';
-  totalBudget = 1200;
-  spent = 856;
-  remaining = 344;
-  spentPercentage = 71;
+  currentUser!: User;
+  dashboardData!: HomeDashboardResponse;
 
   @ViewChild('dailyExpensesChart') chartCanvas!: ElementRef<HTMLCanvasElement>;
   gastoMensualChart: any;
 
-  // Gráfico de gastos diarios (datos simulados)
-  dailyExpenses: DailyExpense[] = [
-    { day: 1, amount: 25 },
-    { day: 2, amount: 45 },
-    { day: 3, amount: 30 },
-    { day: 4, amount: 15 },
-    { day: 5, amount: 60 },
-    { day: 6, amount: 80 },
-    { day: 7, amount: 35 },
-    { day: 8, amount: 25 },
-    { day: 9, amount: 40 },
-    { day: 10, amount: 55 },
-    { day: 11, amount: 45 },
-    { day: 12, amount: 30 },
-    { day: 13, amount: 70 },
-    { day: 14, amount: 35 },
-    { day: 15, amount: 50 },
-    { day: 16, amount: 45 }
-  ];
+  currentMonth = '';
+  dailyExpenses: DailyExpense[] = [];
+  private viewInitialized = false; // 👈 Añadido
 
-  maxDailyExpense = 80;
-
-  // Recordatorios de pagos/deudas
   debts: Debt[] = [
     {
       id: 1,
@@ -108,20 +74,60 @@ export class Home implements OnInit {
     }
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cryptoService: CryptoService,
+    private reportService: ReportService,
+
+  ) {}
 
   ngOnInit(): void {
-    // Aquí cargarías los datos reales de tu API
+    this.currentUser = this.cryptoService.getCurrentUser()!;
+
+    this.reportService.getHomeDashboard().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.dashboardData = res;
+
+          const budget = res.data.budget;
+          this.currentMonth = this.getMonthName(budget.month);
+
+          // Cargar gastos diarios desde el backend
+          this.dailyExpenses = res.data.daily_expenses;
+
+          // 👇 Si la vista ya está lista, crea el gráfico
+          if (this.viewInitialized) {
+            this.createDailyExpensesChart();
+          }
+
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando dashboard:', err);
+      }
+    });
   }
 
   ngAfterViewInit(): void {
-    this.createDailyExpensesChart();
+    this.viewInitialized = true;
+
+    // 👇 Si los datos ya llegaron antes que la vista, ahora sí crea el gráfico
+    if (this.dailyExpenses.length > 0) {
+      this.createDailyExpensesChart();
+    }
   }
 
   createDailyExpensesChart(): void {
-    const ctx = this.chartCanvas.nativeElement.getContext('2d');
+    if (!this.chartCanvas || !this.dailyExpenses.length) return;
 
-    this.gastoMensualChart = new Chart(ctx!, {
+    const ctx = this.chartCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    if (this.gastoMensualChart) {
+      this.gastoMensualChart.destroy();
+    }
+
+    this.gastoMensualChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: this.dailyExpenses.map(e => e.day.toString()),
@@ -139,45 +145,28 @@ export class Home implements OnInit {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           tooltip: {
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
             padding: 12,
             cornerRadius: 8,
             callbacks: {
-              label: (context) => {
-                return `Gastado: ${this.formatCurrency(context.parsed.y)}`;
-              }
+              label: (context) => `Gastado: ${this.formatCurrency(context.parsed.y)}`
             }
           }
         },
         scales: {
           x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              font: {
-                size: 11
-              },
-              color: '#6b7280'
-            }
+            grid: { display: false },
+            ticks: { font: { size: 11 }, color: '#6b7280' }
           },
           y: {
             beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            },
+            grid: { color: 'rgba(0, 0, 0, 0.05)' },
             ticks: {
-              font: {
-                size: 11
-              },
+              font: { size: 11 },
               color: '#6b7280',
-              callback: (value) => {
-                return 'S/ ' + value;
-              }
+              callback: (value) => 'S/ ' + value
             }
           }
         }
@@ -185,19 +174,27 @@ export class Home implements OnInit {
     });
   }
 
+  private getMonthName(monthNumber: number): string {
+    const months = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return months[monthNumber - 1] || '';
+  }
+
   get welcomeMessage(): string {
     const greeting = this.getGreeting();
-    return this.userGender === 'male'
-      ? `${greeting} ${this.userName}`
-      : `${greeting} ${this.userName}`;
+    const firstName = this.currentUser ? this.currentUser.first_name : '';
+    return `${greeting} ${firstName}`;
   }
 
   getGreeting(): string {
-    return 'Bienvenido';
-  }
-
-  getBarHeight(amount: number): number {
-    return (amount / this.maxDailyExpense) * 100;
+    if (!this.currentUser) return 'Bienvenido';
+    switch (this.currentUser.gender?.toLowerCase()) {
+      case 'male': return 'Bienvenido';
+      case 'female': return 'Bienvenida';
+      default: return 'Bienvenid@';
+    }
   }
 
   getDebtUrgencyClass(daysUntilDue: number): string {
@@ -207,16 +204,14 @@ export class Home implements OnInit {
   }
 
   goToScanner(): void {
-    this.router.navigate(['/escanear']);
+    this.router.navigate(['/scan']);
   }
 
   openAddDebtDialog(): void {
-    // Aquí abrirías el diálogo para agregar deuda
     console.log('Abrir diálogo de agregar deuda');
   }
 
   openPaymentDialog(debt: Debt): void {
-    // Aquí abrirías el diálogo para registrar el pago
     console.log('Registrar pago para:', debt.name);
   }
 

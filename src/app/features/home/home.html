@@ -8,10 +8,10 @@
   <!-- Tip de la semana -->
   <mat-card class="tip-card" appearance="outlined">
     <div class="tip-content">
-      <div class="tip-icon">{{ weeklyTip.icon }}</div>
+      <div class="tip-icon">💡</div>
       <div class="tip-text">
-        <h3 class="tip-title">{{ weeklyTip.title }}</h3>
-        <p class="tip-message">{{ weeklyTip.message }}</p>
+        <h3 class="tip-title">{{ dashboardData.data.weekly_tip.title }}</h3>
+        <p class="tip-message">{{ dashboardData.data.weekly_tip.message }}</p>
       </div>
     </div>
   </mat-card>
@@ -28,24 +28,24 @@
       <div class="budget-content">
         <div class="budget-amount">
           <span class="amount-label">Restante</span>
-          <span class="amount-value" [class.low]="spentPercentage > 80">
-            {{ formatCurrency(remaining) }}
-          </span>
+          <span class="amount-value" [class.low]="dashboardData.data.budget.percentage > 80">
+          {{ formatCurrency(dashboardData.data.budget.remaining) }}
+        </span>
         </div>
 
         <div class="budget-bar">
-          <div class="budget-bar-fill" [style.width.%]="spentPercentage"></div>
+          <div class="budget-bar-fill" [style.width.%]="dashboardData.data.budget.percentage"></div>
         </div>
 
         <div class="budget-details">
+        <span class="detail-item">
+          <span class="detail-label">Gastado:</span>
+          <span class="detail-value">{{ formatCurrency(dashboardData.data.budget.spent) }}</span>
+        </span>
           <span class="detail-item">
-            <span class="detail-label">Gastado:</span>
-            <span class="detail-value">{{ formatCurrency(spent) }}</span>
-          </span>
-          <span class="detail-item">
-            <span class="detail-label">Total:</span>
-            <span class="detail-value">{{ formatCurrency(totalBudget) }}</span>
-          </span>
+          <span class="detail-label">Total:</span>
+          <span class="detail-value">{{ formatCurrency(dashboardData.data.budget.total) }}</span>
+        </span>
         </div>
       </div>
     </mat-card>
@@ -62,13 +62,14 @@
           <canvas #dailyExpensesChart></canvas>
         </div>
         <div class="chart-summary">
-      <span class="summary-text">
-        Total gastado hasta hoy: <strong>{{ formatCurrency(spent) }}</strong>
-      </span>
+        <span class="summary-text">
+          Total gastado hasta hoy: <strong>{{ formatCurrency(dashboardData.data.budget.spent) }}</strong>
+        </span>
         </div>
       </div>
     </mat-card>
   </div>
+
 
   <!-- Acceso directo a escaneo -->
   <mat-card class="scanner-card" appearance="outlined">

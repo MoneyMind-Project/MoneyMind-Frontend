@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from './environment';
-import { Expense } from '../../shared/models/expense.model';
-import { Income} from '../../shared/models/income.model';
-import {PaginatedNotificationsResponse} from '../../shared/models/response.model';
 import { CryptoService} from './crypto.service';
 import { catchError, map } from 'rxjs/operators';
-import { of, Observable } from 'rxjs';
+import { of, Observable, throwError } from 'rxjs';
+import { HomeDashboardResponse} from '../../shared/models/home-dashboard.model';
 
 @Injectable({
   providedIn: 'root'
@@ -123,6 +121,29 @@ export class ReportService{
       })
     );
   }
+
+  getHomeDashboard(): Observable<HomeDashboardResponse> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return throwError(() => new Error('Usuario no autenticado'));
+    }
+
+    const url = `${this.apiUrl}/reports/home/dashboard/`;
+
+    return this.http.get<HomeDashboardResponse>(url, {
+      params: {
+        user_id: userId.toString(),
+      }
+    }).pipe(
+      catchError((error) => {
+        console.error('Error obteniendo datos del Home Dashboard:', error);
+        return of({ success: false, data: null as any });
+      })
+    );
+  }
+
 
   getUserAlerts(seen?: boolean): Observable<any> {
     const userId = this.crypto.getCurrentUserId();

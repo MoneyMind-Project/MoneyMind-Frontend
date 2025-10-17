@@ -15,6 +15,8 @@ import {ReportService} from '../../core/services/report.service';
 import {NotificationsPanel} from './notifications-panel/notifications-panel';
 import {MatDialogModule, MatDialog} from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import {CryptoService} from '../../core/services/crypto.service';
+import { User } from '../../shared/models/user.model';
 
 // Registrar todos los componentes de Chart.js
 Chart.register(...registerables);
@@ -37,7 +39,7 @@ Chart.register(...registerables);
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit, AfterViewInit {
-  userName: string = 'Diego';
+  currentUser!: User;
   unreadNotifications: number = 0;
   showNotificationPanel = false;
 
@@ -68,9 +70,19 @@ export class Dashboard implements OnInit, AfterViewInit {
   showBackPadres = false;
 
   constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService,
-              private dialog: MatDialog, private router: Router, private  alertService: AlertService) {}
+              private dialog: MatDialog, private router: Router, private  alertService: AlertService,
+              private cryptoService: CryptoService) {}
 
   ngOnInit(): void {
+    const user = this.cryptoService.getCurrentUser();
+    if (user) {
+      this.currentUser = user;
+      console.log('Usuario cargado en Dashboard:', this.currentUser);
+    } else {
+      console.warn('No se encontró el usuario en localStorage');
+      // Redirigir o manejar el caso de no autenticado
+      this.router.navigate(['/login']);
+    }
     this.breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small,

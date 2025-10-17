@@ -8,6 +8,10 @@ import { of, Observable } from 'rxjs';
 import { ApiResponse} from '../../shared/models/response.model';
 import { CryptoService } from './crypto.service';
 
+interface CurrentUserData {
+  token: string;
+  user: User;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -70,7 +74,6 @@ export class UserService {
     );
   }
 
-
   // Logout
   logout(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/users/logout/`, {});
@@ -80,4 +83,40 @@ export class UserService {
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/users/list/`);
   }
+
+  updateProfile(userId: number, data: any): Observable<ApiResponse<any>> {
+    return this.http.put<any>(`${this.apiUrl}/users/update-profile/${userId}/`, data).pipe(
+      map((response) => {
+        if (response?.user) {
+          // Actualizamos el usuario almacenado en el localStorage
+          const encryptedUser = localStorage.getItem('mm-current-user');
+          if (encryptedUser) {
+            const currentUser = this.crypto.decrypt(encryptedUser) as CurrentUserData;
+            currentUser.user = { ...currentUser.user, ...response.user };
+            localStorage.setItem('mm-current-user', this.crypto.encrypt(currentUser));
+          }
+
+          return {
+            success: true,
+            message: response.message || 'Perfil actualizado correctamente',
+            data: response
+          } as ApiResponse<any>;
+        }
+
+        return {
+          success: false,
+          message: 'Error al actualizar el perfil',
+          data: undefined
+        } as ApiResponse<any>;
+      }),
+      catchError((error) =>
+        of({
+          success: false,
+          message: error?.error?.message || 'Error al actualizar el perfil',
+          data: undefined
+        })
+      )
+    );
+  }
+
 }

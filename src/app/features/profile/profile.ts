@@ -6,12 +6,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { User } from '../../shared/models/user.model';
+import { CryptoService } from '../../core/services/crypto.service';
+import {BalanceService} from '../../core/services/balance.service';
 
 interface UserData {
-  name: string;
-  email: string;
   memberSince: Date;
-  currentBudget: number;
 }
 
 @Component({
@@ -29,27 +29,42 @@ interface UserData {
   styleUrl: './profile.css'
 })
 export class Profile implements OnInit {
+  currentUser!: User;
   userData: UserData = {
-    name: 'Diego Martínez',
-    email: 'diego.martinez@example.com',
     memberSince: new Date(2024, 0, 15),
-    currentBudget: 1200
   };
+  monthly_income: number = 0;
+  current_balance: number = 0;
 
-  constructor(private router: Router) {}
+
+  constructor(private router: Router, private cryptoService: CryptoService, private balanceService: BalanceService) {}
 
   ngOnInit(): void {
     // Aquí cargarías los datos reales del usuario desde tu servicio
     this.loadUserData();
+    this.loadUserBalance();
   }
 
   loadUserData(): void {
-    // TODO: Obtener datos del usuario desde tu servicio de autenticación
-    const storedUser = localStorage.getItem('mm-current-user');
-    if (storedUser) {
-      // Parsear y usar datos reales
-      // this.userData = ...
-    }
+    this.currentUser = this.cryptoService.getCurrentUser()!;
+    this.balanceService.getUserBalance().subscribe()
+  }
+
+  private loadUserBalance(): void {
+    this.balanceService.getUserBalance().subscribe({
+      next: (res) => {
+        if (res) {
+          this.monthly_income = res.monthly_income ?? 0;
+          this.current_balance = res.current_balance ?? 0;
+          console.log('✅ Datos de balance cargados:', res);
+        } else {
+          console.warn('No se encontraron datos de balance para este usuario');
+        }
+      },
+      error: (err) => {
+        console.error('❌ Error al obtener el balance del usuario:', err);
+      }
+    });
   }
 
   editBudget(): void {

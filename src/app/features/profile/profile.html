@@ -13,8 +13,8 @@
           <mat-icon class="avatar-icon">person</mat-icon>
         </div>
         <div class="user-info">
-          <h2 class="user-name">{{ userData.name }}</h2>
-          <p class="user-email">{{ userData.email }}</p>
+          <h2 class="user-name">{{ currentUser.first_name }}</h2>
+          <p class="user-email">{{ currentUser.email }}</p>
           <span class="user-badge">
             <mat-icon class="badge-icon">schedule</mat-icon>
             Miembro desde {{ getMembershipDuration() }}
@@ -34,7 +34,7 @@
           <mat-icon class="stat-icon">account_balance_wallet</mat-icon>
           <div class="stat-content">
             <span class="stat-label">Presupuesto actual</span>
-            <span class="stat-value">{{ formatCurrency(userData.currentBudget) }}</span>
+            <span class="stat-value">{{ formatCurrency(current_balance) }}</span>
           </div>
         </div>
       </div>

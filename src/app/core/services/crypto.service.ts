@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as CryptoJS from 'crypto-js';
 import { environment } from './environment';
+import { User} from '../../shared/models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,14 @@ export class CryptoService {
 
     const currentUser = this.decrypt<{ token: string; user: { id: number } }>(encryptedUser);
     return currentUser?.user?.id ?? null;
+  }
+
+  getCurrentUser(): User | null {
+    const encryptedUser = localStorage.getItem('mm-current-user');
+    if (!encryptedUser) return null;
+
+    const currentUser = this.decrypt<{ token: string; user: User }>(encryptedUser);
+    return currentUser?.user ?? null;
   }
 
 }
