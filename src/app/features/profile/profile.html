@@ -1,10 +1,78 @@
-<p>Profile works!</p>
-<button mat-flat-button color="warn" (click)="logOut()">
-  Cerrar sesión
-</button>
+<div class="profile-container">
+  <!-- Header con título -->
+  <div class="profile-header">
+    <h1 class="profile-title">Mi Perfil</h1>
+    <p class="profile-subtitle">Gestiona tu información y preferencias</p>
+  </div>
 
-<p>Datos del usuario (correo).</p>
+  <div class="profile-content">
+    <!-- Tarjeta de información del usuario -->
+    <mat-card class="user-info-card" appearance="outlined">
+      <div class="user-avatar-section">
+        <div class="user-avatar">
+          <mat-icon class="avatar-icon">person</mat-icon>
+        </div>
+        <div class="user-info">
+          <h2 class="user-name">{{ userData.name }}</h2>
+          <p class="user-email">{{ userData.email }}</p>
+          <span class="user-badge">
+            <mat-icon class="badge-icon">schedule</mat-icon>
+            Miembro desde {{ getMembershipDuration() }}
+          </span>
+        </div>
 
-<p>Ajuste de presupuesto (cuestionario inicial).</p>
+        <!-- Botón cerrar sesión en la esquina -->
+        <button mat-icon-button class="logout-icon-btn" (click)="logOut()" matTooltip="Cerrar sesión">
+          <mat-icon class="logout-icon">logout</mat-icon>
+        </button>
+      </div>
 
-<p>Exportar reporte en PDF/Excel.</p>
+      <mat-divider></mat-divider>
+
+      <div class="user-stats">
+        <div class="stat-item">
+          <mat-icon class="stat-icon">account_balance_wallet</mat-icon>
+          <div class="stat-content">
+            <span class="stat-label">Presupuesto actual</span>
+            <span class="stat-value">{{ formatCurrency(userData.currentBudget) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <button mat-stroked-button color="primary" class="edit-profile-btn" (click)="editProfile()">
+        <mat-icon>edit</mat-icon>
+        Editar información
+      </button>
+    </mat-card>
+
+    <!-- Sección de configuración -->
+    <div class="settings-section">
+
+      <!-- Exportar reportes -->
+      <mat-card class="settings-card" appearance="outlined">
+        <div class="card-header-custom">
+          <div class="header-icon-wrapper export-color">
+            <mat-icon class="header-icon">download</mat-icon>
+          </div>
+          <div class="header-text">
+            <h3 class="card-title-custom">Exportar reportes</h3>
+            <p class="card-subtitle">Descarga tus datos financieros</p>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="card-actions">
+          <button mat-raised-button class="export-btn pdf-btn" (click)="exportPDF()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Descargar PDF
+          </button>
+          <button mat-raised-button class="export-btn excel-btn" (click)="exportExcel()">
+            <mat-icon>table_chart</mat-icon>
+            Descargar Excel
+          </button>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</div>
