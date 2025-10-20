@@ -94,7 +94,7 @@
       <div class="section-title-wrapper">
         <mat-icon class="section-icon">notifications_active</mat-icon>
         <h2 class="section-title">Próximos pagos</h2>
-        <h2 class="debt-count">{{ debts.length }}</h2>
+        <h2 class="debt-count">{{ dashboardData.data.upcoming_payments.length }}</h2>
       </div>
       <button mat-stroked-button color="primary" (click)="openAddDebtDialog()">
         <mat-icon>add</mat-icon>
@@ -104,35 +104,35 @@
 
     <div class="debts-list">
       <mat-card
-        *ngFor="let debt of debts"
+        *ngFor="let payment of dashboardData.data.upcoming_payments"
         class="debt-card"
-        [ngClass]="getDebtUrgencyClass(debt.daysUntilDue)"
+        [ngClass]="getDebtUrgencyClass(payment.payment_day)"
         appearance="outlined">
         <div class="debt-content">
           <div class="debt-info">
             <div class="debt-urgency-indicator"></div>
             <div class="debt-details">
-              <h4 class="debt-name">{{ debt.name }}</h4>
+              <h4 class="debt-name">{{ payment.name }}</h4>
               <div class="debt-meta">
                 <span class="debt-date">
                   <mat-icon class="meta-icon">event</mat-icon>
-                  {{ debt.dueDate | date:'dd/MM/yyyy' }}
+                  {{ getPaymentDate(payment.payment_day) | date:'dd/MM/yyyy' }}
                 </span>
-                <span class="debt-days" [ngClass]="getDebtUrgencyClass(debt.daysUntilDue)">
+                <span class="debt-days" [ngClass]="getDebtUrgencyClass(payment.payment_day)">
                   <mat-icon class="meta-icon">schedule</mat-icon>
-                  {{ debt.daysUntilDue }} días restantes
+                  {{ getDaysUntilPayment(payment.payment_day) }} días restantes
                 </span>
               </div>
             </div>
           </div>
 
           <div class="debt-actions">
-            <span class="debt-amount">{{ formatCurrency(debt.amount) }}</span>
+            <span class="debt-amount">{{ formatCurrency(payment.amount) }}</span>
             <button
               mat-flat-button
               color="primary"
               class="pay-button"
-              (click)="openPaymentDialog(debt)">
+              (click)="openPaymentDialog(payment)">
               <mat-icon>payment</mat-icon>
               Pagar
             </button>
@@ -140,7 +140,7 @@
         </div>
       </mat-card>
 
-      <div *ngIf="debts.length === 0" class="empty-debts">
+      <div *ngIf="dashboardData.data.upcoming_payments.length === 0" class="empty-debts">
         <mat-icon class="empty-icon">check_circle</mat-icon>
         <p class="empty-text">No tienes pagos pendientes</p>
         <button mat-stroked-button color="primary" (click)="openAddDebtDialog()">

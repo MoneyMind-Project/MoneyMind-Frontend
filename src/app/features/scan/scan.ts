@@ -17,6 +17,9 @@ import { MovementDetails} from './movement-details/movement-details';
 import { DashboardResponse} from '../../shared/models/response.model';
 import { MovementService } from '../../core/services/movement.service';
 import {CategoryUtils} from '../../shared/utils/category.utils';
+import { Router } from '@angular/router';
+import { RecurringPayment } from '../../shared/models/recurring-payment.model';
+
 
 
 @Component({
@@ -46,11 +49,37 @@ export class Scan implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private movementService: MovementService
-  ) {}
+    private movementService: MovementService,
+    private router: Router
+  ) {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state) {
+      const state = navigation.extras.state as {
+        recurringPayment?: RecurringPayment;
+        autoOpenForm?: boolean;
+      };
+
+      if (state.autoOpenForm && state.recurringPayment) {
+        // Guardar temporalmente para usar en ngAfterViewInit
+        this.pendingRecurringPayment = state.recurringPayment;
+      }
+    }
+  }
+
+  private pendingRecurringPayment?: RecurringPayment;
 
   ngOnInit(): void {
     this.loadDashboard();
+  }
+
+  ngAfterViewInit(): void {
+    // Abrir el form automáticamente si viene de un recurring payment
+    if (this.pendingRecurringPayment) {
+      setTimeout(() => {
+        this.openExpenseDialog('manual', this.pendingRecurringPayment);
+        this.pendingRecurringPayment = undefined; // Limpiar después de usar
+      }, 100);
+    }
   }
 
   loadDashboard(): void {
@@ -114,9 +143,19 @@ export class Scan implements OnInit {
     this.isTotalAmountVisible = !this.isTotalAmountVisible;
   }
 
-  openExpenseDialog(mode: 'upload' | 'camera' | 'manual') {
+  openExpenseDialog(mode: 'upload' | 'camera' | 'manual', recurringPayment?: RecurringPayment) {
     const dialogRef = this.dialog.open(ExpenseDialog, {
-      data: { mode },
+      data: {
+        mode,
+        prefilledData: recurringPayment ? {
+          place: recurringPayment.name,  // "Netflix Premium" va a "place"
+          total: recurringPayment.amount,
+          category: recurringPayment.category,
+          date: new Date().toISOString().split('T')[0], // Fecha de hoy en formato YYYY-MM-DD
+          time: new Date().toTimeString().slice(0, 5),  // Hora actual HH:MM
+          recurringPaymentId: recurringPayment.id
+        } : null
+      },
       disableClose: true
     });
 
@@ -124,8 +163,29 @@ export class Scan implements OnInit {
       if (newExpense) {
         console.log('Nuevo gasto guardado:', newExpense);
         this.addNewMovement('expense', newExpense);
+
+        // Si viene de recurring payment, ocultar la alerta
+        if (recurringPayment) {
+          this.dismissRecurringPaymentAlert(recurringPayment.id);
+        }
       }
     });
+  }
+
+  dismissRecurringPaymentAlert(recurringPaymentId: number): void {
+    const today = new Date();
+    /*this.paymentService.dismissPaymentAlert({
+      recurring_payment_id: recurringPaymentId,
+      target_month: today.getMonth() + 1,
+      target_year: today.getFullYear()
+    }).subscribe({
+      next: () => {
+        console.log('Alerta de pago ocultada exitosamente');
+      },
+      error: (err) => {
+        console.error('Error al ocultar alerta:', err);
+      }
+    });*/
   }
 
   openIncomeDialog(mode: 'upload' | 'manual') {

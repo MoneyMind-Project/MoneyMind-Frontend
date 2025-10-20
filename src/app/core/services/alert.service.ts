@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from './environment';
-import {PaginatedNotificationsResponse} from '../../shared/models/response.model';
+import {
+  ApiResponse,
+  CreateExpenseApiResponse,
+  PaginatedNotificationsResponse
+} from '../../shared/models/response.model';
 import { CryptoService} from './crypto.service';
 import { catchError, map } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
+import {RecurringPayment} from '../../shared/models/recurring-payment.model';
 
 @Injectable({
   providedIn: 'root'
@@ -97,6 +102,38 @@ export class AlertService{
         return of({ success: false, error });
       })
     );
+  }
+
+  createRecurringPaymentReminder(data: RecurringPayment): Observable<ApiResponse<RecurringPayment>> {
+    const userId = this.crypto.getCurrentUserId();
+
+    const payload = {
+      ...data,
+      user_id: userId
+    };
+
+    return this.http.post<any>(`${this.apiUrl}/alerts/recurring-payments/create/`, payload).pipe(
+      map((response) => ({
+        success: true,
+        message: response.message,
+        data: response.data // 👈 aquí, no "expense"
+      })),
+      catchError((error) =>
+        of({
+          success: false,
+          message: error.error?.message || 'Error al crear el pago recurrente',
+          data: undefined
+        })
+      )
+    );
+  }
+
+  dismissPaymentAlert(data: {
+    recurring_payment_id: number;
+    target_month: number;
+    target_year: number;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/payments/dismiss-alert/`, data);
   }
 
 }

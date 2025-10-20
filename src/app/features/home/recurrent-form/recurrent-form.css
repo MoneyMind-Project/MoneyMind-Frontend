@@ -1,0 +1,138 @@
+.recurrent-dialog{
+  margin: 50px 20px 20px 20px;
+}
+.dialog-title{
+  margin-left: 20px;
+}
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reducido de 16px */
+  padding: 16px;
+  min-width: 480px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
+.full-width {
+  width: 100%;
+  font-size: 14px; /* Reduce el tamaño de fuente de todos los form-fields */
+}
+
+/* Campos más compactos - aplicado a todos los mat-form-field */
+.expense-form .mat-mdc-form-field-infix {
+  min-height: 48px; /* Altura más pequeña */
+  padding: 8px 0; /* Padding reducido */
+}
+
+.expense-form .mat-mdc-form-field-subscript-wrapper {
+  margin-top: 4px; /* Reduce espacio de error */
+}
+
+.expense-form .mat-mdc-text-field-wrapper {
+  padding: 0 12px; /* Padding horizontal reducido */
+}
+
+/* Etiquetas más pequeñas */
+.expense-form .mat-mdc-form-field-label {
+  font-size: 14px;
+}
+
+/* Inputs más pequeños */
+.expense-form input,
+.expense-form textarea,
+.expense-form .mat-mdc-select {
+  font-size: 14px;
+}
+
+/* Mensajes de error más pequeños */
+.expense-form .mat-mdc-form-field-error {
+  font-size: 12px;
+}
+
+/* Botones más compactos */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px; /* Reducido de 12px */
+}
+
+.actions button {
+  flex: 1;
+  height: 40px; /* Altura reducida de botones */
+  font-size: 14px;
+}
+
+/* Ajustes específicos para el datepicker toggle */
+.expense-form .mat-datepicker-toggle {
+  width: 20px;
+  height: 20px;
+}
+
+/* Ajustes para el select */
+.expense-form .mat-mdc-select-arrow {
+  width: 16px;
+  height: 16px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .expense-form {
+    padding: 12px 0; /* Reducido */
+    max-width: 560px;
+    align-items: center;
+  }
+
+  .actions {
+    width: 100%;
+    display: flex; /* Cambiado de block a flex */
+    flex-direction: column; /* Para apilar los botones verticalmente */
+    align-items: center; /* Centra horizontalmente los elementos */
+    justify-content: center; /* Centra verticalmente si hay espacio */
+  }
+
+  .actions button {
+    width: 90%;
+    padding: 12px 0; /* Añade altura vertical */
+    font-size: 16px;  /* Asegura que el texto se vea bien */
+    border-radius: 15px; /* Opcional, para suavizar bordes */
+  }
+
+
+  .full-width {
+    font-size: 13px; /* Aún más pequeño en móvil */
+    width: 90%;
+  }
+
+  .expense-form input,
+  .expense-form textarea,
+  .expense-form .mat-mdc-select {
+    font-size: 13px;
+  }
+
+  .actions button {
+    height: 36px; /* Más pequeños en móvil */
+    font-size: 13px;
+  }
+}
+
+.form-error {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #fdecea;
+  color: #b71c1c;
+  font-size: 14px;
+}
+
+@media (max-width: 580px) {
+  .expense-form {
+    min-width: 80vw!important;
+
+  }
+}

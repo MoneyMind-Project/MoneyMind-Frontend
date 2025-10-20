@@ -1,0 +1,86 @@
+<div class="recurrent-dialog">
+  <button matIconButton class="close-btn" (click)="close()" aria-label="Cerrar">
+    <mat-icon>close</mat-icon>
+  </button>
+  <div>
+    <h2 class="dialog-title">Nuevo gasto recurrente</h2>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="expense-form">
+
+      <!-- Nombre del pago -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre del pago</mat-label>
+        <input matInput formControlName="name" placeholder="Ej: Netflix Premium" />
+        <mat-error *ngIf="form.get('name')?.hasError('required')">
+          El nombre es obligatorio
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Categoría -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Categoría</mat-label>
+        <mat-select formControlName="category">
+          <mat-option *ngFor="let c of categories" [value]="c">
+            {{ formatCategory(c) | titlecase }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('category')?.hasError('required')">
+          La categoría es obligatoria
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Monto -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Monto</mat-label>
+        <input matInput type="number" formControlName="amount" min="0.01" step="0.01" />
+        <mat-error *ngIf="form.get('amount')?.hasError('required')">
+          El monto es obligatorio
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Tipo de recurrencia -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tipo de recurrencia</mat-label>
+        <mat-select formControlName="recurrence_type">
+          <mat-option value="monthly">Mensual</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Día de pago -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Día de pago</mat-label>
+        <input matInput type="number" formControlName="payment_day" min="1" max="31" />
+      </mat-form-field>
+
+      <!-- Fecha de inicio -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Fecha de inicio</mat-label>
+        <input matInput [matDatepicker]="pickerStart" formControlName="start_date" />
+        <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+        <mat-datepicker #pickerStart></mat-datepicker>
+      </mat-form-field>
+
+      <!-- Fecha de fin -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Fecha de fin (opcional)</mat-label>
+        <input matInput [matDatepicker]="pickerEnd" formControlName="end_date" />
+        <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+        <mat-datepicker #pickerEnd></mat-datepicker>
+      </mat-form-field>
+
+      <!-- Activo -->
+      <mat-checkbox formControlName="is_active">Activo</mat-checkbox>
+
+      <!-- Acciones -->
+      <div class="actions">
+        <button mat-stroked-button color="warn" type="button" (click)="onCancel()">
+          Cancelar
+        </button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+

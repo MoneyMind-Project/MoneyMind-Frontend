@@ -1,3 +1,5 @@
+import {RecurringPayment} from './recurring-payment.model';
+
 export interface HomeDashboardResponse {
   success: boolean;
   data: HomeDashboardData;
@@ -7,7 +9,7 @@ export interface HomeDashboardData {
   weekly_tip: WeeklyTip;
   budget: BudgetData;
   daily_expenses: DailyExpense[];
-  upcoming_payments: UpcomingPayment[];
+  upcoming_payments: RecurringPayment[];
 }
 
 export interface WeeklyTip {
@@ -27,12 +29,4 @@ export interface BudgetData {
 export interface DailyExpense {
   day: number;
   amount: number;
-}
-
-export interface UpcomingPayment {
-  // temporalmente vacío, pero puedes ampliarlo luego
-  id?: number;
-  description?: string;
-  due_date?: string;
-  amount?: number;
 }

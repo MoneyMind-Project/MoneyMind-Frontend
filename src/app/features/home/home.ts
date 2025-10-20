@@ -10,17 +10,11 @@ import { User } from '../../shared/models/user.model';
 import { CryptoService } from '../../core/services/crypto.service';
 import { ReportService } from '../../core/services/report.service';
 import { HomeDashboardResponse, DailyExpense } from '../../shared/models/home-dashboard.model';
+import {MatDialog} from '@angular/material/dialog';
+import {RecurringPayment} from '../../shared/models/recurring-payment.model';
+import {RecurrentForm} from './recurrent-form/recurrent-form';
 
 Chart.register(...registerables);
-
-interface Debt {
-  id: number;
-  name: string;
-  amount: number;
-  dueDate: Date;
-  isPaid: boolean;
-  daysUntilDue: number;
-}
 
 @Component({
   selector: 'app-home',
@@ -47,37 +41,11 @@ export class Home implements OnInit, AfterViewInit {
   dailyExpenses: DailyExpense[] = [];
   private viewInitialized = false; // 👈 Añadido
 
-  debts: Debt[] = [
-    {
-      id: 1,
-      name: 'Tarjeta de crédito BBVA',
-      amount: 450,
-      dueDate: new Date(2025, 9, 20),
-      isPaid: false,
-      daysUntilDue: 4
-    },
-    {
-      id: 2,
-      name: 'Internet Movistar',
-      amount: 89.90,
-      dueDate: new Date(2025, 9, 25),
-      isPaid: false,
-      daysUntilDue: 9
-    },
-    {
-      id: 3,
-      name: 'Netflix Premium',
-      amount: 44.90,
-      dueDate: new Date(2025, 9, 18),
-      isPaid: false,
-      daysUntilDue: 2
-    }
-  ];
-
   constructor(
     private router: Router,
     private cryptoService: CryptoService,
     private reportService: ReportService,
+    private dialog: MatDialog,
 
   ) {}
 
@@ -88,6 +56,7 @@ export class Home implements OnInit, AfterViewInit {
       next: (res) => {
         if (res.success && res.data) {
           this.dashboardData = res;
+          console.log(this.dashboardData)
 
           const budget = res.data.budget;
           this.currentMonth = this.getMonthName(budget.month);
@@ -197,10 +166,59 @@ export class Home implements OnInit, AfterViewInit {
     }
   }
 
-  getDebtUrgencyClass(daysUntilDue: number): string {
+  getDebtUrgencyClass(payment_day: number): string {
+    const daysUntilDue = this.getDaysUntilPayment(payment_day);
+
     if (daysUntilDue <= 3) return 'urgent';
     if (daysUntilDue <= 7) return 'warning';
     return 'normal';
+  }
+
+  getDaysUntilPayment(payment_day: number): number {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    let targetMonth = currentMonth;
+    let targetYear = currentYear;
+
+    // 👉 Si el día del pago ya pasó, es del próximo mes
+    if (payment_day < currentDay) {
+      targetMonth += 1;
+      if (targetMonth > 11) { // diciembre → enero siguiente año
+        targetMonth = 0;
+        targetYear += 1;
+      }
+    }
+
+    const paymentDate = new Date(targetYear, targetMonth, payment_day);
+
+    // Diferencia en milisegundos → días
+    const diffTime = paymentDate.getTime() - today.getTime();
+    const daysUntilDue = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return daysUntilDue;
+  }
+
+  getPaymentDate(payment_day: number): Date {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    let targetMonth = currentMonth;
+    let targetYear = currentYear;
+
+    if (payment_day < currentDay) {
+      targetMonth += 1;
+      if (targetMonth > 11) {
+        targetMonth = 0;
+        targetYear += 1;
+      }
+    }
+
+    return new Date(targetYear, targetMonth, payment_day);
   }
 
   goToScanner(): void {
@@ -208,14 +226,31 @@ export class Home implements OnInit, AfterViewInit {
   }
 
   openAddDebtDialog(): void {
-    console.log('Abrir diálogo de agregar deuda');
+    const dialogRef = this.dialog.open(RecurrentForm, {});
+
+    dialogRef.afterClosed().subscribe((newRecurrentPay: RecurringPayment | null) => {
+      if (newRecurrentPay) {
+        console.log('Nuevo gasto recurrente guardado:', newRecurrentPay);
+        //this.addNewMovement('expense', newExpense);
+      }
+    });
   }
 
-  openPaymentDialog(debt: Debt): void {
-    console.log('Registrar pago para:', debt.name);
+  openPaymentDialog(recurringPayment: RecurringPayment): void {
+    // Navegar a scan con los datos del recurring payment
+    this.router.navigate(['/scan'], {
+      state: {
+        recurringPayment: recurringPayment,
+        autoOpenForm: true
+      }
+    });
   }
 
   formatCurrency(amount: number): string {
-    return `S/ ${amount.toFixed(2)}`;
+    return new Intl.NumberFormat('es-PE', {
+      style: 'currency',
+      currency: 'PEN',
+      minimumFractionDigits: 2
+    }).format(amount);
   }
 }

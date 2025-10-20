@@ -9,6 +9,7 @@ import { ViewChild } from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
+import { Category} from '../../../shared/enums/category.enum';
 
 
 @Component({
@@ -49,13 +50,34 @@ export class ExpenseDialog implements AfterViewInit {
   constructor(
     private http: HttpClient,
     private dialogRef: MatDialogRef<ExpenseDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: 'upload' | 'camera' | 'manual' },
+    @Inject(MAT_DIALOG_DATA) public data: {
+      mode: 'upload' | 'camera' | 'manual',
+      prefilledData?: {
+        place: string;
+        total: number;
+        category: string;
+        date: string;
+        time: string;
+        recurringPaymentId: number;
+      }
+    },
     private zone: NgZone
   ) {
-    if (data.mode === 'manual') this.step = 2;
-    this.mode = data.mode;
+    if (data.mode === 'manual' && data.prefilledData) {
+      this.step = 2;
+      this.parsedExpense = {
+        place: data.prefilledData.place,
+        total: data.prefilledData.total,
+        category: data.prefilledData.category as Category,
+        date: data.prefilledData.date,
+        time: data.prefilledData.time,
+        comment: `Pago recurrente: ${data.prefilledData.place}`
+      };
+    } else if (data.mode === 'manual') {
+      this.step = 2;
+    }
 
-    // Detectar dispositivo móvil
+    this.mode = data.mode;
     this.detectMobileDevice();
   }
 
