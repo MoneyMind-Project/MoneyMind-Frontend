@@ -128,12 +128,11 @@ export class AlertService{
     );
   }
 
-  dismissPaymentAlert(data: {
-    recurring_payment_id: number;
-    target_month: number;
-    target_year: number;
-  }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/payments/dismiss-alert/`, data);
+  markRecurringPaymentAsPaid(reminderId: number): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/alerts/recurring-payments/${reminderId}/mark-paid/`,
+      {} // Body vacío ya que el ID va en la URL
+    );
   }
 
 }

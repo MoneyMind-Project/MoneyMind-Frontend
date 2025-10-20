@@ -19,7 +19,7 @@ import { MovementService } from '../../core/services/movement.service';
 import {CategoryUtils} from '../../shared/utils/category.utils';
 import { Router } from '@angular/router';
 import { RecurringPayment } from '../../shared/models/recurring-payment.model';
-
+import { AlertService} from '../../core/services/alert.service';
 
 
 @Component({
@@ -50,7 +50,8 @@ export class Scan implements OnInit {
   constructor(
     private dialog: MatDialog,
     private movementService: MovementService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state) {
@@ -173,19 +174,20 @@ export class Scan implements OnInit {
   }
 
   dismissRecurringPaymentAlert(recurringPaymentId: number): void {
-    const today = new Date();
-    /*this.paymentService.dismissPaymentAlert({
-      recurring_payment_id: recurringPaymentId,
-      target_month: today.getMonth() + 1,
-      target_year: today.getFullYear()
-    }).subscribe({
-      next: () => {
-        console.log('Alerta de pago ocultada exitosamente');
+    this.alertService.markRecurringPaymentAsPaid(recurringPaymentId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          console.log('✅', response.message);
+          // Opcional: Mostrar toast de éxito
+          // this.toast.success(response.message, 'Pago registrado', 3000);
+        }
       },
       error: (err) => {
-        console.error('Error al ocultar alerta:', err);
+        console.error('❌ Error al marcar pago como realizado:', err);
+        // Opcional: Mostrar toast de error
+        // this.toast.error('No se pudo registrar el pago', 'Error', 3000);
       }
-    });*/
+    });
   }
 
   openIncomeDialog(mode: 'upload' | 'manual') {
