@@ -169,10 +169,11 @@ export class Home implements OnInit, AfterViewInit {
   getDebtUrgencyClass(payment_day: number): string {
     const daysUntilDue = this.getDaysUntilPayment(payment_day);
 
-    if (daysUntilDue <= 3) return 'urgent';
-    if (daysUntilDue <= 7) return 'warning';
+    if (daysUntilDue === 0) return 'urgent';
+    if (daysUntilDue === 1) return 'warning';
     return 'normal';
   }
+
 
   getDaysUntilPayment(payment_day: number): number {
     const today = new Date();

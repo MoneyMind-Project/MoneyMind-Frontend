@@ -274,7 +274,7 @@ mat-grid-list {
 
 @media (max-width: 767px) {
   .dashboard-container {
-    padding: 16px;
+    padding: 16px 16px 80px 16px;
     --grid-cols: 1;
     --main-chart-cols: 1;
     --side-chart-cols: 1;

@@ -444,7 +444,7 @@
 
 @media (max-width: 768px) {
   .home-container {
-    padding: 16px;
+    padding: 16px 16px 80px 16px;
   }
 
   .welcome-title {
@@ -474,6 +474,10 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+  }
+
+  .section-header button{
+    margin: auto;
   }
 
   .chart-bars {

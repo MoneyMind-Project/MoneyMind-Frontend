@@ -285,7 +285,7 @@ mat-divider {
 /* Responsive */
 @media (max-width: 768px) {
   .profile-container {
-    padding: 16px;
+    padding: 16px 16px 80px 16px;
   }
 
   .profile-title {
