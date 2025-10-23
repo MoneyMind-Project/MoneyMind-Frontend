@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from './environment';
 import { CryptoService} from './crypto.service';
 import { catchError, map } from 'rxjs/operators';
@@ -144,7 +144,6 @@ export class ReportService{
     );
   }
 
-
   getUserAlerts(seen?: boolean): Observable<any> {
     const userId = this.crypto.getCurrentUserId();
 
@@ -187,8 +186,52 @@ export class ReportService{
     );
   }
 
-  markAlertsAsSeen(alertIds: number[]): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/reports/user-alerts/`, { alert_ids: alertIds });
+  exportReport(params: {
+    userId: string;
+    reportType: 'monthly' | 'yearly' | 'custom';
+    format: 'pdf' | 'excel';
+    month?: number;
+    year?: number;
+    startDate?: string;
+    endDate?: string;
+  }): Observable<Blob> {
+    let httpParams = new HttpParams()
+      .set('user_id', params.userId)
+      .set('report_type', params.reportType)
+      .set('file_format', params.format);
+
+    if (params.reportType === 'monthly' && params.month && params.year) {
+      httpParams = httpParams
+        .set('month', params.month.toString())
+        .set('year', params.year.toString());
+    }
+
+    if (params.reportType === 'yearly' && params.year) {
+      httpParams = httpParams.set('year', params.year.toString());
+    }
+
+    if (params.reportType === 'custom' && params.startDate && params.endDate) {
+      httpParams = httpParams
+        .set('start_date', params.startDate)
+        .set('end_date', params.endDate);
+    }
+
+    return this.http.get(`${this.apiUrl}/reports/export/`, {
+      params: httpParams,
+      responseType: 'blob' // ← Importante para archivos
+    });
+  }
+
+  /**
+   * Descarga el archivo generado
+   */
+  downloadFile(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    window.URL.revokeObjectURL(url);
   }
 
 }

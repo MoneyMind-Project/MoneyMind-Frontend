@@ -10,8 +10,8 @@
     <div class="tip-content">
       <div class="tip-icon">💡</div>
       <div class="tip-text">
-        <h3 class="tip-title">{{ dashboardData?.data?.weekly_tip?.title }}</h3>
-        <p class="tip-message">{{ dashboardData?.data?.weekly_tip?.message }}</p>
+        <h3 class="tip-title">{{ dashboardData.data.weekly_tip.title }}</h3>
+        <p class="tip-message">{{ dashboardData.data.weekly_tip.message }}</p>
       </div>
     </div>
   </mat-card>
@@ -96,10 +96,18 @@
         <h2 class="section-title">Próximos pagos</h2>
         <h2 class="debt-count">{{ dashboardData.data.upcoming_payments.length }}</h2>
       </div>
-      <button mat-stroked-button color="primary" (click)="openAddDebtDialog()">
-        <mat-icon>add</mat-icon>
-        Agregar pago
-      </button>
+      <div class="button-debt-group">
+        <button mat-stroked-button color="primary" class="notifications-btn" (click)="openAddDebtDialog()">
+          <mat-icon>add_alert</mat-icon>
+          Nueva alerta
+        </button>
+
+        <button mat-stroked-button color="accent" class="notifications-btn" (click)="openViewDebtsDialog()">
+          <mat-icon>notifications_active</mat-icon>
+          Ver alertas
+        </button>
+      </div>
+
     </div>
 
     <div class="debts-list">

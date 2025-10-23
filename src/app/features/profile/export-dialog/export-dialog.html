@@ -1,0 +1,124 @@
+<div class="export-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>{{ data.format === 'pdf' ? 'picture_as_pdf' : 'table_chart' }}</mat-icon>
+    Exportar Reporte en {{ formatName }}
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="exportForm" class="export-form">
+
+      <!-- Tipo de Reporte -->
+      <div class="form-section">
+        <label class="section-label">Tipo de Reporte</label>
+        <mat-radio-group formControlName="reportType" class="radio-group">
+          <mat-radio-button value="monthly" class="radio-option">
+            <div class="radio-content">
+              <mat-icon>calendar_today</mat-icon>
+              <div>
+                <div class="radio-title">Mensual</div>
+                <div class="radio-description">Reporte de un mes específico</div>
+              </div>
+            </div>
+          </mat-radio-button>
+
+          <mat-radio-button value="yearly" class="radio-option">
+            <div class="radio-content">
+              <mat-icon>calendar_view_month</mat-icon>
+              <div>
+                <div class="radio-title">Anual</div>
+                <div class="radio-description">Reporte de todo el año</div>
+              </div>
+            </div>
+          </mat-radio-button>
+
+          <mat-radio-button value="custom" class="radio-option">
+            <div class="radio-content">
+              <mat-icon>date_range</mat-icon>
+              <div>
+                <div class="radio-title">Rango Personalizado</div>
+                <div class="radio-description">Selecciona fechas específicas</div>
+              </div>
+            </div>
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+
+      <!-- Selector de Año (siempre visible) -->
+      <div class="form-section" *ngIf="!isCustom">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Año</mat-label>
+          <mat-select formControlName="year">
+            <mat-option *ngFor="let year of years" [value]="year">
+              {{ year }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>event</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Selector de Mes (solo para mensual) -->
+      <div class="form-section" *ngIf="isMonthly">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Mes</mat-label>
+          <mat-select formControlName="month">
+            <mat-option *ngFor="let month of months" [value]="month.value">
+              {{ month.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>calendar_month</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Selector de Rango de Fechas -->
+      <div class="form-section" *ngIf="isCustom">
+        <div class="date-range-container">
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Fecha Inicio</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-datepicker-toggle matIconPrefix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-icon class="date-separator">arrow_forward</mat-icon>
+
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Fecha Fin</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matIconPrefix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Vista Previa -->
+      <div class="preview-section" *ngIf="exportForm.valid">
+        <mat-icon>info</mat-icon>
+        <div class="preview-text">
+          <span *ngIf="isMonthly">
+            Se exportará el reporte de <strong>{{ months[exportForm.value.month - 1].name }} {{ exportForm.value.year }}</strong>
+          </span>
+          <span *ngIf="isYearly">
+            Se exportará el reporte anual de <strong>{{ exportForm.value.year }}</strong>
+          </span>
+          <span *ngIf="isCustom && exportForm!.value!.startDate && exportForm!.value!.endDate">
+            Se exportará el reporte desde <strong>{{ exportForm!.value!.startDate | date:'dd/MM/yyyy' }}</strong>
+            hasta <strong>{{ exportForm!.value!.endDate | date:'dd/MM/yyyy' }}</strong>
+          </span>
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary"
+            [disabled]="!exportForm.valid"
+            (click)="onExport()">
+      <mat-icon>{{ data.format === 'pdf' ? 'picture_as_pdf' : 'table_chart' }}</mat-icon>
+      Exportar {{ formatName }}
+    </button>
+  </mat-dialog-actions>
+</div>

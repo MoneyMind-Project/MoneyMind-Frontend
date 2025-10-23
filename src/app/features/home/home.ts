@@ -237,6 +237,10 @@ export class Home implements OnInit, AfterViewInit {
     });
   }
 
+  openViewDebtsDialog(): void {
+    this.router.navigate(['home/recurrent-payments']);
+  }
+
   openPaymentDialog(recurringPayment: RecurringPayment): void {
     // Navegar a scan con los datos del recurring payment
     this.router.navigate(['/scan'], {

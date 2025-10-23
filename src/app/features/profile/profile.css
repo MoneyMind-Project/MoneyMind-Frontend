@@ -332,6 +332,7 @@ mat-divider {
 
   .export-btn {
     min-width: unset;
+    padding: 10px 20px;
   }
 }
 

@@ -9,6 +9,10 @@ import { MatListModule } from '@angular/material/list';
 import { User } from '../../shared/models/user.model';
 import { CryptoService } from '../../core/services/crypto.service';
 import {BalanceService} from '../../core/services/balance.service';
+import {ReportService} from '../../core/services/report.service';
+import {ExportDialog, ExportConfig} from './export-dialog/export-dialog';
+import { MatDialog } from '@angular/material/dialog';
+import {MatDialogModule} from '@angular/material/dialog';
 
 interface UserData {
   memberSince: Date;
@@ -20,6 +24,7 @@ interface UserData {
   imports: [
     CommonModule,
     MatButtonModule,
+    MatDialogModule,
     MatCardModule,
     MatIconModule,
     MatDividerModule,
@@ -37,7 +42,8 @@ export class Profile implements OnInit {
   current_balance: number = 0;
 
 
-  constructor(private router: Router, private cryptoService: CryptoService, private balanceService: BalanceService) {}
+  constructor(private router: Router, private cryptoService: CryptoService,
+              private balanceService: BalanceService, private reportService :ReportService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     // Aquí cargarías los datos reales del usuario desde tu servicio
@@ -74,18 +80,101 @@ export class Profile implements OnInit {
   }
 
   exportPDF(): void {
-    console.log('Exportando reporte en PDF...');
-    // Implementar lógica de exportación
+    const dialogRef = this.dialog.open(ExportDialog, {
+      width: '600px',
+      data: { format: 'pdf' },
+      disableClose: true,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe((config: ExportConfig) => {
+      if (config) {
+        this.downloadReport(config);
+      }
+    });
   }
 
   exportExcel(): void {
-    console.log('Exportando reporte en Excel...');
-    // Implementar lógica de exportación
+    const dialogRef = this.dialog.open(ExportDialog, {
+      width: '600px',
+      data: { format: 'excel' },
+      disableClose: true,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe((config: ExportConfig) => {
+      if (config) {
+        this.downloadReport(config);
+      }
+    });
   }
 
-  changePassword(): void {
-    console.log('Cambiar contraseña');
-    // Implementar cambio de contraseña
+  private downloadReport(config: ExportConfig): void {
+    const userId = '13';
+
+    console.log(`Exportando reporte en ${config.format.toUpperCase()}...`, config);
+
+    // Preparar parámetros según el tipo de reporte
+    let params: any = {
+      userId: userId,
+      reportType: config.reportType,
+      format: config.format,
+      year: config.year
+    };
+
+    if (config.reportType === 'monthly') {
+      params.report_type = 'monthly';
+      params.month = config.month;
+    } else if (config.reportType === 'yearly') {
+      params.report_type = 'yearly';  // Backend usa 'yearly'
+    } else if (config.reportType === 'custom' && config.startDate && config.endDate) {
+      params.report_type = 'custom';  // Backend usa 'custom'
+      params.start_date = this.formatDate(config.startDate);
+      params.end_date = this.formatDate(config.endDate);
+    }
+
+    this.reportService.exportReport(params).subscribe({
+      next: (blob) => {
+        const filename = this.generateFilename(config);
+        this.reportService.downloadFile(blob, filename);
+        console.log(`✅ ${config.format.toUpperCase()} descargado exitosamente`);
+      },
+      error: (err) => {
+        console.error(`❌ Error al descargar ${config.format.toUpperCase()}:`, err);
+        // Aquí podrías mostrar un snackbar o notificación de error
+      }
+    });
+  }
+
+  private generateFilename(config: ExportConfig): string {
+    const extension = config.format === 'pdf' ? 'pdf' : 'xlsx';
+    const prefix = 'reporte_financiero';
+
+    if (config.reportType === 'monthly' && config.month) {
+      return `${prefix}_${config.year}_${String(config.month).padStart(2, '0')}.${extension}`;
+    } else if (config.reportType === 'yearly') {
+      return `${prefix}_${config.year}.${extension}`;
+    } else if (config.reportType === 'custom' && config.startDate && config.endDate) {
+      const start = this.formatDateShort(config.startDate);
+      const end = this.formatDateShort(config.endDate);
+      return `${prefix}_${start}_${end}.${extension}`;
+    }
+
+    return `${prefix}_${Date.now()}.${extension}`;
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatDateShort(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
   }
 
   editProfile(): void {

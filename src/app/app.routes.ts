@@ -6,6 +6,7 @@ import { MainLayout} from './features/layouts/main-layout/main-layout';
 import {GuestGuard} from './core/guards/guest.guard';
 import {AuthGuard} from './core/guards/auth.guard';
 import {Home} from './features/home/home';
+import {RecurrentList} from './features/home/recurrent-list/recurrent-list';
 import {Scan} from './features/scan/scan';
 import {AllMovements} from './features/scan/all-movements/all-movements';
 import {Dashboard} from './features/dashboard/dashboard';
@@ -25,6 +26,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard], // solo accesible si estás logueado
     children: [
       { path: 'home', component: Home },
+      { path: 'home/recurrent-payments', component: RecurrentList },
       {
         path: 'scan',
         component: Scan,

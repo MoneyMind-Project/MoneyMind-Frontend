@@ -1,0 +1,182 @@
+.export-dialog {
+  min-width: 500px;
+  max-width: 600px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    padding: 24px 24px 16px;
+    font-size: 20px;
+    font-weight: 500;
+
+    mat-icon {
+      color: #1976d2;
+    }
+  }
+}
+
+mat-dialog-content {
+  padding: 0 24px 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.export-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  margin-bottom: 8px;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radio-option {
+  padding: 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #1976d2;
+    background-color: rgba(25, 118, 210, 0.04);
+  }
+
+  &.mat-radio-checked {
+    border-color: #1976d2;
+    background-color: rgba(25, 118, 210, 0.08);
+  }
+
+  ::ng-deep .mat-radio-container {
+    display: none;
+  }
+
+  ::ng-deep .mat-radio-label-content {
+    padding: 0;
+    width: 100%;
+  }
+}
+
+.radio-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  mat-icon {
+    color: #1976d2;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .radio-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+    margin-bottom: 4px;
+  }
+
+  .radio-description {
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.date-range-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .date-field {
+    flex: 1;
+  }
+
+  .date-separator {
+    color: rgba(0, 0, 0, 0.54);
+    margin-top: -8px;
+  }
+}
+
+.preview-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background-color: #e3f2fd;
+  border-radius: 8px;
+  border-left: 4px solid #1976d2;
+  margin-bottom: 16px;
+
+  mat-icon {
+    color: #1976d2;
+    margin-top: 2px;
+  }
+
+  .preview-text {
+    flex: 1;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.87);
+    line-height: 1.5;
+
+    strong {
+      font-weight: 600;
+      color: #1976d2;
+    }
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  margin: 0;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    margin-left: 8px;
+
+    mat-icon {
+      margin-right: 4px;
+    }
+  }
+}
+
+
+@media (max-width: 600px) {
+  .export-dialog {
+    min-width: 100%;
+  }
+
+  .date-range-container {
+    flex-direction: column;
+    gap: 12px;
+
+    .date-separator {
+      transform: rotate(90deg);
+      margin: 0;
+    }
+
+    .date-field {
+      width: 100%;
+    }
+  }
+}
