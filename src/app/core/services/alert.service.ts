@@ -128,6 +128,27 @@ export class AlertService{
     );
   }
 
+  getRecurringPaymentsByUser(): Observable<RecurringPayment[]> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.warn('No hay usuario logueado.');
+      return of([]); // Devuelve un arreglo vacío si no hay usuario
+    }
+
+    return this.http
+      .get<RecurringPayment[]>(`${this.apiUrl}/alerts/recurring-payments/all/`, {
+        params: { user_id: userId.toString() },
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Error al obtener los pagos recurrentes:', error);
+          return of([]); // Devuelve un array vacío si hay error
+        })
+      );
+  }
+
+
   markRecurringPaymentAsPaid(reminderId: number): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/alerts/recurring-payments/${reminderId}/mark-paid/`,

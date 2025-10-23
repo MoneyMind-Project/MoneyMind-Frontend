@@ -1,1 +1,124 @@
-<p>recurrent-list works!</p>
+<div class="recurrent-list-container">
+  <div class="section-header">
+    <div class="section-title-wrapper">
+      <mat-icon class="section-icon">notifications_active</mat-icon>
+      <h2 class="section-title">Mis Alertas de Pago</h2>
+      <span class="alert-count">{{ recurringPayments.length }}</span>
+    </div>
+
+    <button
+      mat-flat-button
+      color="primary"
+      class="add-alert-btn"
+      (click)="openAddAlertDialog()">
+      <mat-icon>add_alert</mat-icon>
+      Nueva alerta
+    </button>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+    <p>Cargando alertas...</p>
+  </div>
+
+  <!-- Lista de alertas -->
+  <div *ngIf="!loading" class="alerts-grid">
+    <mat-card
+      *ngFor="let payment of recurringPayments"
+      class="alert-card"
+      [ngClass]="getUrgencyClass(payment.payment_day)"
+      appearance="outlined">
+
+      <!-- Header con categoría e ícono -->
+      <div class="card-header">
+        <div class="category-badge">
+          <mat-icon class="category-icon">{{ getCategoryIcon(payment.category) }}</mat-icon>
+          <span class="category-text">{{ formatCategory(payment.category) | titlecase }}</span>
+        </div>
+
+        <div class="status-indicator" [class.active]="payment.is_active">
+          <mat-icon>{{ payment.is_active ? 'check_circle' : 'cancel' }}</mat-icon>
+        </div>
+      </div>
+
+      <!-- Contenido principal -->
+      <div class="card-content">
+        <h3 class="payment-name">{{ payment.name }}</h3>
+
+        <div class="payment-info">
+          <div class="info-row">
+            <mat-icon class="info-icon">payments</mat-icon>
+            <span class="payment-amount">{{ formatCurrency(payment.amount) }}</span>
+          </div>
+
+          <div class="info-row">
+            <mat-icon class="info-icon">event</mat-icon>
+            <span>Día {{ payment.payment_day }} de cada mes</span>
+          </div>
+
+          <div class="info-row">
+            <mat-icon class="info-icon">schedule</mat-icon>
+            <span class="days-until" [ngClass]="getUrgencyClass(payment.payment_day)">
+              {{ getDaysUntilPayment(payment.payment_day) }} días restantes
+            </span>
+          </div>
+
+          <div class="info-row" *ngIf="payment.start_date">
+            <mat-icon class="info-icon">play_arrow</mat-icon>
+            <span>Desde: {{ payment.start_date | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+          <div class="info-row" *ngIf="payment.end_date">
+            <mat-icon class="info-icon">stop</mat-icon>
+            <span>Hasta: {{ payment.end_date | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <!-- Próximo pago destacado -->
+        <div class="next-payment-box" [ngClass]="getUrgencyClass(payment.payment_day)">
+          <mat-icon>alarm</mat-icon>
+          <div>
+            <span class="next-payment-label">Próximo pago:</span>
+            <span class="next-payment-date">{{ getNextPaymentDate(payment.payment_day) | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="card-actions">
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="openEditAlertDialog(payment)">
+          <mat-icon>edit</mat-icon>
+          Editar
+        </button>
+
+        <button
+          mat-flat-button
+          color="warn"
+          (click)="openDeleteDialog(payment)">
+          <mat-icon>delete</mat-icon>
+          Eliminar
+        </button>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!loading && recurringPayments.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">notifications_off</mat-icon>
+    <h3 class="empty-title">No tienes alertas configuradas</h3>
+    <p class="empty-text">
+      Crea tu primera alerta para recibir recordatorios automáticos de tus pagos recurrentes
+    </p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="openAddAlertDialog()">
+      <mat-icon>add_alert</mat-icon>
+      Crear mi primera alerta
+    </button>
+  </div>
+</div>
