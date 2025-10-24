@@ -63,6 +63,13 @@ export class Dashboard implements OnInit, AfterViewInit {
   prediccionChart: any;
   esencialesChart: any;
 
+  // Comentarios explicativos (generados por IA)
+  monthlyPredictionsComment: string = '';
+  expensesByCategoryComment: string = '';
+  expensesByParentCategoryComment: string = '';
+  savingsEvolutionComment: string = '';
+  essentialVsNonEssentialComment: string = '';
+
   showBackCategorias = false;
   showBackAhorro = false;
   showBackProyeccion = false;
@@ -149,6 +156,12 @@ export class Dashboard implements OnInit, AfterViewInit {
           this.createPrediccionChartWithData(data.monthly_predictions);
           this.createAhorroChartWithData(data.savings_evolution);
           this.createEsencialesChartWithData(data.essential_vs_non_essential);
+          this.expensesByCategoryComment = data.expenses_by_category_comment || 'Sin comentario disponible.';
+          this.expensesByParentCategoryComment = data.expenses_by_parent_category_comment || 'Sin comentario disponible.';
+          this.monthlyPredictionsComment = data.monthly_predictions_comment || 'Sin comentario disponible.';
+          this.savingsEvolutionComment = data.savings_evolution_comment || 'Sin comentario disponible.';
+          this.essentialVsNonEssentialComment = data.essential_vs_non_essential_comment || 'Sin comentario disponible.';
+
         } else {
           console.error('Respuesta no válida del backend:', response);
           this.loadFallbackCharts();

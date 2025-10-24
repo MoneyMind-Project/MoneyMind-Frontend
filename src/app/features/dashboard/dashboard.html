@@ -97,11 +97,7 @@
               </button>
             </mat-card-header>
             <mat-card-content>
-              <p>
-                Este gráfico muestra la distribución de gastos clasificados en
-                diferentes <b>minicategorías</b>, ayudándote a identificar en qué
-                áreas específicas concentras más tus gastos.
-              </p>
+              <p>{{ expensesByCategoryComment }}</p>
             </mat-card-content>
           </div>
 
@@ -138,11 +134,7 @@
               </button>
             </mat-card-header>
             <mat-card-content>
-              <p>
-                Este gráfico muestra la <b>evolución del ahorro mes a mes</b>,
-                ayudándote a identificar los meses donde acumulaste más saldo
-                o tuviste pérdidas.
-              </p>
+              <p>{{ savingsEvolutionComment }}</p>
             </mat-card-content>
           </div>
 
@@ -179,11 +171,7 @@
               </button>
             </mat-card-header>
             <mat-card-content>
-              <p>
-                Este gráfico muestra la <b>proporción de gastos agrupados por categorías padres</b>,
-                permitiéndote analizar qué grandes áreas de tu presupuesto concentran mayor gasto
-                (ej. vivienda, transporte, alimentación).
-              </p>
+              <p>{{ expensesByParentCategoryComment }}</p>
             </mat-card-content>
           </div>
 
@@ -220,11 +208,7 @@
               </button>
             </mat-card-header>
             <mat-card-content>
-              <p>
-                Este gráfico muestra la <b>predicción de tus gastos para los próximos meses</b>,
-                basada en el historial de consumo. Te permite anticipar posibles desbalances
-                y planificar mejor tu presupuesto.
-              </p>
+              <p>{{ monthlyPredictionsComment }}</p>
             </mat-card-content>
           </div>
 
@@ -261,11 +245,7 @@
               </button>
             </mat-card-header>
             <mat-card-content>
-              <p>
-                Este gráfico compara tus <b>gastos esenciales</b> (como vivienda, alimentación, transporte)
-                frente a los <b>no esenciales</b> (ocio, entretenimiento, compras extra).
-                Te ayuda a mantener un balance saludable entre necesidades básicas y gastos discrecionales.
-              </p>
+              <p>{{ essentialVsNonEssentialComment }}</p>
             </mat-card-content>
           </div>
 
