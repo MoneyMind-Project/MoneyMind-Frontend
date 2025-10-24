@@ -148,6 +148,30 @@ export class AlertService{
       );
   }
 
+  updateRecurringPayment(reminderId: number, updatedData: any): Observable<RecurringPayment | null> {
+    return this.http
+      .patch<RecurringPayment>(`${this.apiUrl}/alerts/recurring-payments/update/${reminderId}/`, updatedData)
+      .pipe(
+        catchError((error) => {
+          console.error('Error al actualizar el pago recurrente:', error);
+          return of(null);
+        })
+      );
+  }
+
+  deleteRecurringPayment(reminderId: number): Observable<boolean> {
+    return this.http
+      .delete<{ success: boolean }>(`${this.apiUrl}/alerts/recurring-payments/delete/${reminderId}/`)
+      .pipe(
+        map((response) => response.success),
+        catchError((error) => {
+          console.error('Error al eliminar el pago recurrente:', error);
+          return of(false);
+        })
+      );
+  }
+
+
 
   markRecurringPaymentAsPaid(reminderId: number): Observable<any> {
     return this.http.post(

@@ -1,24 +1,23 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import { RecurringPayment} from '../../../shared/models/recurring-payment.model';
+import { Component, Inject, OnInit } from '@angular/core';
+import { RecurringPayment } from '../../../shared/models/recurring-payment.model';
 import { CommonModule } from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import {MatOption} from '@angular/material/core';
+import { MatOption } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
-import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
-import {TitleCasePipe} from '@angular/common';
-import {Category} from '../../../shared/enums/category.enum';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import { TitleCasePipe } from '@angular/common';
+import { Category } from '../../../shared/enums/category.enum';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTimepickerModule } from '@angular/material/timepicker';
-import { AlertService} from '../../../core/services/alert.service';
-import {NgToastService} from 'ng-angular-popup';
-import {MatIconModule, MatIcon} from '@angular/material/icon';
-import { inject } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { AlertService } from '../../../core/services/alert.service';
+import { NgToastService } from 'ng-angular-popup';
+import { MatIconModule, MatIcon } from '@angular/material/icon';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-recurrent-form',
@@ -48,16 +47,24 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
   templateUrl: './recurrent-form.html',
   styleUrl: './recurrent-form.css'
 })
-export class RecurrentForm {
-  readonly dialogRef = inject(MatDialogRef<RecurrentForm>);
-
+export class RecurrentForm implements OnInit {
   categories: Category[] = Object.values(Category);
   form!: FormGroup;
   loading = false;
   isDuplicated = false;
   errorMessage: string | null = null;
+  isEditMode = false;
 
-  constructor(private fb: FormBuilder, private alertService: AlertService, private toast: NgToastService) {}
+  constructor(
+    public dialogRef: MatDialogRef<RecurrentForm>,
+    @Inject(MAT_DIALOG_DATA) public data: RecurringPayment | null,
+    private fb: FormBuilder,
+    private alertService: AlertService,
+    private toast: NgToastService
+  ) {
+    // Si recibimos data, estamos en modo edición
+    this.isEditMode = !!data;
+  }
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -71,6 +78,23 @@ export class RecurrentForm {
       is_active: [true, Validators.required],
     });
 
+    // Si estamos editando, cargar los datos
+    if (this.isEditMode && this.data) {
+      this.loadPaymentData(this.data);
+    }
+  }
+
+  loadPaymentData(payment: RecurringPayment): void {
+    this.form.patchValue({
+      name: payment.name,
+      category: payment.category,
+      amount: payment.amount,
+      recurrence_type: payment.recurrence_type,
+      payment_day: payment.payment_day,
+      start_date: this.parseDateString(payment.start_date),
+      end_date: payment.end_date ? this.parseDateString(payment.end_date) : null,
+      is_active: payment.is_active
+    });
   }
 
   formatCategory(cat: string): string {
@@ -95,29 +119,56 @@ export class RecurrentForm {
       end_date: formattedEnd,
     };
 
-    this.alertService.createRecurringPaymentReminder(recurringPayment).subscribe({
-      next: (res) => {
-        this.loading = false;
-        if (res.success) {
-          this.dialogRef.close(res.data);
-        } else {
-          if (res.message === 'DUPLICATED') {
-            this.isDuplicated = true; // 👈 activamos alerta en el form
-            this.toast.danger(
-              'No se pudo crear el registro porque ya existe otro con las mismas características.',
-              'Error',
-              3000
-            );
+    if (this.isEditMode && this.data) {
+      // Modo edición
+      const updateData = {
+        ...recurringPayment
+      };
+
+      this.loading = true;
+
+      this.alertService.updateRecurringPayment(this.data.id, updateData).subscribe({
+        next: (res) => {
+          this.loading = false;
+          if (res) {
+            this.toast.success('Pago recurrente actualizado exitosamente', 'Éxito', 3000);
+            this.dialogRef.close(res); // Devuelve el pago actualizado al cerrar el modal
           } else {
-            this.errorMessage = res.message;
+            this.errorMessage = 'No se pudo actualizar el pago recurrente.';
           }
+        },
+        error: (err) => {
+          this.loading = false;
+          console.error('Error al actualizar el pago recurrente:', err);
+          this.errorMessage = 'Error inesperado al actualizar el pago recurrente.';
         }
-      },
-      error: () => {
-        this.loading = false;
-        this.errorMessage = 'Error inesperado al crear el gasto';
-      }
-    });
+      });
+    } else {
+      // Modo creación
+      this.alertService.createRecurringPaymentReminder(recurringPayment).subscribe({
+        next: (res) => {
+          this.loading = false;
+          if (res.success) {
+            this.dialogRef.close(res.data);
+          } else {
+            if (res.message === 'DUPLICATED') {
+              this.isDuplicated = true;
+              this.toast.danger(
+                'No se pudo crear el registro porque ya existe otro con las mismas características.',
+                'Error',
+                3000
+              );
+            } else {
+              this.errorMessage = res.message;
+            }
+          }
+        },
+        error: () => {
+          this.loading = false;
+          this.errorMessage = 'Error inesperado al crear el gasto';
+        }
+      });
+    }
   }
 
   private formatDate(date: any): string {
@@ -130,28 +181,6 @@ export class RecurrentForm {
     return `${year}-${month}-${day}`;
   }
 
-  private formatTime(time: any): string {
-    if (!time) return '';
-
-    if (!(time instanceof Date)) {
-      time = new Date(time);
-    }
-
-    const hours = String(time.getHours()).padStart(2, '0');
-    const minutes = String(time.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }
-
-  private parseTimeString(timeString: string): Date | null {
-    if (!timeString) return null;
-
-    const [hours, minutes] = timeString.split(':');
-    const date = new Date();
-    date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
-    return date;
-  }
-
-  // 👈 NUEVO: Convertir string YYYY-MM-DD a Date local (sin desfase de zona horaria)
   private parseDateString(dateString: string): Date | null {
     if (!dateString) return null;
 
@@ -163,10 +192,11 @@ export class RecurrentForm {
     this.dialogRef.close();
   }
 
-  // Asegúrate de detener la cámara al cerrar el diálogo
   close() {
     this.dialogRef.close();
   }
 
-
+  get dialogTitle(): string {
+    return this.isEditMode ? 'Editar alerta de pago' : 'Nuevo gasto recurrente';
+  }
 }

@@ -3,8 +3,20 @@
     <mat-icon>close</mat-icon>
   </button>
   <div>
-    <h2 class="dialog-title">Nuevo gasto recurrente</h2>
+    <h2 class="dialog-title">{{ dialogTitle }}</h2>
     <form [formGroup]="form" (ngSubmit)="submit()" class="expense-form">
+
+      <!-- Alerta de duplicado -->
+      <div *ngIf="isDuplicated" class="alert alert-warning">
+        <mat-icon>warning</mat-icon>
+        <span>Ya existe una alerta con estas características</span>
+      </div>
+
+      <!-- Error general -->
+      <div *ngIf="errorMessage" class="alert alert-error">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
 
       <!-- Nombre del pago -->
       <mat-form-field appearance="outline" class="full-width">
@@ -32,55 +44,68 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Monto</mat-label>
         <input matInput type="number" formControlName="amount" min="0.01" step="0.01" />
+        <span matTextPrefix>S/&nbsp;</span>
         <mat-error *ngIf="form.get('amount')?.hasError('required')">
           El monto es obligatorio
         </mat-error>
-      </mat-form-field>
-
-      <!-- Tipo de recurrencia -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Tipo de recurrencia</mat-label>
-        <mat-select formControlName="recurrence_type">
-          <mat-option value="monthly">Mensual</mat-option>
-        </mat-select>
+        <mat-error *ngIf="form.get('amount')?.hasError('min')">
+          El monto debe ser mayor a 0
+        </mat-error>
       </mat-form-field>
 
       <!-- Día de pago -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Día de pago</mat-label>
         <input matInput type="number" formControlName="payment_day" min="1" max="31" />
+        <mat-hint>Día del mes en que se realiza el pago (1-31)</mat-hint>
+        <mat-error *ngIf="form.get('payment_day')?.hasError('min') || form.get('payment_day')?.hasError('max')">
+          Debe ser un día válido (1-31)
+        </mat-error>
       </mat-form-field>
 
       <!-- Fecha de inicio -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Fecha de inicio</mat-label>
-        <input matInput [matDatepicker]="pickerStart" formControlName="start_date" />
-        <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
-        <mat-datepicker #pickerStart></mat-datepicker>
+        <input matInput [matDatepicker]="picker" formControlName="start_date" />
+        <mat-datepicker-toggle matIconPrefix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="form.get('start_date')?.hasError('required')">
+          La fecha de inicio es obligatoria
+        </mat-error>
       </mat-form-field>
 
       <!-- Fecha de fin -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Fecha de fin (opcional)</mat-label>
-        <input matInput [matDatepicker]="pickerEnd" formControlName="end_date" />
-        <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-        <mat-datepicker #pickerEnd></mat-datepicker>
+        <input matInput [matDatepicker]="picker" formControlName="end_date" />
+        <mat-datepicker-toggle matIconPrefix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-hint>Dejar vacío si el pago es indefinido</mat-hint>
       </mat-form-field>
 
       <!-- Activo -->
-      <mat-checkbox formControlName="is_active">Activo</mat-checkbox>
+      <div class="checkbox-container">
+        <mat-checkbox formControlName="is_active">
+          <p class="checkbox-hint">
+            {{ form.get('is_active')?.value
+            ? 'Recibirás notificaciones para este pago'
+            : 'No recibirás notificaciones hasta que la actives' }}
+          </p>
+        </mat-checkbox>
+
+      </div>
 
       <!-- Acciones -->
       <div class="actions">
-        <button mat-stroked-button color="warn" type="button" (click)="onCancel()">
+        <button mat-stroked-button color="warn" type="button" (click)="onCancel()" [disabled]="loading">
+          <mat-icon>close</mat-icon>
           Cancelar
         </button>
-        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
-          Guardar
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading">
+          <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+          {{ loading ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Guardar') }}
         </button>
       </div>
     </form>
   </div>
 </div>
-
-

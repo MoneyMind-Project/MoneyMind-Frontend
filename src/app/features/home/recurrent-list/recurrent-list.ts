@@ -85,25 +85,24 @@ export class RecurrentList implements OnInit {
   }
 
   openDeleteDialog(payment: RecurringPayment): void {
-    // TODO: Crear componente de confirmación de eliminación
     const confirmDelete = confirm(`¿Estás seguro de eliminar la alerta "${payment.name}"?`);
 
     if (confirmDelete) {
-      // TODO: Implementar servicio de eliminación
-      // this.alertService.deleteRecurringPayment(payment.id).subscribe({
-      //   next: () => {
-      //     this.recurringPayments = this.recurringPayments.filter(p => p.id !== payment.id);
-      //     this.toast.success('Alerta eliminada', 'Éxito', 3000);
-      //   },
-      //   error: (err) => {
-      //     console.error('Error al eliminar:', err);
-      //     this.toast.danger('Error al eliminar la alerta', 'Error', 3000);
-      //   }
-      // });
+      this.loading = true;
 
-      // Simulación mientras implementas el servicio
-      this.recurringPayments = this.recurringPayments.filter(p => p.id !== payment.id);
-      this.toast.success('Alerta eliminada', 'Éxito', 3000);
+      this.alertService.deleteRecurringPayment(payment.id).subscribe({
+        next: () => {
+          this.loading = false;
+          // Eliminar del array local para actualizar la vista
+          this.recurringPayments = this.recurringPayments.filter(p => p.id !== payment.id);
+          this.toast.success('Alerta eliminada exitosamente', 'Éxito', 3000);
+        },
+        error: (err) => {
+          this.loading = false;
+          console.error('Error al eliminar la alerta:', err);
+          this.toast.danger('Error al eliminar la alerta', 'Error', 3000);
+        }
+      });
     }
   }
 
