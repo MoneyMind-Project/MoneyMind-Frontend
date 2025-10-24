@@ -36,6 +36,28 @@ export class ReportService{
     );
   }
 
+  getUnifiedAnalysis(month: number, year: number): Observable<any> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return of({ success: false, data: [] });
+    }
+
+    return this.http.get(`${this.apiUrl}/reports/unified-analysis/`, {
+      params: {
+        user_id: userId.toString(),
+        month: month.toString(),
+        year: year.toString()
+      }
+    }).pipe(
+      catchError((error) => {
+        console.error('Error obteniendo gastos por categoría:', error);
+        return of({ success: false, data: [] });
+      })
+    );
+  }
+
   getExpensesByParentCategory(month: number, year: number): Observable<any> {
     const userId = this.crypto.getCurrentUserId();
 

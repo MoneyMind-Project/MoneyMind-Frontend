@@ -115,26 +115,9 @@ export class Dashboard implements OnInit, AfterViewInit {
     });
   }
 
-  viewNotifications(): void {
-    this.showNotificationPanel = !this.showNotificationPanel;
-  }
-
-  closeNotificationPanel(): void {
-    this.showNotificationPanel = false;
-  }
-
-  viewAllNotifications(): void {
-    this.dialog.closeAll(); // Cierra el panel si está abierto
-    this.router.navigate(['/dashboard/notifications']);
-  }
-
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.loadCategoriasData();
-      this.loadProporcionData();
-      this.loadPrediccionData();
-      this.loadEsencialesData();
-      this.loadAhorroData();
+      this.loadUnifiedDashboardData();
       this.loadDashboardOverview();
       this.loadUserAlerts();
     }, 0);
@@ -150,155 +133,40 @@ export class Dashboard implements OnInit, AfterViewInit {
     }
   }
 
-  loadDashboardOverview(): void {
+  loadUnifiedDashboardData(): void {
     const currentDate = new Date();
     const month = currentDate.getMonth() + 1;
     const year = currentDate.getFullYear();
 
-    this.reportService.getDashboardOverview(month, year).subscribe({
+    this.reportService.getUnifiedAnalysis(month, year).subscribe({
       next: (response) => {
-        if (response.success) {
-          this.totalGastadoMes = response.data.total_gastado_mes;
-          this.categoriaMasAlta = response.data.categoria_mas_alta?.label || 'N/A';
-          this.presupuestoRestante = response.data.presupuesto_restante;
-          this.proyeccionProximoMes = response.data.proyeccion_proximo_mes;
-        }
-      },
-      error: (error) => {
-        console.error('Error cargando overview:', error);
-      }
-    });
-  }
+        if (response.success && response.data) {
+          const data = response.data;
 
-  loadUserAlerts(): void {
-
-    this.reportService.getUserAlerts(false).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.unreadNotifications = response.unread_count;
-        }
-      }
-    });
-  }
-
-  loadCategoriasData(): void {
-    const currentDate = new Date();
-    const month = currentDate.getMonth() + 1; // getMonth() retorna 0-11
-    const year = currentDate.getFullYear();
-
-    this.reportService.getExpensesByCategory( month, year).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.createCategoriasChartWithData(response.data);
+          // Aquí llamas a los constructores de los charts con los subbloques del JSON:
+          this.createCategoriasChartWithData(data.expenses_by_category);
+          this.createProporcionChartWithData(data.expenses_by_parent_category);
+          this.createPrediccionChartWithData(data.monthly_predictions);
+          this.createAhorroChartWithData(data.savings_evolution);
+          this.createEsencialesChartWithData(data.essential_vs_non_essential);
         } else {
-          console.error('Error en la respuesta:', response);
+          console.error('Respuesta no válida del backend:', response);
+          this.loadFallbackCharts();
         }
       },
       error: (error) => {
-        console.error('Error cargando datos:', error);
-        this.createCategoriasChart(); // Usar datos de prueba si falla
+        console.error('Error al obtener datos unificados:', error);
+        this.loadFallbackCharts();
       }
     });
   }
 
-  loadProporcionData(): void {
-    const currentDate = new Date();
-    const month = currentDate.getMonth() + 1;
-    const year = currentDate.getFullYear();
-
-    this.reportService.getExpensesByParentCategory(month, year).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.createProporcionChartWithData(response.data);
-        } else {
-          console.error('Error en la respuesta:', response);
-          this.createProporcionChart(); // Fallback con datos aleatorios
-        }
-      },
-      error: (error) => {
-        console.error('Error cargando datos de proporción:', error);
-        this.createProporcionChart(); // Fallback con datos aleatorios
-      }
-    });
-  }
-
-  loadAhorroData(): void {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-
-    this.reportService.getSavingsEvolution(year).subscribe({
-      next: (response) => {
-        // Preparamos los 12 meses
-        const fullYearData = Array.from({ length: 12 }, (_, i) => ({
-          month: i + 1,
-          date: `${year}-${String(i + 1).padStart(2, '0')}-01`,
-          balance: 0,
-          saving: 0
-        }));
-
-        if (response.success && response.data.length > 0) {
-          response.data.forEach((item: any) => {
-            const idx = item.month - 1;
-            fullYearData[idx] = { ...fullYearData[idx], ...item };
-          });
-        }
-
-        // 🔹 Ahora graficamos el balance, no el saving
-        this.createAhorroChartWithData(fullYearData);
-      },
-      error: (error) => {
-        console.error('Error cargando datos de ahorro:', error);
-
-        const emptyData = Array.from({ length: 12 }, (_, i) => ({
-          month: i + 1,
-          date: `${year}-${String(i + 1).padStart(2, '0')}-01`,
-          balance: 0,
-          saving: 0
-        }));
-
-        this.createAhorroChartWithData(emptyData);
-      }
-    });
-  }
-
-  loadPrediccionData(): void {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-
-    this.reportService.getMonthlyPrediction( year).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.createPrediccionChartWithData(response.data);
-        } else {
-          console.error('Error en la respuesta:', response);
-          this.createPrediccionChart(); // Fallback
-        }
-      },
-      error: (error) => {
-        console.error('Error cargando datos de predicción:', error);
-        this.createPrediccionChart(); // Fallback
-      }
-    });
-  }
-
-  loadEsencialesData(): void {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-
-    this.reportService.getEssentialVsNonEssential(year).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.createEsencialesChartWithData(response.data);
-        } else {
-          console.error('Error en la respuesta:', response);
-          this.createEsencialesChart(); // Fallback
-        }
-      },
-      error: (error) => {
-        console.error('Error cargando datos esenciales:', error);
-        this.createEsencialesChart(); // Fallback
-      }
-    });
+  private loadFallbackCharts(): void {
+    this.createCategoriasChart();
+    this.createProporcionChart();
+    this.createPrediccionChart();
+    this.createAhorroChartWithData([]);
+    this.createEsencialesChart();
   }
 
   createEsencialesChartWithData(data: Array<{month: number, esencial: number, no_esencial: number}>): void {
@@ -796,6 +664,37 @@ export class Dashboard implements OnInit, AfterViewInit {
     });
   }
 
+  loadDashboardOverview(): void {
+    const currentDate = new Date();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+
+    this.reportService.getDashboardOverview(month, year).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.totalGastadoMes = response.data.total_gastado_mes;
+          this.categoriaMasAlta = response.data.categoria_mas_alta?.label || 'N/A';
+          this.presupuestoRestante = response.data.presupuesto_restante;
+          this.proyeccionProximoMes = response.data.proyeccion_proximo_mes;
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando overview:', error);
+      }
+    });
+  }
+
+  loadUserAlerts(): void {
+
+    this.reportService.getUserAlerts(false).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.unreadNotifications = response.unread_count;
+        }
+      }
+    });
+  }
+
   get isPresupuestoCritico(): boolean {
     const presupuestoTotal = this.presupuestoRestante + this.totalGastadoMes;
     const limite = (2 / 3) * presupuestoTotal;
@@ -816,5 +715,18 @@ export class Dashboard implements OnInit, AfterViewInit {
         console.error('❌ Error al marcar todas las alertas risk como vistas:', err);
       }
     });
+  }
+
+  viewNotifications(): void {
+    this.showNotificationPanel = !this.showNotificationPanel;
+  }
+
+  closeNotificationPanel(): void {
+    this.showNotificationPanel = false;
+  }
+
+  viewAllNotifications(): void {
+    this.dialog.closeAll(); // Cierra el panel si está abierto
+    this.router.navigate(['/dashboard/notifications']);
   }
 }
