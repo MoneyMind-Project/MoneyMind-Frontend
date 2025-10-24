@@ -131,7 +131,6 @@ export class RecurrentForm implements OnInit {
         next: (res) => {
           this.loading = false;
           if (res) {
-            this.toast.success('Pago recurrente actualizado exitosamente', 'Éxito', 3000);
             this.dialogRef.close(res); // Devuelve el pago actualizado al cerrar el modal
           } else {
             this.errorMessage = 'No se pudo actualizar el pago recurrente.';

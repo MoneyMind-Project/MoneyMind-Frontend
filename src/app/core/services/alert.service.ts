@@ -150,7 +150,7 @@ export class AlertService{
 
   updateRecurringPayment(reminderId: number, updatedData: any): Observable<RecurringPayment | null> {
     return this.http
-      .patch<RecurringPayment>(`${this.apiUrl}/alerts/recurring-payments/update/${reminderId}/`, updatedData)
+      .patch<RecurringPayment>(`${this.apiUrl}/alerts/recurring-payments/${reminderId}/update/`, updatedData)
       .pipe(
         catchError((error) => {
           console.error('Error al actualizar el pago recurrente:', error);
@@ -161,7 +161,7 @@ export class AlertService{
 
   deleteRecurringPayment(reminderId: number): Observable<boolean> {
     return this.http
-      .delete<{ success: boolean }>(`${this.apiUrl}/alerts/recurring-payments/delete/${reminderId}/`)
+      .delete<{ success: boolean }>(`${this.apiUrl}/alerts/recurring-payments/${reminderId}/delete/`)
       .pipe(
         map((response) => response.success),
         catchError((error) => {

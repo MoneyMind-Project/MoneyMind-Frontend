@@ -25,7 +25,7 @@
   <!-- Lista de alertas -->
   <div *ngIf="!loading" class="alerts-grid">
     <mat-card
-      *ngFor="let payment of recurringPayments"
+      *ngFor="let payment of recurringPayments; trackBy: trackByPaymentId"
       class="alert-card"
       [ngClass]="getUrgencyClass(payment.payment_day)"
       appearance="outlined">
@@ -88,7 +88,7 @@
       <!-- Acciones -->
       <div class="card-actions">
         <button
-          mat-flat-button
+          mat-stroked-button
           color="primary"
           (click)="openEditAlertDialog(payment)">
           <mat-icon>edit</mat-icon>
@@ -96,7 +96,7 @@
         </button>
 
         <button
-          mat-flat-button
+          mat-stroked-button
           color="warn"
           (click)="openDeleteDialog(payment)">
           <mat-icon>delete</mat-icon>

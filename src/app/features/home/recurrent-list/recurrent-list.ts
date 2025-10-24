@@ -9,6 +9,7 @@ import { Category } from '../../../shared/enums/category.enum';
 import { RecurrentForm } from '../recurrent-form/recurrent-form';
 import { AlertService } from '../../../core/services/alert.service';
 import { NgToastService } from 'ng-angular-popup';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-recurrent-list',
@@ -34,6 +35,8 @@ export class RecurrentList implements OnInit {
   ngOnInit() {
     this.loadRecurringPayments();
   }
+
+  constructor(private cdRef: ChangeDetectorRef) {}
 
   loadRecurringPayments(): void {
     this.loading = true;
@@ -69,20 +72,41 @@ export class RecurrentList implements OnInit {
     const dialogRef = this.dialog.open(RecurrentForm, {
       width: '600px',
       disableClose: true,
-      data: payment // pasamos el payment para editar
+      data: { ...payment } // Pasar una copia del objeto
     });
 
-    dialogRef.afterClosed().subscribe((updatedPayment: RecurringPayment | null) => {
-      if (updatedPayment) {
-        console.log('Alerta actualizada:', updatedPayment);
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.success && result.data) {
+        const updatedPayment: RecurringPayment = result.data;
+
+        console.log('🔍 DEBUG - Datos recibidos:', updatedPayment);
+        console.log('🔍 DEBUG - Array antes:', JSON.stringify(this.recurringPayments));
+
         const index = this.recurringPayments.findIndex(p => p.id === updatedPayment.id);
+        console.log('🔍 DEBUG - Index encontrado:', index);
+
         if (index !== -1) {
-          this.recurringPayments[index] = updatedPayment;
+          // Forzar actualización completa del array
+          const newArray = [...this.recurringPayments];
+          newArray[index] = { ...updatedPayment };
+          this.recurringPayments = newArray;
+
+          console.log('🔍 DEBUG - Array después:', JSON.stringify(this.recurringPayments));
+          console.log('✅ Elemento actualizado correctamente');
         }
+
         this.toast.success('Alerta actualizada exitosamente', 'Éxito', 3000);
+      } else if (result) {
+        console.log('⚠️ Respuesta inesperada:', result);
       }
     });
   }
+
+  // Función trackBy para optimizar el *ngFor
+  trackByPaymentId(index: number, payment: RecurringPayment): number {
+    return payment.id;
+  }
+
 
   openDeleteDialog(payment: RecurringPayment): void {
     const confirmDelete = confirm(`¿Estás seguro de eliminar la alerta "${payment.name}"?`);

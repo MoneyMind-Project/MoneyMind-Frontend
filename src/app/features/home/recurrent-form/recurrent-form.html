@@ -66,9 +66,9 @@
       <!-- Fecha de inicio -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Fecha de inicio</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="start_date" />
-        <mat-datepicker-toggle matIconPrefix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
+        <input matInput [matDatepicker]="picker_" formControlName="start_date" />
+        <mat-datepicker-toggle matIconPrefix [for]="picker_"></mat-datepicker-toggle>
+        <mat-datepicker #picker_></mat-datepicker>
         <mat-error *ngIf="form.get('start_date')?.hasError('required')">
           La fecha de inicio es obligatoria
         </mat-error>
