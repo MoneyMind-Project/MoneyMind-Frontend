@@ -1,0 +1,159 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  padding: 20px;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 16px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.prefix-symbol{
+  margin-left: 20px;
+}
+
+.close-button {
+  color: #6b7280;
+}
+
+.dialog-content {
+  padding: 24px 0;
+  overflow-y: auto;
+  max-height: calc(90vh - 180px);
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1033d3;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #1033d3;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.income-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.prefer-not-checkbox {
+  margin-bottom: 8px;
+}
+
+.prefix-symbol {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 0 0 0;
+  border-top: 1px solid #e0e0e0;
+  margin-top: auto;
+}
+
+.cancel-button {
+  min-width: 100px;
+}
+
+.save-button {
+  min-width: 140px;
+  font-weight: 600;
+}
+
+/* Estilos para los iconos de prefix */
+::ng-deep .mat-mdc-form-field-icon-prefix {
+  padding-right: 8px;
+  color: #1033d3;
+}
+
+/* Estilos para los campos */
+::ng-deep .mat-mdc-text-field-wrapper {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Scrollbar personalizado */
+.dialog-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dialog-container {
+    max-height: 100vh;
+  }
+
+  .dialog-header h2 {
+    font-size: 20px;
+  }
+
+  .dialog-content {
+    padding: 16px 0;
+    max-height: calc(100vh - 160px);
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .cancel-button,
+  .save-button {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-header h2 {
+    font-size: 18px;
+  }
+}

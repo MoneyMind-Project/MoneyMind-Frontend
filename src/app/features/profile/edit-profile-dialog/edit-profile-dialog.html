@@ -1,0 +1,117 @@
+<div class="dialog-container">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Editar Perfil</h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="editForm" class="edit-form">
+
+      <!-- Información Personal -->
+      <div class="form-section">
+        <h3 class="section-title">Información Personal</h3>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre</mat-label>
+          <input matInput type="text" formControlName="firstName" placeholder="Tu nombre" required />
+          <mat-error *ngIf="editForm.get('firstName')?.hasError('required')">
+            El nombre es obligatorio
+          </mat-error>
+          <mat-error *ngIf="editForm.get('firstName')?.hasError('minlength')">
+            El nombre debe tener al menos 2 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Apellido</mat-label>
+          <input matInput type="text" formControlName="lastName" placeholder="Tu apellido" required />
+          <mat-error *ngIf="editForm.get('lastName')?.hasError('required')">
+            El apellido es obligatorio
+          </mat-error>
+          <mat-error *ngIf="editForm.get('lastName')?.hasError('minlength')">
+            El apellido debe tener al menos 2 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Fecha de nacimiento</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="birthDate"
+            placeholder="DD/MM/AAAA"
+            [max]="maxDate"
+            required
+            readonly>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="editForm.get('birthDate')?.hasError('required')">
+            La fecha de nacimiento es obligatoria
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Género</mat-label>
+          <mat-select formControlName="gender" required>
+            <mat-option value="male">Masculino</mat-option>
+            <mat-option value="female">Femenino</mat-option>
+            <mat-option value="other">Otro</mat-option>
+          </mat-select>
+          <mat-error *ngIf="editForm.get('gender')?.hasError('required')">
+            El género es obligatorio
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Información Financiera -->
+      <div class="form-section">
+        <h3 class="section-title">Información Financiera</h3>
+
+        <div class="income-section">
+          <mat-checkbox
+            formControlName="preferNotToSayIncome"
+            (change)="onIncomePreferenceChange($event)"
+            class="prefer-not-checkbox">
+            Prefiero no especificar mis ingresos mensuales
+          </mat-checkbox>
+
+          <mat-form-field
+            appearance="outline"
+            class="full-width"
+            *ngIf="!editForm.get('preferNotToSayIncome')?.value">
+            <mat-label>Ingreso mensual</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="monthlyIncome"
+              placeholder="0.00"
+              min="0"
+              step="0.01" />
+            <span matPrefix class="prefix-symbol">S/ &nbsp;</span>
+            <mat-hint>Este dato nos ayuda a personalizar tus recomendaciones</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <!-- Actions -->
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-button">
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSave()"
+      [disabled]="!isFormValid"
+      class="save-button">
+      Guardar cambios
+    </button>
+  </mat-dialog-actions>
+</div>

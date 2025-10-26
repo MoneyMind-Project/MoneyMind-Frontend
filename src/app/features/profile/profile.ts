@@ -13,6 +13,7 @@ import {ReportService} from '../../core/services/report.service';
 import {ExportDialog, ExportConfig} from './export-dialog/export-dialog';
 import { MatDialog } from '@angular/material/dialog';
 import {MatDialogModule} from '@angular/material/dialog';
+import {EditProfileDialog} from './edit-profile-dialog/edit-profile-dialog';
 
 interface UserData {
   memberSince: Date;
@@ -73,10 +74,36 @@ export class Profile implements OnInit {
     });
   }
 
-  editBudget(): void {
-    // Aquí abrirías el diálogo del cuestionario de presupuesto
-    console.log('Abrir cuestionario de presupuesto');
-    // this.router.navigate(['/onboarding/budget']);
+  editProfile(): void {
+    const dialogRef = this.dialog.open(EditProfileDialog, {
+      width: '600px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: {
+        user: this.currentUser,
+        monthlyIncome: this.monthly_income
+      },
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Datos actualizados:', result);
+        // Aquí llamarás a tu servicio para actualizar el perfil
+        // this.userService.updateProfile(result).subscribe(...)
+
+        // Por ahora, actualiza localmente
+        this.currentUser.first_name = result.first_name;
+        this.currentUser.last_name = result.last_name;
+        this.currentUser.birth_date = result.birth_date;
+        this.currentUser.gender = result.gender;
+
+        if (result.monthly_income !== null) {
+          this.monthly_income = result.monthly_income;
+        }
+      }
+    });
   }
 
   exportPDF(): void {
@@ -175,11 +202,6 @@ export class Profile implements OnInit {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}${month}${day}`;
-  }
-
-  editProfile(): void {
-    console.log('Editar perfil');
-    // Implementar edición de perfil
   }
 
   logOut(): void {
