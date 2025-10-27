@@ -54,7 +54,7 @@ export class MovementService{
 
   createIncome(data: Income): Observable<ApiResponse<Income>> {
     const userId = this.crypto.getCurrentUserId();
-    const payload = { ...data, user_id: userId };
+    const payload = { ...data, user_id: userId, is_recurring: data.is_recurring ?? false };
 
     return this.http.post<any>(`${this.apiUrl}/movements/income/create/`, payload).pipe(
       map((response) => {

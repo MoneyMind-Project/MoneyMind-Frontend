@@ -48,6 +48,20 @@
     <textarea matInput formControlName="comment"></textarea>
   </mat-form-field>
 
+  <!-- Checkbox: Ingreso Recurrente -->
+  <div class="recurring-checkbox-container">
+    <mat-checkbox formControlName="is_recurring" color="primary">
+      <div class="checkbox-content">
+        <div class="checkbox-text">
+          <span class="checkbox-label">Ingreso mensual recurrente</span>
+          <span class="checkbox-description">
+            Marca esta opción si es un ingreso fijo mensual (sueldo, alquiler recibido, etc.)
+          </span>
+        </div>
+      </div>
+    </mat-checkbox>
+  </div>
+
   <div *ngIf="isDuplicated" class="form-error">
     No se pudo crear el registro porque ya existe otro con las mismas características.
   </div>

@@ -5,6 +5,7 @@ export interface Income {
   time: string;        // "14:35" or in HH:mm format
   total: number;       // Amount spent
   comment?: string;    // Optional notes
+  is_recurring: boolean;
   created_at?: string;
 
 }

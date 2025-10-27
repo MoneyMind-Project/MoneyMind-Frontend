@@ -13,6 +13,8 @@ import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MovementService} from '../../../core/services/movement.service';
 import {ApiResponse} from '../../../shared/models/response.model';
 import {NgToastService} from 'ng-angular-popup';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatIconModule} from '@angular/material/icon';
 
 @Component({
   selector: 'app-income-form',
@@ -28,7 +30,9 @@ import {NgToastService} from 'ng-angular-popup';
     MatInputModule,
     MatDatepickerModule,
     MatButtonModule,
-    MatTimepickerModule
+    MatTimepickerModule,
+    MatCheckboxModule,
+    MatIconModule
   ],
   providers: [
     provideNativeDateAdapter(),
@@ -55,14 +59,16 @@ export class IncomeForm implements OnInit {
       date: ['', Validators.required],
       time: ['', Validators.required],
       total: [0, [Validators.required, Validators.min(0.01)]],
-      comment: ['']
+      comment: [''],
+      is_recurring: [false]
     });
 
     if (this.initialData) {
       const patchedData = {
         ...this.initialData,
         date: this.initialData.date ? this.parseDateString(this.initialData.date as string) : null, // 👈 AGREGADO
-        time: this.initialData.time ? this.parseTimeString(this.initialData.time) : null
+        time: this.initialData.time ? this.parseTimeString(this.initialData.time) : null,
+        is_recurring: this.initialData.is_recurring ?? false
       };
       this.form.patchValue(patchedData);
     }
@@ -83,7 +89,8 @@ export class IncomeForm implements OnInit {
     const income: Income = {
       ...rawValue,
       date: formattedDate,
-      time: formattedTime
+      time: formattedTime,
+      is_recurring: rawValue.is_recurring ?? false
     };
 
     this.incomeService.createIncome(income).subscribe({
@@ -155,6 +162,8 @@ export class IncomeForm implements OnInit {
   }
 
   resetForm() {
-    this.form.reset();
+    this.form.reset({
+      is_recurring: false // Reset al valor por defecto
+    });
   }
 }
