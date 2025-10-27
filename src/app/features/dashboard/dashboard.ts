@@ -17,6 +17,7 @@ import {MatDialogModule, MatDialog} from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import {CryptoService} from '../../core/services/crypto.service';
 import { User } from '../../shared/models/user.model';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 // Registrar todos los componentes de Chart.js
 Chart.register(...registerables);
@@ -33,7 +34,8 @@ Chart.register(...registerables);
     MatButtonModule,
     MatMenuModule,
     MatDialogModule,
-    NotificationsPanel
+    NotificationsPanel,
+    MatProgressSpinnerModule
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -42,6 +44,8 @@ export class Dashboard implements OnInit, AfterViewInit {
   currentUser!: User;
   unreadNotifications: number = 0;
   showNotificationPanel = false;
+
+  private chartDataList: any[] = [];
 
   // KPIs
   totalGastadoMes: number = 0;
@@ -75,6 +79,8 @@ export class Dashboard implements OnInit, AfterViewInit {
   showBackProyeccion = false;
   showBackEsenciales = false;
   showBackPadres = false;
+
+  isLoadingComments: boolean = false;
 
   constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService,
               private dialog: MatDialog, private router: Router, private  alertService: AlertService,
@@ -131,6 +137,27 @@ export class Dashboard implements OnInit, AfterViewInit {
   }
 
   toggleFlip(chart: string): void {
+    if (this.chartDataList && this.chartDataList.length > 0) {
+      // Verificar si ya existen comentarios generados
+      const commentsExist =
+        this.monthlyPredictionsComment ||
+        this.expensesByCategoryComment ||
+        this.expensesByParentCategoryComment ||
+        this.savingsEvolutionComment ||
+        this.essentialVsNonEssentialComment;
+
+      if (!commentsExist) {
+        console.log("🧠 No hay comentarios previos, generando con IA...");
+        this.generateAIComments();
+      } else {
+        console.log("✅ Comentarios de IA ya existen, no se genera nuevamente.");
+      }
+
+    } else {
+      console.warn("⚠️ No hay datos de los gráficos aún. Espera a que el dashboard cargue.");
+    }
+
+
     switch (chart) {
       case 'categorias': this.showBackCategorias = !this.showBackCategorias; break;
       case 'ahorro': this.showBackAhorro = !this.showBackAhorro; break;
@@ -150,17 +177,22 @@ export class Dashboard implements OnInit, AfterViewInit {
         if (response.success && response.data) {
           const data = response.data;
 
+          // Guardar los datasets localmente para futura generación de comentarios
+          this.chartDataList = [
+            data.monthly_predictions,
+            data.expenses_by_category,
+            data.expenses_by_parent_category,
+            data.savings_evolution,
+            data.essential_vs_non_essential
+          ];
+
+
           // Aquí llamas a los constructores de los charts con los subbloques del JSON:
           this.createCategoriasChartWithData(data.expenses_by_category);
           this.createProporcionChartWithData(data.expenses_by_parent_category);
           this.createPrediccionChartWithData(data.monthly_predictions);
           this.createAhorroChartWithData(data.savings_evolution);
           this.createEsencialesChartWithData(data.essential_vs_non_essential);
-          this.expensesByCategoryComment = data.expenses_by_category_comment || 'Sin comentario disponible.';
-          this.expensesByParentCategoryComment = data.expenses_by_parent_category_comment || 'Sin comentario disponible.';
-          this.monthlyPredictionsComment = data.monthly_predictions_comment || 'Sin comentario disponible.';
-          this.savingsEvolutionComment = data.savings_evolution_comment || 'Sin comentario disponible.';
-          this.essentialVsNonEssentialComment = data.essential_vs_non_essential_comment || 'Sin comentario disponible.';
 
         } else {
           console.error('Respuesta no válida del backend:', response);
@@ -173,6 +205,48 @@ export class Dashboard implements OnInit, AfterViewInit {
       }
     });
   }
+
+  generateAIComments(): void {
+    if (!this.chartDataList || this.chartDataList.length !== 5) {
+      console.warn("⚠️ Datos de gráficos incompletos, no se puede generar comentarios IA.");
+      return;
+    }
+
+    console.log("🧠 Generando comentarios de IA...");
+    this.isLoadingComments = true; // ⏳ Inicia el estado de carga
+
+    this.reportService.getChartComments(this.chartDataList).subscribe({
+      next: (response) => {
+        if (response.success && response.comments) {
+          const [
+            monthlyComment,
+            categoryComment,
+            parentComment,
+            savingsComment,
+            essentialsComment
+          ] = response.comments;
+
+          this.monthlyPredictionsComment = monthlyComment;
+          this.expensesByCategoryComment = categoryComment;
+          this.expensesByParentCategoryComment = parentComment;
+          this.savingsEvolutionComment = savingsComment;
+          this.essentialVsNonEssentialComment = essentialsComment;
+
+          console.log("✅ Comentarios de IA generados correctamente.");
+        } else {
+          console.warn("⚠️ No se pudieron generar comentarios de IA o respuesta vacía.");
+        }
+
+        this.isLoadingComments = false; // ✅ Termina el estado de carga
+      },
+      error: (err) => {
+        console.error("🔥 Error generando comentarios IA:", err);
+        this.isLoadingComments = false; // 🚫 Termina el estado de carga aunque haya error
+      }
+    });
+  }
+
+
 
   private loadFallbackCharts(): void {
     this.createCategoriasChart();

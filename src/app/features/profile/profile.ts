@@ -89,19 +89,11 @@ export class Profile implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Datos actualizados:', result);
-        // Aquí llamarás a tu servicio para actualizar el perfil
-        // this.userService.updateProfile(result).subscribe(...)
-
-        // Por ahora, actualiza localmente
-        this.currentUser.first_name = result.first_name;
-        this.currentUser.last_name = result.last_name;
-        this.currentUser.birth_date = result.birth_date;
-        this.currentUser.gender = result.gender;
-
-        if (result.monthly_income !== null) {
-          this.monthly_income = result.monthly_income;
-        }
+        console.log('Perfil actualizado:', result);
+        // Actualiza la data local para refrescar la vista
+        this.currentUser = { ...this.currentUser, ...result.user };
+        this.monthly_income = result.monthly_income;
+        console.log(this.currentUser);
       }
     });
   }

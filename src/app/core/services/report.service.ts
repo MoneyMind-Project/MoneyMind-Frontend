@@ -58,6 +58,25 @@ export class ReportService{
     );
   }
 
+  getChartComments(chartDataList: any[]): Observable<any> {
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return of({ success: false, comments: [] });
+    }
+
+    return this.http.post(`${this.apiUrl}/reports/generate-chart-comments/`, {
+      user_id: userId,
+      chart_data_list: chartDataList
+    }).pipe(
+      catchError((error) => {
+        console.error('Error generando comentarios de IA:', error);
+        return of({ success: false, comments: [] });
+      })
+    );
+  }
+
   getExpensesByParentCategory(month: number, year: number): Observable<any> {
     const userId = this.crypto.getCurrentUserId();
 

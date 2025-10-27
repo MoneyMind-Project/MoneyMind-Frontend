@@ -96,14 +96,29 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
+
             <mat-card-content>
-              <p>{{ expensesByCategoryComment }}</p>
+              <!-- 🔹 Mostrar spinner si aún está generando los comentarios -->
+              <div *ngIf="isLoadingComments; else commentContent" class="loading-container">
+                <mat-progress-spinner
+                  color="accent"
+                  mode="indeterminate"
+                  diameter="40">
+                </mat-progress-spinner>
+                <p>Generando análisis con IA...</p>
+              </div>
+
+              <!-- 🔹 Contenido del comentario cuando ya está listo -->
+              <ng-template #commentContent>
+                <p>{{ expensesByCategoryComment || 'No hay comentario disponible por el momento.' }}</p>
+              </ng-template>
             </mat-card-content>
           </div>
 
         </div>
       </mat-card>
     </mat-grid-tile>
+
 
 
     <mat-grid-tile [colspan]="sideChartCols" [rowspan]="1">
@@ -133,14 +148,29 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
+
             <mat-card-content>
-              <p>{{ savingsEvolutionComment }}</p>
+              <!-- 🔹 Mostrar spinner mientras se generan los comentarios -->
+              <div *ngIf="isLoadingComments; else ahorroCommentContent" class="loading-container">
+                <mat-progress-spinner
+                  color="accent"
+                  mode="indeterminate"
+                  diameter="40">
+                </mat-progress-spinner>
+                <p>Generando análisis con IA...</p>
+              </div>
+
+              <!-- 🔹 Mostrar el comentario una vez listo -->
+              <ng-template #ahorroCommentContent>
+                <p>{{ savingsEvolutionComment || 'No hay comentario disponible por el momento.' }}</p>
+              </ng-template>
             </mat-card-content>
           </div>
 
         </div>
       </mat-card>
     </mat-grid-tile>
+
 
 
     <mat-grid-tile [colspan]="1" [rowspan]="1">
@@ -170,14 +200,29 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
+
             <mat-card-content>
-              <p>{{ expensesByParentCategoryComment }}</p>
+              <!-- 🔹 Mostrar spinner mientras se generan los comentarios -->
+              <div *ngIf="isLoadingComments; else padresCommentContent" class="loading-container">
+                <mat-progress-spinner
+                  color="accent"
+                  mode="indeterminate"
+                  diameter="40">
+                </mat-progress-spinner>
+                <p>Generando análisis con IA...</p>
+              </div>
+
+              <!-- 🔹 Mostrar el comentario una vez disponible -->
+              <ng-template #padresCommentContent>
+                <p>{{ expensesByParentCategoryComment || 'No hay comentario disponible por el momento.' }}</p>
+              </ng-template>
             </mat-card-content>
           </div>
 
         </div>
       </mat-card>
     </mat-grid-tile>
+
 
 
     <mat-grid-tile [colspan]="1" [rowspan]="1">
@@ -207,14 +252,29 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
+
             <mat-card-content>
-              <p>{{ monthlyPredictionsComment }}</p>
+              <!-- 🔹 Mostrar spinner mientras se generan los comentarios -->
+              <div *ngIf="isLoadingComments; else proyeccionCommentContent" class="loading-container">
+                <mat-progress-spinner
+                  color="accent"
+                  mode="indeterminate"
+                  diameter="40">
+                </mat-progress-spinner>
+                <p>Generando análisis con IA...</p>
+              </div>
+
+              <!-- 🔹 Mostrar comentario una vez disponible -->
+              <ng-template #proyeccionCommentContent>
+                <p>{{ monthlyPredictionsComment || 'No hay comentario disponible por el momento.' }}</p>
+              </ng-template>
             </mat-card-content>
           </div>
 
         </div>
       </mat-card>
     </mat-grid-tile>
+
 
 
     <mat-grid-tile [colspan]="lastChartCols" [rowspan]="1">
@@ -244,14 +304,29 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
+
             <mat-card-content>
-              <p>{{ essentialVsNonEssentialComment }}</p>
+              <!-- 🔹 Mostrar spinner mientras se generan los comentarios -->
+              <div *ngIf="isLoadingComments; else esencialesCommentContent" class="loading-container">
+                <mat-progress-spinner
+                  color="accent"
+                  mode="indeterminate"
+                  diameter="40">
+                </mat-progress-spinner>
+                <p>Generando análisis con IA...</p>
+              </div>
+
+              <!-- 🔹 Mostrar comentario una vez disponible -->
+              <ng-template #esencialesCommentContent>
+                <p>{{ essentialVsNonEssentialComment || 'No hay comentario disponible por el momento.' }}</p>
+              </ng-template>
             </mat-card-content>
           </div>
 
         </div>
       </mat-card>
     </mat-grid-tile>
+
 
 
   </mat-grid-list>
