@@ -232,7 +232,47 @@ export class Home implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe((newRecurrentPay: RecurringPayment | null) => {
       if (newRecurrentPay) {
         console.log('Nuevo gasto recurrente guardado:', newRecurrentPay);
-        //this.addNewMovement('expense', newExpense);
+
+        const today = new Date();
+        const currentDay = today.getDate();
+        const currentMonth = today.getMonth(); // 0-11
+        const currentYear = today.getFullYear();
+
+        // Construir la fecha de pago del mes actual
+        let paymentDateThisMonth = new Date(currentYear, currentMonth, newRecurrentPay.payment_day);
+
+        // Si el día no existe en el mes actual (por ejemplo, 31 en febrero)
+        const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        if (newRecurrentPay.payment_day > lastDayOfMonth) {
+          paymentDateThisMonth = new Date(currentYear, currentMonth, lastDayOfMonth);
+        }
+
+        let paymentDateToCheck = paymentDateThisMonth;
+
+        // Si la fecha de pago ya pasó este mes, usar el próximo mes
+        if (today > paymentDateThisMonth) {
+          paymentDateToCheck = new Date(currentYear, currentMonth + 1, newRecurrentPay.payment_day);
+        }
+
+        // Rango de alerta: 3 días antes (incluyendo el día)
+        const alertStartDate = new Date(paymentDateToCheck);
+        alertStartDate.setDate(paymentDateToCheck.getDate() - 2);
+
+        const alertEndDate = paymentDateToCheck;
+
+        // Verificar si hoy está dentro del rango [alertStartDate, alertEndDate]
+        if (today >= alertStartDate && today <= alertEndDate) {
+          this.dashboardData.data.upcoming_payments.push(newRecurrentPay);
+          console.log('✅ Agregado a upcoming_payments:', newRecurrentPay);
+        } else {
+          console.log('⚠️ No se agregó: fuera del rango de 3 días.');
+          console.log({
+            today,
+            alertStartDate,
+            alertEndDate,
+            paymentDateToCheck
+          });
+        }
       }
     });
   }

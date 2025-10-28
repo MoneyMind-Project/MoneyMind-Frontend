@@ -14,28 +14,6 @@ export class ReportService{
   private apiUrl = environment.apiUrl;
   constructor(private http: HttpClient, private crypto: CryptoService){}
 
-  getExpensesByCategory(month: number, year: number): Observable<any> {
-    const userId = this.crypto.getCurrentUserId();
-
-    if (!userId) {
-      console.error('Usuario no autenticado');
-      return of({ success: false, data: [] });
-    }
-
-    return this.http.get(`${this.apiUrl}/reports/expenses-by-category/`, {
-      params: {
-        user_id: userId.toString(),
-        month: month.toString(),
-        year: year.toString()
-      }
-    }).pipe(
-      catchError((error) => {
-        console.error('Error obteniendo gastos por categoría:', error);
-        return of({ success: false, data: [] });
-      })
-    );
-  }
-
   getUnifiedAnalysis(month: number, year: number): Observable<any> {
     const userId = this.crypto.getCurrentUserId();
 
@@ -73,70 +51,6 @@ export class ReportService{
       catchError((error) => {
         console.error('Error generando comentarios de IA:', error);
         return of({ success: false, comments: [] });
-      })
-    );
-  }
-
-  getExpensesByParentCategory(month: number, year: number): Observable<any> {
-    const userId = this.crypto.getCurrentUserId();
-
-    if (!userId) {
-      console.error('Usuario no autenticado');
-      return of({ success: false, data: [] });
-    }
-
-    return this.http.get(`${this.apiUrl}/reports/expenses-by-parent-category/`, {
-      params: {
-        user_id: userId.toString(),
-        month: month.toString(),
-        year: year.toString()
-      }
-    }).pipe(
-      catchError((error) => {
-        console.error('Error obteniendo gastos por categoría padre:', error);
-        return of({ success: false, data: [] });
-      })
-    );
-  }
-
-  getEssentialVsNonEssential(year: number): Observable<any> {
-    const userId = this.crypto.getCurrentUserId();
-
-    if (!userId) {
-      console.error('Usuario no autenticado');
-      return of({ success: false, data: [] });
-    }
-
-    return this.http.get(`${this.apiUrl}/reports/essential-vs-non-essential/`, {
-      params: {
-        user_id: userId.toString(),
-        year: year.toString()
-      }
-    }).pipe(
-      catchError((error) => {
-        console.error('Error obteniendo gastos esenciales vs no esenciales:', error);
-        return of({ success: false, data: [] });
-      })
-    );
-  }
-
-  getSavingsEvolution(year: number): Observable<any> {
-    const userId = this.crypto.getCurrentUserId();
-
-    if (!userId) {
-      console.error('Usuario no autenticado');
-      return of({ success: false, data: [] });
-    }
-
-    return this.http.get(`${this.apiUrl}/reports/saving-evolution/`, {
-      params: {
-        user_id: userId.toString(),
-        year: year.toString()
-      }
-    }).pipe(
-      catchError((error) => {
-        console.error('Error obteniendo evolución de ahorro:', error);
-        return of({ success: false, data: [] });
       })
     );
   }
@@ -206,36 +120,16 @@ export class ReportService{
     );
   }
 
-  getMonthlyPrediction(year: number): Observable<any> {
-    const userId = this.crypto.getCurrentUserId();
-
-    if (!userId) {
-      console.error('Usuario no autenticado');
-      return of({ success: false, data: [] });
-    }
-
-    return this.http.get(`${this.apiUrl}/reports/monthly-prediction/`, {
-      params: {
-        user_id: userId.toString(),
-        year: year.toString()
-      }
-    }).pipe(
-      catchError((error) => {
-        console.error('Error obteniendo predicción mensual:', error);
-        return of({ success: false, data: [] });
-      })
-    );
-  }
-
   exportReport(params: {
     userId: string;
     reportType: 'monthly' | 'yearly' | 'custom';
     format: 'pdf' | 'excel';
     month?: number;
     year?: number;
-    startDate?: string;
-    endDate?: string;
+    start_date ?: string;
+    end_date?: string;
   }): Observable<Blob> {
+    console.log(params);
     let httpParams = new HttpParams()
       .set('user_id', params.userId)
       .set('report_type', params.reportType)
@@ -251,11 +145,12 @@ export class ReportService{
       httpParams = httpParams.set('year', params.year.toString());
     }
 
-    if (params.reportType === 'custom' && params.startDate && params.endDate) {
+    if (params.reportType === 'custom' && params.start_date && params.end_date) {
       httpParams = httpParams
-        .set('start_date', params.startDate)
-        .set('end_date', params.endDate);
+        .set('start_date', params.start_date)
+        .set('end_date', params.end_date);
     }
+
 
     return this.http.get(`${this.apiUrl}/reports/export/`, {
       params: httpParams,

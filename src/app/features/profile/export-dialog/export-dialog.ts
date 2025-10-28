@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import {provideNativeDateAdapter} from '@angular/material/core';
+import {MAT_DATE_LOCALE, provideNativeDateAdapter} from '@angular/material/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -41,7 +41,10 @@ export interface ExportConfig {
     MatInputModule,
     MatButtonModule
   ],
-  providers: [provideNativeDateAdapter()],
+  providers: [
+    provideNativeDateAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: 'es-PE' }
+  ],
   templateUrl: './export-dialog.html',
   styleUrl: './export-dialog.css'
 })
@@ -104,7 +107,7 @@ export class ExportDialog implements OnInit {
     // Aplicar validadores según el tipo
     if (reportType === 'monthly') {
       monthControl?.setValidators([Validators.required]);
-    } else if (reportType === 'range') {
+    } else if (reportType === 'custom') {
       startDateControl?.setValidators([Validators.required]);
       endDateControl?.setValidators([Validators.required]);
     }
@@ -130,7 +133,7 @@ export class ExportDialog implements OnInit {
 
       if (formValue.reportType === 'monthly') {
         config.month = formValue.month;
-      } else if (formValue.reportType === 'range') {
+      } else if (formValue.reportType === 'custom') {
         config.startDate = formValue.startDate;
         config.endDate = formValue.endDate;
       }

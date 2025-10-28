@@ -15,10 +15,6 @@ import { MatDialog } from '@angular/material/dialog';
 import {MatDialogModule} from '@angular/material/dialog';
 import {EditProfileDialog} from './edit-profile-dialog/edit-profile-dialog';
 
-interface UserData {
-  memberSince: Date;
-}
-
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -36,9 +32,6 @@ interface UserData {
 })
 export class Profile implements OnInit {
   currentUser!: User;
-  userData: UserData = {
-    memberSince: new Date(2024, 0, 15),
-  };
   monthly_income: number = 0;
   current_balance: number = 0;
 
@@ -156,7 +149,6 @@ export class Profile implements OnInit {
       next: (blob) => {
         const filename = this.generateFilename(config);
         this.reportService.downloadFile(blob, filename);
-        console.log(`✅ ${config.format.toUpperCase()} descargado exitosamente`);
       },
       error: (err) => {
         console.error(`❌ Error al descargar ${config.format.toUpperCase()}:`, err);
@@ -206,18 +198,5 @@ export class Profile implements OnInit {
 
   formatCurrency(amount: number): string {
     return `S/ ${amount.toFixed(2)}`;
-  }
-
-  getMembershipDuration(): string {
-    const now = new Date();
-    const months = (now.getFullYear() - this.userData.memberSince.getFullYear()) * 12
-      + (now.getMonth() - this.userData.memberSince.getMonth());
-
-    if (months < 1) return 'Nuevo miembro';
-    if (months === 1) return '1 mes';
-    if (months < 12) return `${months} meses`;
-
-    const years = Math.floor(months / 12);
-    return years === 1 ? '1 año' : `${years} años`;
   }
 }

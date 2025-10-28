@@ -73,7 +73,7 @@ export class RecurrentForm implements OnInit {
       amount: [0, [Validators.required, Validators.min(0.01)]],
       recurrence_type: ['monthly', Validators.required],
       payment_day: [1, [Validators.required, Validators.min(1), Validators.max(31)]],
-      start_date: ['', Validators.required],
+      start_date: [new Date(), Validators.required],
       end_date: [''],
       is_active: [true, Validators.required],
     });
