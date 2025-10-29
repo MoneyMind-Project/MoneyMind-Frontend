@@ -25,8 +25,8 @@ export class OneSignalService {
           }
 
           await OneSignal.init({
-            appId: '64b2a598-c69a-40bc-9b73-300085bcca04',
-            safari_web_id: 'web.onesignal.auto.57daeefd-2777-4d55-aef6-93b3ff4b973a',
+            appId: "64b2a598-c69a-40bc-9b73-300085bcca04",
+            safari_web_id: '',
             allowLocalhostAsSecureOrigin: true,
             notifyButton: { enable: true },
           });
