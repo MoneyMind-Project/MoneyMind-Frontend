@@ -39,6 +39,11 @@ export class OneSignalService {
    * Solicita permiso para notificaciones y vincula al usuario
    */
   async requestPermissionAndSetUser(userId: string): Promise<{ success: boolean; message: string }> {
+    console.log('🌐 Dominio actual:', window.location.hostname);
+    console.log('🔐 HTTPS:', window.location.protocol === 'https:');
+    console.log('🔔 Permiso actual:', Notification.permission);
+    console.log('👷 Service Worker soportado:', 'serviceWorker' in navigator);
+    
     try {
       if (!this.isInitialized) {
         console.warn('⚠️ OneSignal no está inicializado, inicializando...');
