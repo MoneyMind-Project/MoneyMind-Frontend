@@ -15,3 +15,9 @@ export interface UpdateProfileData {
   gender: string;
   monthly_income: number | null;
 }
+
+export interface UserPreference {
+  id?: number;
+  user: number;
+  color: string;
+}

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from './environment';
 import { User } from '../../shared/models/user.model';
+import {UserPreference} from '../../shared/models/user.model';
 import { RegisterRequest } from '../../shared/models/register-request.model';
 import {catchError, map, switchMap} from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
@@ -177,6 +178,16 @@ export class UserService {
         } as ApiResponse<any>);
       })
     );
+  }
+
+  // ✅ Obtener preferencia por userId
+  getUserPreference(userId: number): Observable<UserPreference> {
+    return this.http.get<UserPreference>(`${this.apiUrl}/users/user-preferences/${userId}/`);
+  }
+
+  // ✅ Crear o actualizar (upsert) preferencia
+  upsertUserPreference(userId: number, color: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/users/user-preferences/${userId}/`, { color });
   }
 
 }

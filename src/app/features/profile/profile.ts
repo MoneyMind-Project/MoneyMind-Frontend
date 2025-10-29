@@ -14,6 +14,7 @@ import {ExportDialog, ExportConfig} from './export-dialog/export-dialog';
 import { MatDialog } from '@angular/material/dialog';
 import {MatDialogModule} from '@angular/material/dialog';
 import {EditProfileDialog} from './edit-profile-dialog/edit-profile-dialog';
+import {UserService} from '../../core/services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -35,20 +36,83 @@ export class Profile implements OnInit {
   monthly_income: number = 0;
   current_balance: number = 0;
 
+  avatarColor: string = '#1033d3'; // color por defecto
+  avatarIconColor: string = 'white';
+
+  colorOptions: string[] = [
+    '#1033d3', // azul
+    '#ff5733', // naranja
+    '#28a745', // verde
+    '#6f42c1', // morado
+    '#e83e8c'  // rosa
+  ];
+  showColorPicker: boolean = false;
+
 
   constructor(private router: Router, private cryptoService: CryptoService,
-              private balanceService: BalanceService, private reportService :ReportService, private dialog: MatDialog) {}
+              private balanceService: BalanceService, private reportService :ReportService, private dialog: MatDialog,
+              private userService: UserService) {}
 
   ngOnInit(): void {
     // Aquí cargarías los datos reales del usuario desde tu servicio
     this.loadUserData();
     this.loadUserBalance();
+    this.loadUserPreference();
   }
 
   loadUserData(): void {
     this.currentUser = this.cryptoService.getCurrentUser()!;
     this.balanceService.getUserBalance().subscribe()
   }
+
+  private loadUserPreference(): void {
+    const userId = this.cryptoService.getCurrentUser()?.id;
+    if (!userId) return;
+
+    this.userService.getUserPreference(userId).subscribe({
+      next: (pref) => {
+        if (pref?.color) {
+          this.avatarColor = pref.color;
+          this.avatarIconColor = this.getContrastColor(pref.color);
+        }
+      },
+      error: (err) => {
+        console.warn('No se pudo cargar la preferencia de color del usuario:', err);
+      }
+    });
+  }
+
+  private getContrastColor(hexColor: string): string {
+    if (!hexColor) return 'white';
+    // Quita el # si existe
+    const c = hexColor.charAt(0) === '#' ? hexColor.substring(1) : hexColor;
+    // Convierte a RGB
+    const r = parseInt(c.substr(0,2),16);
+    const g = parseInt(c.substr(2,2),16);
+    const b = parseInt(c.substr(4,2),16);
+    // Calcula luminancia aproximada
+    const luminance = (0.299*r + 0.587*g + 0.114*b)/255;
+    return 'white';
+  }
+
+  toggleColorPicker() {
+    this.showColorPicker = !this.showColorPicker;
+  }
+
+  selectAvatarColor(color: string) {
+    this.avatarColor = color;
+    this.avatarIconColor = 'white';
+    this.showColorPicker = false; // cierra el overlay al seleccionar
+
+    const userId = this.currentUser?.id;
+    if (userId) {
+      this.userService.upsertUserPreference(userId, color).subscribe({
+        next: (res) => console.log('Preferencia de color guardada', res),
+        error: (err) => console.error('Error guardando preferencia de color', err)
+      });
+    }
+  }
+
 
   private loadUserBalance(): void {
     this.balanceService.getUserBalance().subscribe({

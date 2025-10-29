@@ -9,22 +9,44 @@
     <!-- Tarjeta de información del usuario -->
     <mat-card class="user-info-card" appearance="outlined">
       <div class="user-avatar-section">
-        <div class="user-avatar">
-          <mat-icon class="avatar-icon">person</mat-icon>
+        <div
+          class="user-avatar"
+          [ngStyle]="{'background-color': avatarColor}"
+          (click)="toggleColorPicker()">
+
+          <mat-icon
+            class="avatar-icon"
+            [ngStyle]="{'color': avatarIconColor}">
+            person
+          </mat-icon>
+
+          <!-- Icono de pista para cambiar color -->
+          <mat-icon class="avatar-edit-icon">palette</mat-icon>
+
+          <!-- Overlay del selector de colores -->
+          <div
+            class="avatar-color-picker-overlay"
+            *ngIf="showColorPicker">
+            <button
+              *ngFor="let color of colorOptions"
+              class="color-option"
+              [ngStyle]="{'background-color': color}"
+              (click)="selectAvatarColor(color)">
+            </button>
+          </div>
         </div>
+
         <div class="user-info">
           <h2 class="user-name">{{ currentUser.first_name }}</h2>
           <p class="user-email">{{ currentUser.email }}</p>
-          <span class="user-badge">
-            Plan standard
-          </span>
+          <span class="user-badge">Plan standard</span>
         </div>
 
-        <!-- Botón cerrar sesión en la esquina -->
         <button mat-icon-button class="logout-icon-btn" (click)="logOut()" matTooltip="Cerrar sesión">
           <mat-icon class="logout-icon">logout</mat-icon>
         </button>
       </div>
+
 
       <mat-divider></mat-divider>
 

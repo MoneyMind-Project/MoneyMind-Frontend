@@ -47,12 +47,59 @@
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: #1033d3;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  position: relative; /* necesario para overlay e icono */
+  cursor: pointer;
 }
+
+.avatar-edit-icon {
+  position: absolute;
+  bottom: -0.5px; /* ligeramente fuera del avatar */
+  right: -0.5px;
+  font-size: 20px;
+  color: white;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 50%;
+  padding: 6px 2px 2px 6px;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.user-avatar:hover .avatar-edit-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.avatar-color-picker-overlay {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-110%);
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 100;
+}
+
+.color-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.2s;
+}
+
+.color-option:hover {
+  transform: scale(1.2);
+}
+
 
 .avatar-icon {
   font-size: 56px;
@@ -60,6 +107,27 @@
   height: 56px;
   color: white;
 }
+
+.avatar-color-picker {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.color-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.2s;
+}
+
+.color-option:hover {
+  transform: scale(1.2);
+}
+
 
 .user-info {
   flex: 1;
@@ -284,6 +352,11 @@ mat-divider {
 
 /* Responsive */
 @media (max-width: 768px) {
+
+  .avatar-edit-icon {
+    padding: 6px 4px 2px 5px;
+  }
+
   .profile-container {
     padding: 16px 16px 80px 16px;
   }
