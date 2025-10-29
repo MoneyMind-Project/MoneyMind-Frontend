@@ -43,7 +43,7 @@ export class OneSignalService {
     console.log('🔐 HTTPS:', window.location.protocol === 'https:');
     console.log('🔔 Permiso actual:', Notification.permission);
     console.log('👷 Service Worker soportado:', 'serviceWorker' in navigator);
-    
+
     try {
       if (!this.isInitialized) {
         console.warn('⚠️ OneSignal no está inicializado, inicializando...');

@@ -6,6 +6,17 @@
   package = "@netlify/angular-runtime"
 
 [[redirects]]
+  from = "/OneSignalSDKWorker.js"
+  to = "/OneSignalSDKWorker.js"
+  status = 200
+
+[[redirects]]
+  from = "/OneSignalSDK.sw.js"
+  to = "/OneSignalSDK.sw.js"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
