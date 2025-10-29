@@ -3,36 +3,47 @@ import { Injectable } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class OneSignalService {
   private isInitialized = false;
+  private initPromise: Promise<void> | null = null;
+
 
   async init(): Promise<void> {
-    if (this.isInitialized) {
-      console.log('⚠️ OneSignal ya está inicializado');
-      return;
+    // Si ya hay una inicialización en proceso o completada, reutilízala
+    if (this.initPromise) {
+      console.log('⚠️ OneSignal ya se está inicializando o ya fue inicializado');
+      return this.initPromise;
     }
 
-    try {
-      // Asegurar que OneSignalDeferred existe
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
+    this.initPromise = new Promise<void>((resolve) => {
+      try {
+        // Evita múltiples inicializaciones del SDK
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
 
-      await new Promise<void>((resolve) => {
-        window.OneSignalDeferred!.push(async (OneSignal: any) => {
+        window.OneSignalDeferred.push(async (OneSignal: any) => {
+          if (this.isInitialized) {
+            console.log('⚠️ OneSignal ya inicializado (bloque interno)');
+            resolve();
+            return;
+          }
+
           await OneSignal.init({
             appId: '64b2a598-c69a-40bc-9b73-300085bcca04',
             safari_web_id: 'web.onesignal.auto.57daeefd-2777-4d55-aef6-93b3ff4b973a',
             allowLocalhostAsSecureOrigin: true,
-            notifyButton: {
-              enable: true,
-            },
+            notifyButton: { enable: true },
           });
 
           this.isInitialized = true;
           console.log('✅ OneSignal inicializado correctamente');
           resolve();
         });
-      });
-    } catch (error) {
-      console.error('❌ Error inicializando OneSignal:', error);
-    }
+      } catch (error) {
+        console.error('❌ Error inicializando OneSignal:', error);
+        this.initPromise = null; // Permite reintentar
+        resolve();
+      }
+    });
+
+    return this.initPromise;
   }
 
   /**
