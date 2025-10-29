@@ -9,10 +9,8 @@ export class AuthGuard implements CanActivate {
   canActivate(): boolean {
     const token = localStorage.getItem('mm-current-user'); // o donde guardes el token
     if (token) {
-      console.log("usuario logueado, puede entrar");
       return true; // usuario logueado, puede entrar
     } else {
-      console.log("no logueado, manda al login");
       this.router.navigate(['/auth/login']); // no logueado, manda al login
       return false;
     }
