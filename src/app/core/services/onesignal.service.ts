@@ -7,58 +7,57 @@ export class OneSignalService {
 
 
   async init(): Promise<void> {
-    // Previene inicialización duplicada
-    if (this.isInitialized) {
-      console.log('⚠️ OneSignal ya inicializado (flag interno)');
-      return;
-    }
-
-    if (window.OneSignal && window.OneSignal.initialized) {
-      console.log('⚠️ OneSignal ya inicializado (SDK)');
-      this.isInitialized = true;
-      return;
-    }
-
-    // Evita duplicación si ya se está inicializando
     if (this.initPromise) {
-      console.log('⚠️ OneSignal se está inicializando, espera...');
+      console.log('⚠️ OneSignal ya se está inicializando o ya fue inicializado');
       return this.initPromise;
     }
 
     this.initPromise = new Promise<void>((resolve) => {
       try {
-        // Crea el array solo si no existe
+        // Prepara el array global para inicialización diferida
         window.OneSignalDeferred = window.OneSignalDeferred || [];
 
-        // Marca antes de empujar
-        console.log('🚀 Iniciando OneSignal...');
-
-        // Solo un push controlado
         window.OneSignalDeferred.push(async (OneSignal: any) => {
-          try {
-            if (this.isInitialized || OneSignal.initialized) {
-              console.log('⚠️ OneSignal ya estaba inicializado, se omite.');
-              resolve();
-              return;
-            }
+          if (this.isInitialized) {
+            console.log('⚠️ OneSignal ya inicializado (bloque interno)');
+            resolve();
+            return;
+          }
 
-            await OneSignal.init({
-              appId: "64b2a598-c69a-40bc-9b73-300085bcca04",
-              notifyButton: { enable: true },
-              serviceWorkerPath: '/OneSignalSDKWorker.js',
-              serviceWorkerUpdaterPath: '/OneSignalSDKUpdaterWorker.js',
-              serviceWorkerParam: { scope: '/' },
-            });
+          await OneSignal.init({
+            appId: "64b2a598-c69a-40bc-9b73-300085bcca04",
+            safari_web_id: '',
+            allowLocalhostAsSecureOrigin: true,
+            notifyButton: { enable: true },
+          });
 
-            console.log('✅ OneSignal inicializado correctamente');
+          console.log('✅ OneSignal inicializado correctamente');
+
+          // 🧩 Verificar soporte y forzar suscripción
+          const isSupported = await OneSignal.Notifications.isPushSupported();
+          if (!isSupported) {
+            console.warn('⚠️ Push no soportado en este navegador');
             this.isInitialized = true;
             resolve();
-          } catch (err) {
-            console.error('❌ Error en inicialización interna:', err);
-            resolve();
+            return;
           }
-        });
 
+          const subscribed = await OneSignal.User.PushSubscription.optedIn;
+          if (!subscribed) {
+            console.log('🟡 Usuario no suscrito. Intentando optIn...');
+            try {
+              await OneSignal.User.PushSubscription.optIn();
+              console.log('✅ Usuario suscrito exitosamente');
+            } catch (err) {
+              console.error('❌ Error al suscribir usuario automáticamente:', err);
+            }
+          } else {
+            console.log('🟢 Usuario ya suscrito a notificaciones');
+          }
+
+          this.isInitialized = true;
+          resolve();
+        });
       } catch (error) {
         console.error('❌ Error inicializando OneSignal:', error);
         this.initPromise = null;
@@ -68,7 +67,6 @@ export class OneSignalService {
 
     return this.initPromise;
   }
-
 
 
   /**
