@@ -37,29 +37,37 @@ export class UserService {
   }
 
   // Login
-  // login.service.ts
   login(credentials: { email: string; password: string }): Observable<ApiResponse<{ token: string, user: User }>> {
     return this.http.post<any>(`${this.apiUrl}/users/login/`, credentials).pipe(
-      map((response) => {
+      switchMap(async (response) => {
         if (response && response.token && response.user) {
-          // 1. Guardar usuario en localStorage
+          // 1️⃣ Guardar usuario en localStorage (cifrado)
           const currentUser = { token: response.token, user: response.user };
           localStorage.setItem('mm-current-user', this.crypto.encrypt(currentUser));
 
-          // 2. Vincular usuario con OneSignal (sin reinicializar SDK)
-          if (window.OneSignal) {
-            try {
-              window.OneSignalDeferred?.push(async (OneSignal: any) => {
-                await OneSignal.login(response.user.id.toString());
-                console.log('✅ Usuario vinculado a OneSignal (v2):', response.user.id);
-              });
-            } catch (error) {
-              console.error('Error vinculando usuario con OneSignal:', error);
+          // 2️⃣ Inicializar y vincular usuario con OneSignal
+          try {
+            const result = await this.oneSignal.requestPermissionAndSetUser(
+              response.user.id.toString()
+            );
+
+            if (result.success) {
+              console.log('✅ Usuario suscrito y vinculado correctamente a OneSignal');
+            } else {
+              if (result.message === 'PERMISSION_BLOCKED') {
+                console.warn('🚫 Notificaciones bloqueadas manualmente en el navegador');
+                this.showNotificationBlockedMessage();
+              } else if (result.message === 'PERMISSION_DENIED') {
+                console.warn('⚠️ Usuario rechazó las notificaciones');
+              } else {
+                console.warn('⚠️ No se pudo completar la suscripción:', result.message);
+              }
             }
-          } else {
-            console.warn('⚠️ OneSignal no está inicializado todavía.');
+          } catch (error) {
+            console.error('❌ Error configurando OneSignal:', error);
           }
 
+          // 3️⃣ Retornar respuesta exitosa
           return {
             success: true,
             message: response.message || 'Login exitoso',
@@ -67,19 +75,20 @@ export class UserService {
               token: response.token,
               user: response.user
             }
-          };
+          } as ApiResponse<{ token: string, user: User }>;
         }
 
+        // 4️⃣ Si la respuesta no incluye token o user
         return {
           success: false,
           message: response.message || 'Credenciales inválidas'
-        };
+        } as ApiResponse<{ token: string, user: User }>;
       }),
       catchError((error) =>
         of({
           success: false,
           message: error?.error?.message || 'Error en el login'
-        })
+        } as ApiResponse<{ token: string, user: User }>)
       )
     );
   }

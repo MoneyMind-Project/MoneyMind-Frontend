@@ -7,7 +7,6 @@ export class OneSignalService {
 
 
   async init(): Promise<void> {
-    // Si ya hay una inicialización en proceso o completada, reutilízala
     if (this.initPromise) {
       console.log('⚠️ OneSignal ya se está inicializando o ya fue inicializado');
       return this.initPromise;
@@ -15,7 +14,7 @@ export class OneSignalService {
 
     this.initPromise = new Promise<void>((resolve) => {
       try {
-        // Evita múltiples inicializaciones del SDK
+        // Prepara el array global para inicialización diferida
         window.OneSignalDeferred = window.OneSignalDeferred || [];
 
         window.OneSignalDeferred.push(async (OneSignal: any) => {
@@ -32,19 +31,43 @@ export class OneSignalService {
             notifyButton: { enable: true },
           });
 
-          this.isInitialized = true;
           console.log('✅ OneSignal inicializado correctamente');
+
+          // 🧩 Verificar soporte y forzar suscripción
+          const isSupported = await OneSignal.Notifications.isPushSupported();
+          if (!isSupported) {
+            console.warn('⚠️ Push no soportado en este navegador');
+            this.isInitialized = true;
+            resolve();
+            return;
+          }
+
+          const subscribed = await OneSignal.User.PushSubscription.optedIn;
+          if (!subscribed) {
+            console.log('🟡 Usuario no suscrito. Intentando optIn...');
+            try {
+              await OneSignal.User.PushSubscription.optIn();
+              console.log('✅ Usuario suscrito exitosamente');
+            } catch (err) {
+              console.error('❌ Error al suscribir usuario automáticamente:', err);
+            }
+          } else {
+            console.log('🟢 Usuario ya suscrito a notificaciones');
+          }
+
+          this.isInitialized = true;
           resolve();
         });
       } catch (error) {
         console.error('❌ Error inicializando OneSignal:', error);
-        this.initPromise = null; // Permite reintentar
+        this.initPromise = null;
         resolve();
       }
     });
 
     return this.initPromise;
   }
+
 
   /**
    * Solicita permiso para notificaciones y vincula al usuario
@@ -58,61 +81,57 @@ export class OneSignalService {
       return await new Promise<{ success: boolean; message: string }>((resolve) => {
         window.OneSignalDeferred!.push(async (OneSignal: any) => {
           try {
-            // ⭐ NUEVO: Solicitar permiso nativo del navegador directamente
+            // 1️⃣ Solicitar permiso nativo
             const nativePermission = await Notification.requestPermission();
             console.log('🔔 Permiso nativo del navegador:', nativePermission);
 
             if (nativePermission !== 'granted') {
-              console.error('🚫 Usuario negó permiso nativo');
-              resolve({
-                success: false,
-                message: 'PERMISSION_DENIED'
-              });
+              console.warn('🚫 Usuario negó el permiso de notificaciones');
+              resolve({ success: false, message: 'PERMISSION_DENIED' });
               return;
             }
 
-            // 1. Solicitar permiso de notificaciones
+            // 2️⃣ Solicitar permiso desde OneSignal
             const permission = await OneSignal.Notifications.requestPermission();
-            console.log('🔔 Permiso de notificaciones:', permission);
+            console.log('🔔 Permiso OneSignal:', permission);
 
             if (!permission) {
-              console.warn('⚠️ Usuario rechazó las notificaciones');
-              resolve({
-                success: false,
-                message: 'PERMISSION_DENIED'
-              });
+              console.warn('⚠️ Usuario rechazó permiso desde OneSignal');
+              resolve({ success: false, message: 'PERMISSION_DENIED' });
               return;
             }
 
-            // 2. Verificar si el usuario ya está suscrito
-            const isPushEnabled = await OneSignal.User.PushSubscription.optedIn;
-            console.log('📡 Usuario suscrito:', isPushEnabled);
+            // 3️⃣ Verificar suscripción y suscribir si es necesario
+            const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
+            console.log('📡 Usuario suscrito:', isSubscribed);
 
-            if (!isPushEnabled) {
-              // Intentar suscribir al usuario
+            if (!isSubscribed) {
+              console.log('🟡 Intentando suscribir usuario...');
               await OneSignal.User.PushSubscription.optIn();
-              console.log('✅ Usuario suscrito a notificaciones push');
+              console.log('✅ Usuario suscrito correctamente');
             }
 
-            // 3. Vincular external user ID
+            // 4️⃣ Vincular usuario con OneSignal
             await OneSignal.login(userId);
             console.log('🔗 Usuario vinculado a OneSignal:', userId);
 
-            // 4. Verificar la suscripción
+            // 5️⃣ Verificar ID de suscripción
             const subscriptionId = OneSignal.User.PushSubscription.id;
             console.log('📱 Subscription ID:', subscriptionId);
 
-            resolve({
-              success: true,
-              message: 'SUCCESS'
-            });
+            if (!subscriptionId) {
+              console.warn('⚠️ No se obtuvo Subscription ID, podría no estar suscrito completamente');
+            }
+
+            resolve({ success: true, message: 'SUCCESS' });
           } catch (error) {
-            console.error('❌ Error:', error);
+            console.error('❌ Error durante el proceso de permiso/suscripción:', error);
             resolve({ success: false, message: 'ERROR' });
           }
         });
       });
     } catch (error) {
+      console.error('❌ Error general en requestPermissionAndSetUser:', error);
       return { success: false, message: 'ERROR' };
     }
   }
