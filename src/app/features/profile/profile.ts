@@ -56,7 +56,6 @@ export class Profile implements OnInit {
         if (res) {
           this.monthly_income = res.monthly_income ?? 0;
           this.current_balance = res.current_balance ?? 0;
-          console.log('✅ Datos de balance cargados:', res);
         } else {
           console.warn('No se encontraron datos de balance para este usuario');
         }

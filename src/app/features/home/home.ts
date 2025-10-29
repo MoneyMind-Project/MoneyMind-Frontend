@@ -56,7 +56,6 @@ export class Home implements OnInit, AfterViewInit {
       next: (res) => {
         if (res.success && res.data) {
           this.dashboardData = res;
-          console.log(this.dashboardData)
 
           const budget = res.data.budget;
           this.currentMonth = this.getMonthName(budget.month);

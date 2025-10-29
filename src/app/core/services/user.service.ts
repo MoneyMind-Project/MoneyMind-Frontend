@@ -3,16 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from './environment';
 import { User } from '../../shared/models/user.model';
 import { RegisterRequest } from '../../shared/models/register-request.model';
-import { catchError, map } from 'rxjs/operators';
+import {catchError, map, switchMap} from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
 import { ApiResponse} from '../../shared/models/response.model';
 import { CryptoService } from './crypto.service';
 import {UpdateProfileData} from "../../shared/models/user.model";
-
-interface CurrentUserData {
-  token: string;
-  user: User;
-}
+import { OneSignalService} from './onesignal.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +16,7 @@ interface CurrentUserData {
 export class UserService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient, private crypto: CryptoService) {}
+  constructor(private http: HttpClient, private crypto: CryptoService, private oneSignal: OneSignalService) {}
 
   // Registro
   register(data: RegisterRequest): Observable<ApiResponse<User>> {
@@ -43,12 +39,32 @@ export class UserService {
   // Login
   login(credentials: { email: string; password: string }): Observable<ApiResponse<{ token: string, user: User }>> {
     return this.http.post<any>(`${this.apiUrl}/users/login/`, credentials).pipe(
-      map((response) => {
+      switchMap(async (response) => {
         if (response && response.token && response.user) {
-
-          // Guardamos data en el localstorage
+          // 1. Guardar datos en localStorage
           const currentUser = { token: response.token, user: response.user };
           localStorage.setItem('mm-current-user', this.crypto.encrypt(currentUser));
+
+          // 2. Solicitar permiso de notificaciones y vincular usuario
+          try {
+            const result = await this.oneSignal.requestPermissionAndSetUser(
+              response.user.id.toString()
+            );
+
+            if (result.success) {
+              console.log('✅ Usuario suscrito a notificaciones');
+            } else {
+              if (result.message === 'PERMISSION_BLOCKED') {
+                console.warn('🚫 Notificaciones bloqueadas - Se requiere acción manual');
+                // Aquí puedes mostrar un toast o modal con instrucciones
+                this.showNotificationBlockedMessage();
+              } else if (result.message === 'PERMISSION_DENIED') {
+                console.warn('⚠️ Usuario rechazó notificaciones');
+              }
+            }
+          } catch (error) {
+            console.error('Error configurando OneSignal:', error);
+          }
 
           return {
             success: true,
@@ -60,7 +76,6 @@ export class UserService {
           } as ApiResponse<{ token: string, user: User }>;
         }
 
-        // Caso en el que backend solo devuelve un mensaje (ejemplo: credenciales inválidas)
         return {
           success: false,
           message: response.message || 'Credenciales inválidas'
@@ -73,6 +88,20 @@ export class UserService {
         } as ApiResponse<{ token: string, user: User }>)
       )
     );
+  }
+
+  private showNotificationBlockedMessage(): void {
+    // Mostrar mensaje al usuario con instrucciones
+    // Puedes usar NgToast, MatDialog, o cualquier sistema de notificaciones
+    console.log(`
+      🔔 Las notificaciones están bloqueadas
+
+      Para activarlas:
+      1. Haz clic en el candado 🔒 junto a la URL
+      2. Busca "Notificaciones"
+      3. Cambia a "Permitir"
+      4. Recarga la página
+    `);
   }
 
   // Logout
