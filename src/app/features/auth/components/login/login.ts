@@ -47,7 +47,7 @@ export class Login {
       this.userService.login(credentials).subscribe((res) => {
         if (res.success) {
           console.log('Login exitoso ✅');
-          //localStorage.setItem('user', JSON.stringify(res.data?.user));
+          // Luego, sin bloquear la navegación:
           this.router.navigate(['/']); // o '/home'
         } else {
           this.toast.danger(res.message, 'Error', 3000);
