@@ -50,6 +50,7 @@ export class Login {
           // Luego, sin bloquear la navegación:
           this.router.navigate(['/']); // o '/home'
         } else {
+          console.log("ERROR")
           this.toast.danger(res.message, 'Error', 3000);
         }
       });
