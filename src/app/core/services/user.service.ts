@@ -47,11 +47,12 @@ export class UserService {
           localStorage.setItem('mm-current-user', this.crypto.encrypt(currentUser));
 
           // 2. Vincular usuario con OneSignal (sin reinicializar SDK)
-          // Solo si OneSignal ya está inicializado
           if (window.OneSignal) {
             try {
-              window.OneSignal.setExternalUserId(response.user.id.toString());
-              console.log('✅ Usuario vinculado a OneSignal:', response.user.id);
+              window.OneSignalDeferred?.push(async (OneSignal: any) => {
+                await OneSignal.login(response.user.id.toString());
+                console.log('✅ Usuario vinculado a OneSignal (v2):', response.user.id);
+              });
             } catch (error) {
               console.error('Error vinculando usuario con OneSignal:', error);
             }
