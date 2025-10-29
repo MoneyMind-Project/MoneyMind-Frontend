@@ -90,7 +90,6 @@ export class Dashboard implements OnInit, AfterViewInit {
     const user = this.cryptoService.getCurrentUser();
     if (user) {
       this.currentUser = user;
-      console.log('Usuario cargado en Dashboard:', this.currentUser);
     } else {
       console.warn('No se encontró el usuario en localStorage');
       // Redirigir o manejar el caso de no autenticado
