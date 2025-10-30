@@ -1,8 +1,17 @@
+/* Permitir scroll en el diálogo */
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+  max-height: 90vh; /* ocupa el 90% de la altura visible */
+  overflow-y: auto; /* permite desplazamiento vertical */
+}
+
 .recurrent-dialog {
   position: relative;
   min-width: 500px;
   max-width: 600px;
   padding: 24px;
+  max-height: 90vh; /* que no ocupe más del 90% de la pantalla */
+  overflow-y: auto; /* permite el scroll */
+  -webkit-overflow-scrolling: touch; /* scroll suave en iOS */
 }
 
 .close-btn {
@@ -149,7 +158,10 @@
 @media (max-width: 600px) {
   .recurrent-dialog {
     min-width: 90%;
-    padding: 16px;
+    padding: 25px 16px 25px 16px;
+    max-height: 85vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* mejora el scroll en iOS */
   }
 
   .dialog-title {

@@ -323,6 +323,29 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .section-title {
+    margin: 0;
+    font-size: 23px;
+    line-height: 1;
+    color: #333;
+  }
+
+  .section-title-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .alert-count {
+    min-width: 32px;
+    height: 25px;
+    font-size: 14px;
+  }
+
+  .empty-title {
+    line-height: 1.2; /* Aumenta el espacio entre líneas */
+  }
+
   .recurrent-list-container {
     padding: 16px;
   }

@@ -373,6 +373,12 @@ mat-grid-list {
     padding: 8px;
   }
 
+  .notifications-section{
+    display: flex;
+    justify-content: right;
+    width: 100%;
+  }
+
   /* En mobile, el panel ocupa toda la pantalla desde abajo */
   .notifications-section app-notifications-panel {
     position: fixed;
@@ -513,7 +519,7 @@ mat-grid-list {
 }
 
 .welcome-message .subtitle {
-  margin: 4px 0 0 0;
+  margin: 10px 0 0 0;
   color: #666;
   font-size: 16px;
 }
@@ -613,13 +619,24 @@ mat-grid-list {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .dashboard-container {
-    padding: 16px;
+    padding: 16px 16px 80px 16px;
+  }
+
+  .welcome-message .subtitle {
+    margin: 8px 0 0 0;
+  }
+
+  .welcome-message h1 {
+    margin: 15px 0 0 0;
+    font-size: 25px;
+    font-weight: 600;
   }
 
   .header-section {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+    margin-top: 0;
   }
 
   .kpis-grid {
