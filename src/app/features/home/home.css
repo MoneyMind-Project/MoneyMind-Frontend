@@ -513,6 +513,46 @@
   }
 }
 
+/* Para pantallas muy pequeñas como iPhone SE */
+@media (max-width: 390px) {
+  .dashboard-grid {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+}
+
+/* Asegurar que las cards no se salgan */
+.dashboard-grid mat-card {
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0; /* Importante: permite que el contenido se encoja */
+}
+
+/* Asegurar que el contenido interno también respete el ancho */
+.budget-card,
+.chart-card {
+  overflow: hidden; /* Previene que el contenido se salga */
+}
+
+.chart-container,
+.budget-content {
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Ajustar el canvas del gráfico */
+.chart-canvas-wrapper {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+}
+
+.chart-canvas-wrapper canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
 /* ==================== SKELETONS ==================== */
 
 /* Animación de shimmer (deslizamiento) */
