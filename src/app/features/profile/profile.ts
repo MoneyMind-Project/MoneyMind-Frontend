@@ -48,6 +48,10 @@ export class Profile implements OnInit {
   ];
   showColorPicker: boolean = false;
 
+  // Estados de carga
+  loadingAvatarColor: boolean = true;
+  loadingBalance: boolean = true;
+
 
   constructor(private router: Router, private cryptoService: CryptoService,
               private balanceService: BalanceService, private reportService :ReportService, private dialog: MatDialog,
@@ -67,7 +71,10 @@ export class Profile implements OnInit {
 
   private loadUserPreference(): void {
     const userId = this.cryptoService.getCurrentUser()?.id;
-    if (!userId) return;
+    if (!userId) {
+      this.loadingAvatarColor = false;
+      return;
+    }
 
     this.userService.getUserPreference(userId).subscribe({
       next: (pref) => {
@@ -75,28 +82,23 @@ export class Profile implements OnInit {
           this.avatarColor = pref.color;
           this.avatarIconColor = this.getContrastColor(pref.color);
         }
+        this.loadingAvatarColor = false;
       },
       error: (err) => {
         console.warn('No se pudo cargar la preferencia de color del usuario:', err);
+        this.loadingAvatarColor = false;
       }
     });
   }
 
   private getContrastColor(hexColor: string): string {
-    if (!hexColor) return 'white';
-    // Quita el # si existe
-    const c = hexColor.charAt(0) === '#' ? hexColor.substring(1) : hexColor;
-    // Convierte a RGB
-    const r = parseInt(c.substr(0,2),16);
-    const g = parseInt(c.substr(2,2),16);
-    const b = parseInt(c.substr(4,2),16);
-    // Calcula luminancia aproximada
-    const luminance = (0.299*r + 0.587*g + 0.114*b)/255;
     return 'white';
   }
 
   toggleColorPicker() {
-    this.showColorPicker = !this.showColorPicker;
+    if (!this.loadingAvatarColor) {
+      this.showColorPicker = !this.showColorPicker;
+    }
   }
 
   selectAvatarColor(color: string) {
@@ -113,7 +115,6 @@ export class Profile implements OnInit {
     }
   }
 
-
   private loadUserBalance(): void {
     this.balanceService.getUserBalance().subscribe({
       next: (res) => {
@@ -123,9 +124,11 @@ export class Profile implements OnInit {
         } else {
           console.warn('No se encontraron datos de balance para este usuario');
         }
+        this.loadingBalance = false;
       },
       error: (err) => {
         console.error('❌ Error al obtener el balance del usuario:', err);
+        this.loadingBalance = false;
       }
     });
   }

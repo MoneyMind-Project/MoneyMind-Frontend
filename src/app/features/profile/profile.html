@@ -9,31 +9,36 @@
     <!-- Tarjeta de información del usuario -->
     <mat-card class="user-info-card" appearance="outlined">
       <div class="user-avatar-section">
+        <!-- Avatar con skeleton -->
         <div
           class="user-avatar"
-          [ngStyle]="{'background-color': avatarColor}"
+          [class.skeleton]="loadingAvatarColor"
+          [ngStyle]="!loadingAvatarColor ? {'background-color': avatarColor} : {}"
           (click)="toggleColorPicker()">
 
-          <mat-icon
-            class="avatar-icon"
-            [ngStyle]="{'color': avatarIconColor}">
-            person
-          </mat-icon>
+          <!-- Contenido del avatar (solo visible cuando no está cargando) -->
+          <ng-container *ngIf="!loadingAvatarColor">
+            <mat-icon
+              class="avatar-icon"
+              [ngStyle]="{'color': avatarIconColor}">
+              person
+            </mat-icon>
 
-          <!-- Icono de pista para cambiar color -->
-          <mat-icon class="avatar-edit-icon">palette</mat-icon>
+            <!-- Icono de pista para cambiar color -->
+            <mat-icon class="avatar-edit-icon">palette</mat-icon>
 
-          <!-- Overlay del selector de colores -->
-          <div
-            class="avatar-color-picker-overlay"
-            *ngIf="showColorPicker">
-            <button
-              *ngFor="let color of colorOptions"
-              class="color-option"
-              [ngStyle]="{'background-color': color}"
-              (click)="selectAvatarColor(color)">
-            </button>
-          </div>
+            <!-- Overlay del selector de colores -->
+            <div
+              class="avatar-color-picker-overlay"
+              *ngIf="showColorPicker">
+              <button
+                *ngFor="let color of colorOptions"
+                class="color-option"
+                [ngStyle]="{'background-color': color}"
+                (click)="selectAvatarColor(color)">
+              </button>
+            </div>
+          </ng-container>
         </div>
 
         <div class="user-info">
@@ -47,15 +52,20 @@
         </button>
       </div>
 
-
       <mat-divider></mat-divider>
 
+      <!-- Stats con skeleton -->
       <div class="user-stats">
         <div class="stat-item">
           <mat-icon class="stat-icon">account_balance_wallet</mat-icon>
           <div class="stat-content">
             <span class="stat-label">Presupuesto actual</span>
-            <span class="stat-value">{{ formatCurrency(current_balance) }}</span>
+
+            <!-- Valor real o skeleton -->
+            <span class="stat-value" *ngIf="!loadingBalance">
+          {{ formatCurrency(current_balance) }}
+        </span>
+            <span class="stat-value-skeleton skeleton" *ngIf="loadingBalance"></span>
           </div>
         </div>
       </div>
