@@ -40,35 +40,17 @@ export class UserService {
   // Login
   login(credentials: { email: string; password: string }): Observable<ApiResponse<{ token: string, user: User }>> {
     return this.http.post<any>(`${this.apiUrl}/users/login/`, credentials).pipe(
-      switchMap(async (response) => {
+      map((response) => { // ✅ Cambiado de switchMap a map
         if (response && response.token && response.user) {
           // 1️⃣ Guardar usuario en localStorage (cifrado)
           const currentUser = { token: response.token, user: response.user };
           localStorage.setItem('mm-current-user', this.crypto.encrypt(currentUser));
 
-          // 2️⃣ Inicializar y vincular usuario con OneSignal
-          try {
-            const result = await this.oneSignal.requestPermissionAndSetUser(
-              response.user.id.toString()
-            );
+          // 2️⃣ Inicializar y vincular usuario con OneSignal SIN BLOQUEAR
+          // ✅ Ejecutamos en segundo plano sin await
+          this.setupOneSignal(response.user.id.toString());
 
-            if (result.success) {
-              console.log('✅ Usuario suscrito y vinculado correctamente a OneSignal');
-            } else {
-              if (result.message === 'PERMISSION_BLOCKED') {
-                console.warn('🚫 Notificaciones bloqueadas manualmente en el navegador');
-                this.showNotificationBlockedMessage();
-              } else if (result.message === 'PERMISSION_DENIED') {
-                console.warn('⚠️ Usuario rechazó las notificaciones');
-              } else {
-                console.warn('⚠️ No se pudo completar la suscripción:', result.message);
-              }
-            }
-          } catch (error) {
-            console.error('❌ Error configurando OneSignal:', error);
-          }
-
-          // 3️⃣ Retornar respuesta exitosa
+          // 3️⃣ Retornar respuesta exitosa INMEDIATAMENTE
           return {
             success: true,
             message: response.message || 'Login exitoso',
@@ -92,6 +74,38 @@ export class UserService {
         } as ApiResponse<{ token: string, user: User }>)
       )
     );
+  }
+  
+  private async setupOneSignal(userId: string): Promise<void> {
+    try {
+      // Timeout general de 30 segundos
+      const result = await Promise.race([
+        this.oneSignal.requestPermissionAndSetUser(userId),
+        new Promise<{ success: boolean; message: string }>((resolve) =>
+          setTimeout(() => {
+            console.warn('⏱️ OneSignal setup timeout, continuando sin notificaciones');
+            resolve({ success: false, message: 'TIMEOUT' });
+          }, 30000)
+        )
+      ]);
+
+      if (result.success) {
+        console.log('✅ Usuario suscrito y vinculado correctamente a OneSignal');
+      } else {
+        if (result.message === 'PERMISSION_BLOCKED') {
+          console.warn('🚫 Notificaciones bloqueadas manualmente en el navegador');
+          this.showNotificationBlockedMessage();
+        } else if (result.message === 'PERMISSION_DENIED') {
+          console.warn('⚠️ Usuario rechazó las notificaciones');
+        } else if (result.message === 'TIMEOUT') {
+          console.warn('⏱️ OneSignal tardó demasiado, se continuó sin configurar notificaciones');
+        } else {
+          console.warn('⚠️ No se pudo completar la suscripción:', result.message);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error configurando OneSignal (no afecta el login):', error);
+    }
   }
 
 
