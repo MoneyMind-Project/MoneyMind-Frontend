@@ -282,8 +282,8 @@
 /* Responsive */
 @media (max-width: 768px) {
   .notifications-container {
-    border-radius: 0;
     box-shadow: none;
+    background-color: white;
   }
 
   .notifications-header h2 {

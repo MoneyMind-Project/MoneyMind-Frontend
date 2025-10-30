@@ -159,7 +159,7 @@ export class AllMovements implements OnInit {
   openDetails(movement: DisplayableMovement) {
     const ref = this.dialog.open(MovementDetails, {
       width: '500px',
-      maxWidth: window.innerWidth <= 768 ? '85vw' : '500px',
+      maxWidth: window.innerWidth <= 768 ? '93vw' : '500px',
       maxHeight: '85vh',
       data: movement
     });

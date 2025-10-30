@@ -5,7 +5,9 @@
   max-width: 100%;
   background: white;
   border-radius: 12px;
-  overflow: hidden;
+  max-height: 90vh; /* que no ocupe más del 90% de la pantalla */
+  overflow-y: auto; /* permite el scroll */
+  -webkit-overflow-scrolling: touch; /* scroll suave en iOS */
 }
 
 /* Header */

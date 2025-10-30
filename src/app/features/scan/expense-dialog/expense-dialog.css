@@ -581,12 +581,12 @@
   .upload-step-2,
   .camera-step-2,
   .manual-step-2 {
-    max-width: 560px !important;
+    max-width: 660px !important;
   }
 
   .upload-step-1,
   .camera-step-1 {
-    min-width: 80vw;
+    min-width: 90vw;
   }
   .step-1-container{
     width: 90%;
@@ -701,7 +701,7 @@
   .upload-step-2,
   .camera-step-2,
   .manual-step-2 {
-    width: 80vw !important;
+    width: 90vw !important;
   }
 
 }

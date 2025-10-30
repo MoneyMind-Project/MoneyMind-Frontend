@@ -3,6 +3,9 @@
   flex-direction: column;
   max-height: 90vh;
   padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* Evita scroll en el contenedor principal */
 }
 
 .dialog-header {
@@ -11,6 +14,7 @@
   align-items: center;
   padding: 0 0 16px 0;
   border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0; /* No se encoge */
 }
 
 .dialog-header h2 {
@@ -31,17 +35,25 @@
 .dialog-content {
   padding: 24px 0;
   overflow-y: auto;
+  overflow-x: hidden; /* IMPORTANTE: previene scroll horizontal */
   max-height: calc(90vh - 180px);
+  flex: 1; /* Toma el espacio disponible */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .edit-form {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-section {
   margin-bottom: 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .section-title {
@@ -54,14 +66,17 @@
 }
 
 .full-width {
-  width: 99%;
-  margin: 0 auto;
+  width: 100%; /* Cambiado de 99% a 100% */
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .income-section {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .prefer-not-checkbox {
@@ -80,6 +95,7 @@
   padding: 16px 0 0 0;
   border-top: 1px solid #e0e0e0;
   margin-top: auto;
+  flex-shrink: 0; /* No se encoge */
 }
 
 .cancel-button {
@@ -97,10 +113,23 @@
   color: #1033d3;
 }
 
-/* Estilos para los campos */
+/* Estilos para los campos - IMPORTANTE */
 ::ng-deep .mat-mdc-text-field-wrapper {
   padding-left: 0;
   padding-right: 0;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Asegurar que los form fields no se salgan */
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+::ng-deep .mat-mdc-form-field-infix {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Scrollbar personalizado */
@@ -126,6 +155,7 @@
 @media (max-width: 768px) {
   .dialog-container {
     max-height: 100vh;
+    padding: 16px; /* Menos padding en móvil */
   }
 
   .dialog-header h2 {
@@ -154,6 +184,10 @@
 }
 
 @media (max-width: 480px) {
+  .dialog-container {
+    padding: 12px; /* Aún menos padding en pantallas muy pequeñas */
+  }
+
   .dialog-header h2 {
     font-size: 18px;
   }
