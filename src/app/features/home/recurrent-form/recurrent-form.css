@@ -148,7 +148,7 @@
 /* Responsive */
 @media (max-width: 600px) {
   .recurrent-dialog {
-    min-width: 100%;
+    min-width: 90%;
     padding: 16px;
   }
 
@@ -162,5 +162,6 @@
 
   .actions button {
     width: 100%;
+    padding: 10px;
   }
 }
