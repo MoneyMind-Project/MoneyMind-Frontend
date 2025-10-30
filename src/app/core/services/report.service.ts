@@ -121,7 +121,6 @@ export class ReportService{
   }
 
   exportReport(params: {
-    userId: string;
     reportType: 'monthly' | 'yearly' | 'custom';
     format: 'pdf' | 'excel';
     month?: number;
@@ -129,9 +128,15 @@ export class ReportService{
     start_date ?: string;
     end_date?: string;
   }): Observable<Blob> {
-    console.log(params);
+    const userId = this.crypto.getCurrentUserId();
+
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return throwError(() => new Error('Usuario no autenticado. Inicie sesión para exportar el reporte.'));
+    }
+
     let httpParams = new HttpParams()
-      .set('user_id', params.userId)
+      .set('user_id', userId)
       .set('report_type', params.reportType)
       .set('file_format', params.format);
 

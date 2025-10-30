@@ -188,13 +188,11 @@ export class Profile implements OnInit {
   }
 
   private downloadReport(config: ExportConfig): void {
-    const userId = '13';
 
     console.log(`Exportando reporte en ${config.format.toUpperCase()}...`, config);
 
     // Preparar parámetros según el tipo de reporte
     let params: any = {
-      userId: userId,
       reportType: config.reportType,
       format: config.format,
       year: config.year
