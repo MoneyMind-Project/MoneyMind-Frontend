@@ -47,6 +47,11 @@ export class Dashboard implements OnInit, AfterViewInit {
 
   private chartDataList: any[] = [];
 
+  // 🔹 Estados de carga
+  isLoadingKpis: boolean = true;
+  isLoadingCharts: boolean = true;
+  isLoadingComments: boolean = false;
+
   // KPIs
   totalGastadoMes: number = 0;
   categoriaMasAlta: string = '';
@@ -80,8 +85,6 @@ export class Dashboard implements OnInit, AfterViewInit {
   showBackEsenciales = false;
   showBackPadres = false;
 
-  isLoadingComments: boolean = false;
-
   constructor(private breakpointObserver: BreakpointObserver, private reportService: ReportService,
               private dialog: MatDialog, private router: Router, private  alertService: AlertService,
               private cryptoService: CryptoService) {}
@@ -92,7 +95,6 @@ export class Dashboard implements OnInit, AfterViewInit {
       this.currentUser = user;
     } else {
       console.warn('No se encontró el usuario en localStorage');
-      // Redirigir o manejar el caso de no autenticado
       this.router.navigate(['/login']);
     }
     this.breakpointObserver.observe([
@@ -137,7 +139,6 @@ export class Dashboard implements OnInit, AfterViewInit {
 
   toggleFlip(chart: string): void {
     if (this.chartDataList && this.chartDataList.length > 0) {
-      // Verificar si ya existen comentarios generados
       const commentsExist =
         this.monthlyPredictionsComment ||
         this.expensesByCategoryComment ||
@@ -151,11 +152,9 @@ export class Dashboard implements OnInit, AfterViewInit {
       } else {
         console.log("✅ Comentarios de IA ya existen, no se genera nuevamente.");
       }
-
     } else {
       console.warn("⚠️ No hay datos de los gráficos aún. Espera a que el dashboard cargue.");
     }
-
 
     switch (chart) {
       case 'categorias': this.showBackCategorias = !this.showBackCategorias; break;
@@ -166,7 +165,31 @@ export class Dashboard implements OnInit, AfterViewInit {
     }
   }
 
+  loadDashboardOverview(): void {
+    this.isLoadingKpis = true;
+    const currentDate = new Date();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+
+    this.reportService.getDashboardOverview(month, year).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.totalGastadoMes = response.data.total_spent || 0;
+          this.categoriaMasAlta = response.data.highest_category || 'N/A';
+          this.presupuestoRestante = response.data.remaining_budget || 0;
+          this.proyeccionProximoMes = response.data.next_month_projection || 0;
+        }
+        this.isLoadingKpis = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar KPIs:', error);
+        this.isLoadingKpis = false;
+      }
+    });
+  }
+
   loadUnifiedDashboardData(): void {
+    this.isLoadingCharts = true;
     const currentDate = new Date();
     const month = currentDate.getMonth() + 1;
     const year = currentDate.getFullYear();
@@ -176,7 +199,6 @@ export class Dashboard implements OnInit, AfterViewInit {
         if (response.success && response.data) {
           const data = response.data;
 
-          // Guardar los datasets localmente para futura generación de comentarios
           this.chartDataList = [
             data.monthly_predictions,
             data.expenses_by_category,
@@ -185,22 +207,27 @@ export class Dashboard implements OnInit, AfterViewInit {
             data.essential_vs_non_essential
           ];
 
+          // Primero cambiamos el estado de carga
+          this.isLoadingCharts = false;
 
-          // Aquí llamas a los constructores de los charts con los subbloques del JSON:
-          this.createCategoriasChartWithData(data.expenses_by_category);
-          this.createProporcionChartWithData(data.expenses_by_parent_category);
-          this.createPrediccionChartWithData(data.monthly_predictions);
-          this.createAhorroChartWithData(data.savings_evolution);
-          this.createEsencialesChartWithData(data.essential_vs_non_essential);
-
+          // Esperamos a que Angular actualice el DOM antes de crear los gráficos
+          setTimeout(() => {
+            this.createCategoriasChartWithData(data.expenses_by_category);
+            this.createProporcionChartWithData(data.expenses_by_parent_category);
+            this.createPrediccionChartWithData(data.monthly_predictions);
+            this.createAhorroChartWithData(data.savings_evolution);
+            this.createEsencialesChartWithData(data.essential_vs_non_essential);
+          }, 100);
         } else {
           console.error('Respuesta no válida del backend:', response);
-          this.loadFallbackCharts();
+          this.isLoadingCharts = false;
+          setTimeout(() => this.loadFallbackCharts(), 100);
         }
       },
       error: (error) => {
         console.error('Error al obtener datos unificados:', error);
-        this.loadFallbackCharts();
+        this.isLoadingCharts = false;
+        setTimeout(() => this.loadFallbackCharts(), 100);
       }
     });
   }
@@ -212,7 +239,7 @@ export class Dashboard implements OnInit, AfterViewInit {
     }
 
     console.log("🧠 Generando comentarios de IA...");
-    this.isLoadingComments = true; // ⏳ Inicia el estado de carga
+    this.isLoadingComments = true;
 
     this.reportService.getChartComments(this.chartDataList).subscribe({
       next: (response) => {
@@ -236,16 +263,14 @@ export class Dashboard implements OnInit, AfterViewInit {
           console.warn("⚠️ No se pudieron generar comentarios de IA o respuesta vacía.");
         }
 
-        this.isLoadingComments = false; // ✅ Termina el estado de carga
+        this.isLoadingComments = false;
       },
       error: (err) => {
         console.error("🔥 Error generando comentarios IA:", err);
-        this.isLoadingComments = false; // 🚫 Termina el estado de carga aunque haya error
+        this.isLoadingComments = false;
       }
     });
   }
-
-
 
   private loadFallbackCharts(): void {
     this.createCategoriasChart();
@@ -746,26 +771,6 @@ export class Dashboard implements OnInit, AfterViewInit {
             }
           }
         }
-      }
-    });
-  }
-
-  loadDashboardOverview(): void {
-    const currentDate = new Date();
-    const month = currentDate.getMonth() + 1;
-    const year = currentDate.getFullYear();
-
-    this.reportService.getDashboardOverview(month, year).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.totalGastadoMes = response.data.total_gastado_mes;
-          this.categoriaMasAlta = response.data.categoria_mas_alta?.label || 'N/A';
-          this.presupuestoRestante = response.data.presupuesto_restante;
-          this.proyeccionProximoMes = response.data.proyeccion_proximo_mes;
-        }
-      },
-      error: (error) => {
-        console.error('Error cargando overview:', error);
       }
     });
   }

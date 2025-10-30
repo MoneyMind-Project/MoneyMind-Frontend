@@ -27,53 +27,78 @@
         *ngIf="showNotificationPanel"
         (closePanel)="closeNotificationPanel()">
       </app-notifications-panel>
-
     </div>
   </div>
 
   <!-- KPIs Grid -->
   <div class="kpis-grid">
-    <mat-card class="kpi-card">
-      <mat-card-content>
-        <div class="kpi-label">Total gastado este mes</div>
-        <div class="kpi-value">S/ {{ totalGastadoMes }}</div>
-      </mat-card-content>
-    </mat-card>
+    <!-- 🔹 Skeleton para KPIs mientras cargan -->
+    <ng-container *ngIf="isLoadingKpis">
+      <mat-card class="kpi-card" *ngFor="let item of [1,2,3,4]">
+        <mat-card-content>
+          <div class="skeleton skeleton-text skeleton-label"></div>
+          <div class="skeleton skeleton-text skeleton-value"></div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
 
-    <mat-card class="kpi-card">
-      <mat-card-content>
-        <div class="kpi-label">Categoría más alta</div>
-        <div class="kpi-value category">{{ categoriaMasAlta }}</div>
-      </mat-card-content>
-    </mat-card>
+    <!-- ✅ KPIs con datos -->
+    <ng-container *ngIf="!isLoadingKpis">
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-label">Total gastado este mes</div>
+          <div class="kpi-value">S/ {{ totalGastadoMes }}</div>
+        </mat-card-content>
+      </mat-card>
 
-    <mat-card class="kpi-card">
-      <mat-card-content>
-        <div class="kpi-label">Presupuesto restante</div>
-        <div class="kpi-value" [ngClass]="{ 'critico': isPresupuestoCritico }">
-          S/ {{ presupuestoRestante }}
-        </div>
-      </mat-card-content>
-    </mat-card>
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-label">Categoría más alta</div>
+          <div class="kpi-value category">{{ categoriaMasAlta }}</div>
+        </mat-card-content>
+      </mat-card>
 
-    <mat-card class="kpi-card">
-      <mat-card-content>
-        <div class="kpi-label">Proyección de gastos del próximo mes</div>
-        <div class="kpi-value">
-          S/ {{ proyeccionProximoMes }}
-        </div>
-      </mat-card-content>
-    </mat-card>
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-label">Presupuesto restante</div>
+          <div class="kpi-value" [ngClass]="{ 'critico': isPresupuestoCritico }">
+            S/ {{ presupuestoRestante }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-label">Proyección de gastos del próximo mes</div>
+          <div class="kpi-value">
+            S/ {{ proyeccionProximoMes }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
   </div>
 
   <!-- Charts Grid -->
   <mat-grid-list [cols]="gridCols" rowHeight="400px" [gutterSize]="'20px'">
 
-    <mat-grid-tile [colspan]="mainChartCols" [rowspan]="1">
+    <!-- 🔹 SKELETON: Distribución de gastos por minicategorías -->
+    <mat-grid-tile [colspan]="mainChartCols" [rowspan]="1" *ngIf="isLoadingCharts">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <div class="skeleton skeleton-text skeleton-title"></div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-skeleton">
+            <div class="skeleton skeleton-chart"></div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <!-- 📊 GRÁFICO: Distribución de gastos por minicategorías -->
+    <mat-grid-tile [colspan]="mainChartCols" [rowspan]="1" *ngIf="!isLoadingCharts">
       <mat-card class="chart-card flip-card" [class.flipped]="showBackCategorias">
         <div class="flip-card-inner">
-
-          <!-- Cara frontal -->
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Distribución de gastos por minicategorías</mat-card-title>
@@ -88,7 +113,6 @@
             </mat-card-content>
           </div>
 
-          <!-- Cara trasera -->
           <div class="flip-card-back">
             <mat-card-header>
               <mat-card-title>Descripción del gráfico</mat-card-title>
@@ -96,36 +120,38 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
-
             <mat-card-content>
-              <!-- 🔹 Mostrar spinner si aún está generando los comentarios -->
               <div *ngIf="isLoadingComments; else commentContent" class="loading-container">
-                <mat-progress-spinner
-                  color="accent"
-                  mode="indeterminate"
-                  diameter="40">
-                </mat-progress-spinner>
+                <mat-progress-spinner color="accent" mode="indeterminate" diameter="40"></mat-progress-spinner>
                 <p>Generando análisis con IA...</p>
               </div>
-
-              <!-- 🔹 Contenido del comentario cuando ya está listo -->
               <ng-template #commentContent>
                 <p>{{ expensesByCategoryComment || 'No hay comentario disponible por el momento.' }}</p>
               </ng-template>
             </mat-card-content>
           </div>
-
         </div>
       </mat-card>
     </mat-grid-tile>
 
+    <!-- 🔹 SKELETON: Evolución de ahorro -->
+    <mat-grid-tile [colspan]="sideChartCols" [rowspan]="1" *ngIf="isLoadingCharts">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <div class="skeleton skeleton-text skeleton-title"></div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-skeleton">
+            <div class="skeleton skeleton-chart"></div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
 
-
-    <mat-grid-tile [colspan]="sideChartCols" [rowspan]="1">
+    <!-- 📊 GRÁFICO: Evolución de ahorro -->
+    <mat-grid-tile [colspan]="sideChartCols" [rowspan]="1" *ngIf="!isLoadingCharts">
       <mat-card class="chart-card flip-card" [class.flipped]="showBackAhorro">
         <div class="flip-card-inner">
-
-          <!-- Cara frontal -->
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Evolución de ahorro</mat-card-title>
@@ -140,7 +166,6 @@
             </mat-card-content>
           </div>
 
-          <!-- Cara trasera -->
           <div class="flip-card-back">
             <mat-card-header>
               <mat-card-title>Descripción del gráfico</mat-card-title>
@@ -148,36 +173,38 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
-
             <mat-card-content>
-              <!-- 🔹 Mostrar spinner mientras se generan los comentarios -->
               <div *ngIf="isLoadingComments; else ahorroCommentContent" class="loading-container">
-                <mat-progress-spinner
-                  color="accent"
-                  mode="indeterminate"
-                  diameter="40">
-                </mat-progress-spinner>
+                <mat-progress-spinner color="accent" mode="indeterminate" diameter="40"></mat-progress-spinner>
                 <p>Generando análisis con IA...</p>
               </div>
-
-              <!-- 🔹 Mostrar el comentario una vez listo -->
               <ng-template #ahorroCommentContent>
                 <p>{{ savingsEvolutionComment || 'No hay comentario disponible por el momento.' }}</p>
               </ng-template>
             </mat-card-content>
           </div>
-
         </div>
       </mat-card>
     </mat-grid-tile>
 
+    <!-- 🔹 SKELETON: Proporción de categorías padres -->
+    <mat-grid-tile [colspan]="1" [rowspan]="1" *ngIf="isLoadingCharts">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <div class="skeleton skeleton-text skeleton-title"></div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-skeleton">
+            <div class="skeleton skeleton-chart"></div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
 
-
-    <mat-grid-tile [colspan]="1" [rowspan]="1">
+    <!-- 📊 GRÁFICO: Proporción de categorías padres -->
+    <mat-grid-tile [colspan]="1" [rowspan]="1" *ngIf="!isLoadingCharts">
       <mat-card class="chart-card flip-card" [class.flipped]="showBackPadres">
         <div class="flip-card-inner">
-
-          <!-- Cara frontal -->
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Proporción de categorías padres</mat-card-title>
@@ -192,7 +219,6 @@
             </mat-card-content>
           </div>
 
-          <!-- Cara trasera -->
           <div class="flip-card-back">
             <mat-card-header>
               <mat-card-title>Descripción del gráfico</mat-card-title>
@@ -200,36 +226,38 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
-
             <mat-card-content>
-              <!-- 🔹 Mostrar spinner mientras se generan los comentarios -->
               <div *ngIf="isLoadingComments; else padresCommentContent" class="loading-container">
-                <mat-progress-spinner
-                  color="accent"
-                  mode="indeterminate"
-                  diameter="40">
-                </mat-progress-spinner>
+                <mat-progress-spinner color="accent" mode="indeterminate" diameter="40"></mat-progress-spinner>
                 <p>Generando análisis con IA...</p>
               </div>
-
-              <!-- 🔹 Mostrar el comentario una vez disponible -->
               <ng-template #padresCommentContent>
                 <p>{{ expensesByParentCategoryComment || 'No hay comentario disponible por el momento.' }}</p>
               </ng-template>
             </mat-card-content>
           </div>
-
         </div>
       </mat-card>
     </mat-grid-tile>
 
+    <!-- 🔹 SKELETON: Predicción de gastos por mes -->
+    <mat-grid-tile [colspan]="1" [rowspan]="1" *ngIf="isLoadingCharts">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <div class="skeleton skeleton-text skeleton-title"></div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-skeleton">
+            <div class="skeleton skeleton-chart"></div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
 
-
-    <mat-grid-tile [colspan]="1" [rowspan]="1">
+    <!-- 📊 GRÁFICO: Predicción de gastos por mes -->
+    <mat-grid-tile [colspan]="1" [rowspan]="1" *ngIf="!isLoadingCharts">
       <mat-card class="chart-card flip-card" [class.flipped]="showBackProyeccion">
         <div class="flip-card-inner">
-
-          <!-- Cara frontal -->
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Predicción de gastos por mes</mat-card-title>
@@ -244,7 +272,6 @@
             </mat-card-content>
           </div>
 
-          <!-- Cara trasera -->
           <div class="flip-card-back">
             <mat-card-header>
               <mat-card-title>Descripción del gráfico</mat-card-title>
@@ -252,36 +279,38 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
-
             <mat-card-content>
-              <!-- 🔹 Mostrar spinner mientras se generan los comentarios -->
               <div *ngIf="isLoadingComments; else proyeccionCommentContent" class="loading-container">
-                <mat-progress-spinner
-                  color="accent"
-                  mode="indeterminate"
-                  diameter="40">
-                </mat-progress-spinner>
+                <mat-progress-spinner color="accent" mode="indeterminate" diameter="40"></mat-progress-spinner>
                 <p>Generando análisis con IA...</p>
               </div>
-
-              <!-- 🔹 Mostrar comentario una vez disponible -->
               <ng-template #proyeccionCommentContent>
                 <p>{{ monthlyPredictionsComment || 'No hay comentario disponible por el momento.' }}</p>
               </ng-template>
             </mat-card-content>
           </div>
-
         </div>
       </mat-card>
     </mat-grid-tile>
 
+    <!-- 🔹 SKELETON: Gastos esenciales vs no esenciales -->
+    <mat-grid-tile [colspan]="lastChartCols" [rowspan]="1" *ngIf="isLoadingCharts">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <div class="skeleton skeleton-text skeleton-title"></div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-skeleton">
+            <div class="skeleton skeleton-chart"></div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
 
-
-    <mat-grid-tile [colspan]="lastChartCols" [rowspan]="1">
+    <!-- 📊 GRÁFICO: Gastos esenciales vs no esenciales -->
+    <mat-grid-tile [colspan]="lastChartCols" [rowspan]="1" *ngIf="!isLoadingCharts">
       <mat-card class="chart-card flip-card" [class.flipped]="showBackEsenciales">
         <div class="flip-card-inner">
-
-          <!-- Cara frontal -->
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Gastos esenciales vs no esenciales</mat-card-title>
@@ -296,7 +325,6 @@
             </mat-card-content>
           </div>
 
-          <!-- Cara trasera -->
           <div class="flip-card-back">
             <mat-card-header>
               <mat-card-title>Descripción del gráfico</mat-card-title>
@@ -304,30 +332,19 @@
                 Volver al gráfico
               </button>
             </mat-card-header>
-
             <mat-card-content>
-              <!-- 🔹 Mostrar spinner mientras se generan los comentarios -->
               <div *ngIf="isLoadingComments; else esencialesCommentContent" class="loading-container">
-                <mat-progress-spinner
-                  color="accent"
-                  mode="indeterminate"
-                  diameter="40">
-                </mat-progress-spinner>
+                <mat-progress-spinner color="accent" mode="indeterminate" diameter="40"></mat-progress-spinner>
                 <p>Generando análisis con IA...</p>
               </div>
-
-              <!-- 🔹 Mostrar comentario una vez disponible -->
               <ng-template #esencialesCommentContent>
                 <p>{{ essentialVsNonEssentialComment || 'No hay comentario disponible por el momento.' }}</p>
               </ng-template>
             </mat-card-content>
           </div>
-
         </div>
       </mat-card>
     </mat-grid-tile>
-
-
 
   </mat-grid-list>
 
