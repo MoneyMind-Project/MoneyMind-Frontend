@@ -102,16 +102,19 @@
 
   <!-- Actions -->
   <mat-dialog-actions class="dialog-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-button">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-button" [disabled]="isLoading">
       Cancelar
     </button>
+
     <button
       mat-raised-button
       color="primary"
       (click)="onSave()"
-      [disabled]="!isFormValid"
+      [disabled]="!isFormValid || isLoading"
       class="save-button">
-      Guardar cambios
+      <mat-spinner *ngIf="isLoading" diameter="20" class="spinner-button"></mat-spinner>
+      <span *ngIf="!isLoading">Guardar cambios</span>
     </button>
   </mat-dialog-actions>
+
 </div>

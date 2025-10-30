@@ -14,6 +14,7 @@ import { User} from '../../../shared/models/user.model';
 import {UserService} from '../../../core/services/user.service';
 import {ApiResponse} from '../../../shared/models/response.model';
 import {NgToastService} from 'ng-angular-popup';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 interface EditProfileData {
   user: User;
@@ -34,7 +35,8 @@ interface EditProfileData {
     MatDatepickerModule,
     MatNativeDateModule,
     MatCheckboxModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
@@ -46,6 +48,7 @@ interface EditProfileData {
 export class EditProfileDialog implements OnInit {
   editForm!: FormGroup;
   maxDate: Date;
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -106,7 +109,6 @@ export class EditProfileDialog implements OnInit {
     if (this.editForm.valid) {
       const formData = this.editForm.value;
 
-      // Formatear fecha
       const birthDate = new Date(formData.birthDate);
       const formattedDate = birthDate.toISOString().split('T')[0];
 
@@ -115,20 +117,32 @@ export class EditProfileDialog implements OnInit {
         last_name: formData.lastName,
         birth_date: formattedDate,
         gender: formData.gender,
-        monthly_income: formData.preferNotToSayIncome ? null : (formData.monthlyIncome ? Number(formData.monthlyIncome) : null)
+        monthly_income: formData.preferNotToSayIncome
+          ? null
+          : (formData.monthlyIncome ? Number(formData.monthlyIncome) : null)
       };
 
-      this.userService.updateProfile(updatedData).subscribe((response: ApiResponse<any>) => {
-        if (response.success) {
-          this.toast.success(response.message, 'Éxito');
-          this.dialogRef.close(response.data); // 👈 devolvemos los datos actualizados
-        } else {
-          this.toast.danger(response.message, 'Error');
+      // ✅ Activar el estado de carga
+      this.isLoading = true;
+
+      this.userService.updateProfile(updatedData).subscribe({
+        next: (response: ApiResponse<any>) => {
+          this.isLoading = false; // ✅ Desactivar al terminar
+          if (response.success) {
+            this.toast.success(response.message, 'Éxito');
+            this.dialogRef.close(response.data);
+          } else {
+            this.toast.danger(response.message, 'Error');
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.error('Error al actualizar perfil:', err);
+          this.toast.danger('Ocurrió un error al guardar los cambios', 'Error');
         }
       });
 
     } else {
-      // Marcar todos los campos como touched para mostrar errores
       Object.keys(this.editForm.controls).forEach(key => {
         this.editForm.get(key)?.markAsTouched();
       });
