@@ -10,9 +10,9 @@ import { User } from '../../shared/models/user.model';
 import { CryptoService } from '../../core/services/crypto.service';
 import { ReportService } from '../../core/services/report.service';
 import { HomeDashboardResponse, DailyExpense } from '../../shared/models/home-dashboard.model';
-import {MatDialog} from '@angular/material/dialog';
-import {RecurringPayment} from '../../shared/models/recurring-payment.model';
-import {RecurrentForm} from './recurrent-form/recurrent-form';
+import { MatDialog } from '@angular/material/dialog';
+import { RecurringPayment } from '../../shared/models/recurring-payment.model';
+import { RecurrentForm } from './recurrent-form/recurrent-form';
 
 Chart.register(...registerables);
 
@@ -39,18 +39,23 @@ export class Home implements OnInit, AfterViewInit {
 
   currentMonth = '';
   dailyExpenses: DailyExpense[] = [];
-  private viewInitialized = false; // 👈 Añadido
+  private viewInitialized = false;
+  loading = true; // ⭐ Estado de loading
 
   constructor(
     private router: Router,
     private cryptoService: CryptoService,
     private reportService: ReportService,
     private dialog: MatDialog,
-
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.cryptoService.getCurrentUser()!;
+    this.loadDashboardData();
+  }
+
+  loadDashboardData(): void {
+    this.loading = true;
 
     this.reportService.getHomeDashboard().subscribe({
       next: (res) => {
@@ -60,18 +65,20 @@ export class Home implements OnInit, AfterViewInit {
           const budget = res.data.budget;
           this.currentMonth = this.getMonthName(budget.month);
 
-          // Cargar gastos diarios desde el backend
+          // Cargar gastos diarios
           this.dailyExpenses = res.data.daily_expenses;
 
-          // 👇 Si la vista ya está lista, crea el gráfico
-          if (this.viewInitialized) {
-            this.createDailyExpensesChart();
+          // Si la vista ya está lista, crear gráfico
+          if (this.viewInitialized && this.dailyExpenses.length > 0) {
+            setTimeout(() => this.createDailyExpensesChart(), 100);
           }
 
+          this.loading = false;
         }
       },
       error: (err) => {
         console.error('Error cargando dashboard:', err);
+        this.loading = false;
       }
     });
   }
@@ -79,8 +86,8 @@ export class Home implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.viewInitialized = true;
 
-    // 👇 Si los datos ya llegaron antes que la vista, ahora sí crea el gráfico
-    if (this.dailyExpenses.length > 0) {
+    // Si los datos ya llegaron, crear gráfico
+    if (!this.loading && this.dailyExpenses.length > 0) {
       this.createDailyExpensesChart();
     }
   }
@@ -173,7 +180,6 @@ export class Home implements OnInit, AfterViewInit {
     return 'normal';
   }
 
-
   getDaysUntilPayment(payment_day: number): number {
     const today = new Date();
     const currentDay = today.getDate();
@@ -183,18 +189,15 @@ export class Home implements OnInit, AfterViewInit {
     let targetMonth = currentMonth;
     let targetYear = currentYear;
 
-    // 👉 Si el día del pago ya pasó, es del próximo mes
     if (payment_day < currentDay) {
       targetMonth += 1;
-      if (targetMonth > 11) { // diciembre → enero siguiente año
+      if (targetMonth > 11) {
         targetMonth = 0;
         targetYear += 1;
       }
     }
 
     const paymentDate = new Date(targetYear, targetMonth, payment_day);
-
-    // Diferencia en milisegundos → días
     const diffTime = paymentDate.getTime() - today.getTime();
     const daysUntilDue = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -234,13 +237,11 @@ export class Home implements OnInit, AfterViewInit {
 
         const today = new Date();
         const currentDay = today.getDate();
-        const currentMonth = today.getMonth(); // 0-11
+        const currentMonth = today.getMonth();
         const currentYear = today.getFullYear();
 
-        // Construir la fecha de pago del mes actual
         let paymentDateThisMonth = new Date(currentYear, currentMonth, newRecurrentPay.payment_day);
 
-        // Si el día no existe en el mes actual (por ejemplo, 31 en febrero)
         const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         if (newRecurrentPay.payment_day > lastDayOfMonth) {
           paymentDateThisMonth = new Date(currentYear, currentMonth, lastDayOfMonth);
@@ -248,29 +249,20 @@ export class Home implements OnInit, AfterViewInit {
 
         let paymentDateToCheck = paymentDateThisMonth;
 
-        // Si la fecha de pago ya pasó este mes, usar el próximo mes
         if (today > paymentDateThisMonth) {
           paymentDateToCheck = new Date(currentYear, currentMonth + 1, newRecurrentPay.payment_day);
         }
 
-        // Rango de alerta: 3 días antes (incluyendo el día)
         const alertStartDate = new Date(paymentDateToCheck);
         alertStartDate.setDate(paymentDateToCheck.getDate() - 2);
 
         const alertEndDate = paymentDateToCheck;
 
-        // Verificar si hoy está dentro del rango [alertStartDate, alertEndDate]
         if (today >= alertStartDate && today <= alertEndDate) {
           this.dashboardData.data.upcoming_payments.push(newRecurrentPay);
           console.log('✅ Agregado a upcoming_payments:', newRecurrentPay);
         } else {
           console.log('⚠️ No se agregó: fuera del rango de 3 días.');
-          console.log({
-            today,
-            alertStartDate,
-            alertEndDate,
-            paymentDateToCheck
-          });
         }
       }
     });
@@ -281,7 +273,6 @@ export class Home implements OnInit, AfterViewInit {
   }
 
   openPaymentDialog(recurringPayment: RecurringPayment): void {
-    // Navegar a scan con los datos del recurring payment
     this.router.navigate(['/scan'], {
       state: {
         recurringPayment: recurringPayment,

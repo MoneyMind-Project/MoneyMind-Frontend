@@ -7,17 +7,27 @@
 
   <!-- Tip de la semana -->
   <mat-card class="tip-card" appearance="outlined">
-    <div class="tip-content">
+    <div class="tip-content" *ngIf="!loading && dashboardData?.data?.weekly_tip">
       <div class="tip-icon">💡</div>
-      <div class="tip-text" *ngIf="dashboardData?.data?.weekly_tip">
+      <div class="tip-text">
         <h3 class="tip-title">{{ dashboardData.data.weekly_tip.title }}</h3>
         <p class="tip-message">{{ dashboardData.data.weekly_tip.message }}</p>
+      </div>
+    </div>
+
+    <!-- Skeleton para tip -->
+    <div class="tip-skeleton" *ngIf="loading">
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-text">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-message"></div>
       </div>
     </div>
   </mat-card>
 
   <!-- KPIs y Gráfico de gastos -->
   <div class="dashboard-grid">
+
     <!-- Presupuesto restante -->
     <mat-card class="budget-card" appearance="outlined">
       <div class="card-header">
@@ -25,32 +35,40 @@
         <h3 class="card-title">Presupuesto de {{ currentMonth }}</h3>
       </div>
 
-      <div class="budget-content">
+      <!-- Contenido real -->
+      <div class="budget-content" *ngIf="!loading && dashboardData?.data?.budget">
         <div class="budget-amount">
           <span class="amount-label">Restante</span>
-          <span *ngIf="dashboardData?.data?.budget"
-                class="amount-value"
+          <span class="amount-value"
                 [class.low]="dashboardData.data.budget.percentage > 80">
-  {{ dashboardData.data.budget.remaining | currency }}
-</span>
-
+            {{ dashboardData.data.budget.remaining | currency }}
+          </span>
         </div>
 
-        <div *ngIf="dashboardData?.data?.budget" class="budget-bar">
-          <div class="budget-bar-fill" [style.width.%]="dashboardData.data.budget.percentage"></div>
+        <div class="budget-bar">
+          <div class="budget-bar-fill"
+               [style.width.%]="dashboardData.data.budget.percentage"></div>
         </div>
-
 
         <div class="budget-details">
-        <span *ngIf="dashboardData?.data?.budget" class="detail-item">
-        <span class="detail-label">Gastado:</span>
-        <span class="detail-value">{{ formatCurrency(dashboardData.data.budget.spent) }}</span>
-        </span>
-                  <span *ngIf="dashboardData?.data?.budget" class="detail-item">
-          <span class="detail-label">Total:</span>
-          <span *ngIf="dashboardData?.data" class="detail-value">{{ formatCurrency(dashboardData.data.budget.total) }}</span>
-        </span>
+          <span class="detail-item">
+            <span class="detail-label">Gastado:</span>
+            <span class="detail-value">{{ formatCurrency(dashboardData.data.budget.spent) }}</span>
+          </span>
+          <span class="detail-item">
+            <span class="detail-label">Total:</span>
+            <span class="detail-value">{{ formatCurrency(dashboardData.data.budget.total) }}</span>
+          </span>
+        </div>
+      </div>
 
+      <!-- Skeleton para presupuesto -->
+      <div class="budget-skeleton" *ngIf="loading">
+        <div class="skeleton-amount"></div>
+        <div class="skeleton-bar"></div>
+        <div class="skeleton-details">
+          <div class="skeleton-detail"></div>
+          <div class="skeleton-detail"></div>
         </div>
       </div>
     </mat-card>
@@ -62,19 +80,37 @@
         <h3 class="card-title">Gastos diarios de {{ currentMonth }}</h3>
       </div>
 
-      <div class="chart-container">
-        <div class="chart-canvas-wrapper">
+      <!-- Contenido real: gráfico -->
+      <div class="chart-container" *ngIf="!loading && dashboardData?.data">
+        <div class="chart-canvas-wrapper" *ngIf="dailyExpenses.length > 0">
           <canvas #dailyExpensesChart></canvas>
         </div>
-        <div class="chart-summary">
-        <span *ngIf="dashboardData?.data" class="summary-text">
-          Total gastado hasta hoy: <strong>{{ formatCurrency(dashboardData.data.budget.spent) }}</strong>
-        </span>
+
+        <!-- Estado vacío -->
+        <div class="chart-empty" *ngIf="dailyExpenses.length === 0">
+          <mat-icon class="empty-icon">insights</mat-icon>
+          <h3 class="empty-title">Aún no tienes gastos este mes</h3>
+          <p class="empty-text">Comienza a registrar tus gastos para ver el análisis diario</p>
+          <button mat-flat-button color="primary" (click)="goToScanner()">
+            <mat-icon>add</mat-icon>
+            Registrar primer gasto
+          </button>
         </div>
+
+        <div class="chart-summary" *ngIf="dailyExpenses.length > 0">
+          <span class="summary-text">
+            Total gastado hasta hoy: <strong>{{ formatCurrency(dashboardData.data.budget.spent) }}</strong>
+          </span>
+        </div>
+      </div>
+
+      <!-- Skeleton para gráfico -->
+      <div class="chart-skeleton" *ngIf="loading">
+        <div class="skeleton-chart"></div>
+        <div class="skeleton-summary"></div>
       </div>
     </mat-card>
   </div>
-
 
   <!-- Acceso directo a escaneo -->
   <mat-card class="scanner-card" appearance="outlined">
@@ -99,7 +135,8 @@
       <div class="section-title-wrapper">
         <mat-icon class="section-icon">notifications_active</mat-icon>
         <h2 class="section-title">Próximos pagos</h2>
-        <h2 *ngIf="dashboardData?.data" class="debt-count">{{ dashboardData.data.upcoming_payments.length }}</h2>
+        <h2 *ngIf="!loading && dashboardData?.data"
+            class="debt-count">{{ dashboardData.data.upcoming_payments.length }}</h2>
       </div>
       <div class="button-debt-group">
         <button mat-stroked-button color="primary" class="notifications-btn" (click)="openAddDebtDialog()">
@@ -112,10 +149,10 @@
           Ver alertas
         </button>
       </div>
-
     </div>
 
-    <div *ngIf="dashboardData?.data" class="debts-list">
+    <!-- Lista real de pagos -->
+    <div class="debts-list" *ngIf="!loading && dashboardData?.data">
       <mat-card
         *ngFor="let payment of dashboardData.data.upcoming_payments"
         class="debt-card"
@@ -159,6 +196,23 @@
         <button mat-stroked-button color="primary" (click)="openAddDebtDialog()">
           Agregar tu primer pago
         </button>
+      </div>
+    </div>
+
+    <!-- Skeleton para lista de pagos -->
+    <div class="debts-skeleton" *ngIf="loading">
+      <div class="skeleton-debt-card" *ngFor="let item of [1,2,3]">
+        <div class="skeleton-debt-left">
+          <div class="skeleton-debt-indicator"></div>
+          <div class="skeleton-debt-info">
+            <div class="skeleton-line skeleton-debt-name"></div>
+            <div class="skeleton-line skeleton-debt-meta"></div>
+          </div>
+        </div>
+        <div class="skeleton-debt-right">
+          <div class="skeleton-debt-amount"></div>
+          <div class="skeleton-debt-button"></div>
+        </div>
       </div>
     </div>
   </div>

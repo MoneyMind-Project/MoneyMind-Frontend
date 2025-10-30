@@ -512,3 +512,450 @@
     font-size: 10px;
   }
 }
+
+/* ==================== SKELETONS ==================== */
+
+/* Animación de shimmer (deslizamiento) */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+/* Animación de pulse (breathing) */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Animación de wave (ola de luz) */
+@keyframes skeleton-wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  50%, 100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Base del skeleton con efecto shimmer + pulse */
+.skeleton-base {
+  position: relative;
+  overflow: hidden;
+  background: #e0e0e0;
+  border-radius: 4px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-base::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  animation: skeleton-wave 2s ease-in-out infinite;
+}
+
+/* Variante con gradiente más suave */
+.skeleton-gradient {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* Skeleton del Tip */
+.tip-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.skeleton-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    #e0e0e0 0%,
+    #d0d0d0 50%,
+    #e0e0e0 100%
+  );
+  background-size: 200% 200%;
+  animation: skeleton-shimmer 2s ease-in-out infinite, skeleton-pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.skeleton-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-line {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    #6d68cb 0%,     /* Variante muy clara */
+    #6a49f0 25%,    /* Variante clara */
+    #6d68cb 50%,    /* Variante media */
+    #6a49f0 75%,    /* Variante cercana al principal */
+    #6d68cb 100%    /* Color principal */
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.skeleton-title {
+  width: 40%;
+  height: 20px;
+  animation-delay: 0.1s;
+}
+
+.skeleton-message {
+  width: 100%;
+  animation-delay: 0.2s;
+}
+
+/* Skeleton del Presupuesto */
+.budget-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.skeleton-amount {
+  width: 60%;
+  height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+}
+
+.skeleton-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  animation-delay: 0.1s;
+}
+
+.skeleton-details {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.skeleton-detail {
+  flex: 1;
+  height: 20px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.skeleton-detail:first-child {
+  animation-delay: 0.2s;
+}
+
+.skeleton-detail:last-child {
+  animation-delay: 0.3s;
+}
+
+/* Skeleton del Gráfico */
+.chart-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.skeleton-chart {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-chart::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: skeleton-wave 2s ease-in-out infinite;
+}
+
+.skeleton-summary {
+  width: 60%;
+  height: 20px;
+  margin: 0 auto;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  animation-delay: 0.3s;
+  border-radius: 4px;
+}
+
+/* Skeleton de Pagos Pendientes */
+.debts-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton-debt-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  animation: skeleton-pulse 2s ease-in-out infinite;
+}
+
+.skeleton-debt-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.skeleton-debt-card:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.skeleton-debt-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.skeleton-debt-indicator {
+  width: 8px;
+  height: 60px;
+  border-radius: 4px;
+  background: linear-gradient(
+    180deg,
+    #e0e0e0 0%,
+    #d0d0d0 50%,
+    #e0e0e0 100%
+  );
+  background-size: 100% 200%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+}
+
+.skeleton-debt-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-debt-name {
+  width: 70%;
+  height: 20px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.skeleton-debt-meta {
+  width: 50%;
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  animation-delay: 0.1s;
+  border-radius: 4px;
+}
+
+.skeleton-debt-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.skeleton-debt-amount {
+  width: 100px;
+  height: 24px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.skeleton-debt-button {
+  width: 100px;
+  height: 36px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 25%,
+    #d0d0d0 50%,
+    #e0e0e0 75%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+/* ==================== EMPTY STATES ==================== */
+
+/* Estado vacío del gráfico */
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.chart-empty .empty-icon {
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
+  color: #bdbdbd;
+  margin-bottom: 16px;
+}
+
+.chart-empty .empty-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.chart-empty .empty-text {
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: #666;
+  max-width: 400px;
+}
+
+.chart-empty button {
+  gap: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .skeleton-debt-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .skeleton-debt-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .chart-empty .empty-icon {
+    font-size: 60px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .chart-empty .empty-title {
+    font-size: 18px;
+  }
+}
