@@ -15,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MovementService} from '../../../core/services/movement.service';
 import {NgToastService} from 'ng-angular-popup';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-expense-form',
@@ -32,7 +33,8 @@ import {NgToastService} from 'ng-angular-popup';
     MatInputModule,
     MatDatepickerModule,
     MatButtonModule,
-    MatTimepickerModule
+    MatTimepickerModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     provideNativeDateAdapter(),

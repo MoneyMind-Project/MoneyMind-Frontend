@@ -68,11 +68,25 @@
 
   <!-- Acciones -->
   <div class="actions">
-    <button mat-stroked-button color="warn" type="button" (click)="onCancel()">
+    <button
+      mat-stroked-button
+      color="warn"
+      type="button"
+      (click)="onCancel()"
+      [disabled]="loading">
       {{ initialData ? 'Volver' : 'Cancelar' }}
     </button>
-    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
-      Guardar
+
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="form.invalid || loading"
+      class="save-button">
+
+      <!-- Texto del botón -->
+      <span *ngIf="!loading">Guardar</span>
+      <span *ngIf="loading">Guardando...</span>
     </button>
   </div>
 </form>
