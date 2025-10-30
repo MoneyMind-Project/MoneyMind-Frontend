@@ -174,10 +174,10 @@ export class Dashboard implements OnInit, AfterViewInit {
     this.reportService.getDashboardOverview(month, year).subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          this.totalGastadoMes = response.data.total_spent || 0;
-          this.categoriaMasAlta = response.data.highest_category || 'N/A';
-          this.presupuestoRestante = response.data.remaining_budget || 0;
-          this.proyeccionProximoMes = response.data.next_month_projection || 0;
+          this.totalGastadoMes = response.data.total_gastado_mes || 0;
+          this.categoriaMasAlta = response.data.categoria_mas_alta.label || 'N/A';
+          this.presupuestoRestante = response.data.presupuesto_restante || 0;
+          this.proyeccionProximoMes = response.data.proyeccion_proximo_mes || 0;
         }
         this.isLoadingKpis = false;
       },

@@ -9,6 +9,7 @@ import { ViewChild } from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
+import {environment} from '../../../core/services/environment';
 
 @Component({
   selector: 'app-income-dialog',
@@ -24,6 +25,7 @@ import {MatButtonModule} from '@angular/material/button';
 })
 export class IncomeDialog implements AfterViewInit{
 
+  private apiUrl = environment.apiUrl;
   private stream: MediaStream | null = null;
   step = 1;
   selectedFile: File | null = null;
@@ -224,7 +226,7 @@ export class IncomeDialog implements AfterViewInit{
     const formData = new FormData();
     formData.append('file', this.selectedFile, this.selectedFile.name);
 
-    this.http.post<{ data: Partial<Income> }>('http://127.0.0.1:8000/api/movements/analyze-income/', formData)
+    this.http.post<{ data: Partial<Income> }>(`${this.apiUrl}/movements/analyze-income/`, formData)
       .subscribe({
         next: (res) => {
           console.log('Respuesta del análisis:', res);
@@ -254,7 +256,7 @@ export class IncomeDialog implements AfterViewInit{
 
     return new Promise((resolve, reject) => {
       this.http.post<{ data: Partial<Income> }>(
-        'http://127.0.0.1:8000/api/movements/analyze-income/',
+        `${this.apiUrl}/movements/analyze-income/`,
         formData
       ).subscribe({
         next: (res) => {

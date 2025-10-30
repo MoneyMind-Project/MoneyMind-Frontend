@@ -10,6 +10,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
 import { Category} from '../../../shared/enums/category.enum';
+import {environment} from '../../../core/services/environment';
 
 
 @Component({
@@ -26,6 +27,7 @@ import { Category} from '../../../shared/enums/category.enum';
 })
 export class ExpenseDialog implements AfterViewInit {
 
+  private apiUrl = environment.apiUrl;
   private stream: MediaStream | null = null; // Añade esta propiedad
   step = 1;
   selectedFile: File | null = null;
@@ -247,7 +249,7 @@ export class ExpenseDialog implements AfterViewInit {
     const formData = new FormData();
     formData.append('file', this.selectedFile, this.selectedFile.name);
 
-    this.http.post<{ data: Partial<Expense> }>('http://127.0.0.1:8000/api/movements/analyze-expense/', formData)
+    this.http.post<{ data: Partial<Expense> }>(`${this.apiUrl}/movements/analyze-expense/`, formData)
       .subscribe({
         next: (res) => {
           console.log('Respuesta del análisis:', res);
@@ -277,7 +279,7 @@ export class ExpenseDialog implements AfterViewInit {
       console.log('[processReceiptAsync] Enviando petición HTTP al backend...');
 
       this.http.post<{ data: Partial<Expense> }>(
-        'http://127.0.0.1:8000/api/movements/analyze-expense/',
+        `${this.apiUrl}/movements/analyze-expense/`,
         formData
       ).subscribe({
         next: (res) => {
