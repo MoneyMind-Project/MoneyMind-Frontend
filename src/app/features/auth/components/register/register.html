@@ -140,9 +140,12 @@
         <button mat-flat-button class="back-btn" type="button" (click)="previousStep()">
           Volver
         </button>
-        <button mat-flat-button class="register-btn" type="submit"
-                [disabled]="!isStep2Valid()">
-          Crear Cuenta
+        <button
+          mat-flat-button
+          class="register-btn"
+          type="submit"
+          [disabled]="!isStep2Valid() || isLoading">
+          {{ isLoading ? 'Cargando...' : 'Crear Cuenta' }}
         </button>
       </div>
     </div>

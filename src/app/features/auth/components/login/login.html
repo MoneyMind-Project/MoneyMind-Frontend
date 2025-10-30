@@ -27,8 +27,12 @@
       </mat-error>
     </mat-form-field>
 
-    <button mat-flat-button class="login-btn" type="submit" [disabled]="loginForm.invalid">
-      Iniciar Sesión
+    <button
+      mat-flat-button
+      class="login-btn"
+      type="submit"
+      [disabled]="loginForm.invalid || isLoading">
+      {{ isLoading ? 'Cargando...' : 'Iniciar Sesión' }}
     </button>
 
     <div class="links-section">

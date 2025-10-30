@@ -46,6 +46,7 @@ import {Terms} from '../terms/terms';
 export class Register {
   registerForm: FormGroup;
   currentStep: number = 1;
+  isLoading = false;
 
   constructor(private fb: FormBuilder, private router: Router, private userService: UserService,
               private toast: NgToastService, private dialog: MatDialog) {
@@ -159,6 +160,7 @@ export class Register {
 
       // Verifica si el formulario es válido
       if (this.registerForm.valid) {
+        this.isLoading = true;
         console.log("ejecutando register");
 
         const formData = { ...this.registerForm.value };
@@ -194,9 +196,11 @@ export class Register {
 
         this.userService.register(registerRequest).subscribe((response) => {
           if (response.success) {
+            this.isLoading = false;
             this.toast.success(response.message, 'Registro exitoso', 3000);
             this.router.navigate(['/auth/login']);
           } else {
+            this.isLoading = false;
             this.toast.danger(response.message, 'Error', 3000);
           }
         });

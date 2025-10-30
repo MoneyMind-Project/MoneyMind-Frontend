@@ -26,6 +26,7 @@ import {NgToastService} from 'ng-angular-popup';
 })
 export class Login {
   loginForm: FormGroup;
+  isLoading = false;
 
   constructor(private fb: FormBuilder, private router: Router,
               private userService: UserService, private toast: NgToastService) {
@@ -37,6 +38,7 @@ export class Login {
 
   onLogin() {
     if (this.loginForm.valid) {
+      this.isLoading=true;
       const formValue = this.loginForm.value;
 
       const credentials = {
@@ -46,10 +48,12 @@ export class Login {
 
       this.userService.login(credentials).subscribe((res) => {
         if (res.success) {
+          this.isLoading = false;
           console.log('Login exitoso ✅');
           // Luego, sin bloquear la navegación:
           this.router.navigate(['/']); // o '/home'
         } else {
+          this.isLoading = false;
           console.log("ERROR")
           this.toast.danger(res.message, 'Error', 3000);
         }
