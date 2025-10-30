@@ -362,3 +362,19 @@
   background: #bbdefb;
   transition: background-color 0.2s ease;
 }
+
+button[disabled],
+button[disabled]:hover {
+  opacity: 0.6; /* más transparente */
+  cursor: not-allowed; /* ícono de "prohibido" */
+  filter: grayscale(100%); /* gris visual */
+}
+
+/* Ajuste específico para Material Buttons */
+.mat-flat-button[disabled],
+.mat-stroked-button[disabled] {
+  background-color: #e0e0e0 !important; /* gris claro */
+  color: #9e9e9e !important; /* texto gris */
+  box-shadow: none !important;
+  border-color: #ccc !important;
+}

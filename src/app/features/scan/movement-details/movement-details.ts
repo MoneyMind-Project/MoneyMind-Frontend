@@ -6,6 +6,8 @@ import { CommonModule, NgIf } from '@angular/common';
 import { DisplayableMovement} from '../../../shared/models/displayable-movement.model';
 import { ConfirmDeleteDialog } from '../confirm-delete-dialog/confirm-delete-dialog';
 import { MovementService} from '../../../core/services/movement.service';
+import { finalize } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-movement-details',
@@ -17,6 +19,7 @@ import { MovementService} from '../../../core/services/movement.service';
 export class MovementDetails implements OnInit {
   @Output() deleted = new EventEmitter<DisplayableMovement>();
   canDelete: boolean = true;
+  isLoading: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<MovementDetails>,
@@ -67,6 +70,7 @@ export class MovementDetails implements OnInit {
 
     confirmRef.afterClosed().subscribe((result) => {
       if (result === true) {
+        this.isLoading = true;
         let request$;
 
         if (this.movement.type === 'income') {
@@ -76,14 +80,19 @@ export class MovementDetails implements OnInit {
         }
 
         if (request$) {
-          request$.subscribe((res) => {
-            if (res.success) {
-              this.deleted.emit(this.movement);
-              this.dialogRef.close();
-            } else {
-              console.error(res.message);
-            }
-          });
+          request$
+            .pipe(finalize(() => (this.isLoading = false))) // ✅ siempre se ejecuta al final
+            .subscribe({
+              next: (res) => {
+                if (res.success) {
+                  this.deleted.emit(this.movement);
+                  this.dialogRef.close();
+                } else {
+                  console.error(res.message);
+                }
+              },
+              error: (err) => console.error('Error al eliminar:', err),
+            });
         }
       }
     });

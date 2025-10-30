@@ -46,6 +46,7 @@ export class Scan implements OnInit {
 
   searchText: string = '';
   allMovements: DisplayableMovement[] = [];
+  isLoadingMovements: boolean = true;
 
   constructor(
     private dialog: MatDialog,
@@ -84,20 +85,30 @@ export class Scan implements OnInit {
   }
 
   loadDashboard(): void {
-    this.movementService.getScanDashboard().subscribe((res) => {
-      if (res.success && res.data) {
-        const dashboard: DashboardResponse = res.data;
+    this.isLoadingMovements = true; // ← Inicia carga
 
-        this.totalAmount = dashboard.currentBalance;
-        this.allMovements = dashboard.recentMovements.sort((a, b) => {
-          const d1 = new Date(`${a.date}T${a.time}`);
-          const d2 = new Date(`${b.date}T${b.time}`);
-          return d2.getTime() - d1.getTime();
-        });
-        this.movements = [...this.allMovements];
-        this.updateGroupedMovements();
-      } else {
-        console.error(res.message);
+    this.movementService.getScanDashboard().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          const dashboard: DashboardResponse = res.data;
+
+          this.totalAmount = dashboard.currentBalance;
+          this.allMovements = dashboard.recentMovements.sort((a, b) => {
+            const d1 = new Date(`${a.date}T${a.time}`);
+            const d2 = new Date(`${b.date}T${b.time}`);
+            return d2.getTime() - d1.getTime();
+          });
+          this.movements = [...this.allMovements];
+          this.updateGroupedMovements();
+        } else {
+          console.error(res.message);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar movimientos:', err);
+      },
+      complete: () => {
+        this.isLoadingMovements = false; // ← Finaliza carga
       }
     });
   }
@@ -334,7 +345,6 @@ export class Scan implements OnInit {
       console.log(`Movimiento ${deletedMovement.type} eliminado. Nuevo total: ${this.totalAmount}`);
     });
   }
-
 
   private updateTotalOnDelete(type: 'income' | 'expense', amount: number): void {
     if (type === 'expense') {

@@ -74,9 +74,13 @@
   </div>
 
   <!-- Actions -->
-  <!-- Actions -->
   <div class="dialog-actions">
-    <button mat-stroked-button color="primary" (click)="close()" class="cancel-btn">
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="close()"
+      class="cancel-btn"
+      [disabled]="isLoading">
       <mat-icon>arrow_back</mat-icon>
       Volver
     </button>
@@ -86,9 +90,12 @@
       mat-flat-button
       color="warn"
       (click)="confirmDelete()"
-      class="delete-btn">
-      <mat-icon>delete_outline</mat-icon>
-      Eliminar
+      class="delete-btn"
+      [disabled]="isLoading">
+      <mat-icon *ngIf="!isLoading">delete_outline</mat-icon>
+      <span *ngIf="!isLoading">Eliminar</span>
+      <span *ngIf="isLoading">Eliminando...</span>
     </button>
   </div>
+
 </div>

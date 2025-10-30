@@ -26,6 +26,7 @@ export class AllMovements implements OnInit {
 
   searchTerm = '';
   activeDateFilter: string = 'all';
+  isLoadingMovements: boolean = true;
 
   // Paginación
   page = 1;
@@ -52,6 +53,8 @@ export class AllMovements implements OnInit {
   }
 
   loadMovements(): void {
+    this.isLoadingMovements = true; // ← Inicia carga
+
     this.movementService.getAllMovements(this.page, this.pageSize).subscribe((res) => {
       if (res.success && res.data) {
         const response: PaginatedMovementsResponse = res.data;
@@ -65,8 +68,10 @@ export class AllMovements implements OnInit {
 
         // Aplicar filtros sobre todos los movimientos
         this.applyFilters();
+        this.isLoadingMovements = false; // ← Finaliza carga
       } else {
         console.error(res.message);
+        this.isLoadingMovements = false; // ← Finaliza carga
       }
     });
   }

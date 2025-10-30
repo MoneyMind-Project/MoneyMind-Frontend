@@ -93,45 +93,51 @@
 
     <!-- Movements List -->
     <div class="movements-list">
-      <ng-container *ngFor="let group of groupedMovements">
-        <div class="date-group">
-          <!-- Encabezado de fecha -->
-          <div class="date-header">{{ formatDate(group.date) }}</div>
+      <!-- Loader mientras carga -->
+      <div class="skeleton-container" *ngIf="isLoadingMovements">
+        <div class="skeleton-card" *ngFor="let n of [1,2,3,4,5]"></div>
+      </div>
 
-          <!-- Tarjeta de movimiento (usa las clases antiguas) -->
-          <div class="expense-card" *ngFor="let movement of group.movements">
-            <div class="expense-icon">
-              <div
-                class="icon-circle"
-                [style.background-color]="getCategoryColor(movement.category)">
-                <i class="material-icons">
-                  {{ movement.type === 'expense'
-                  ? getCategoryIcon(movement.category)
-                  : 'attach_money' }}
-                </i>
-              </div>
-            </div>
+      <!-- Lista de movimientos reales -->
+      <ng-container *ngIf="!isLoadingMovements">
+        <ng-container *ngFor="let group of groupedMovements">
+          <div class="date-group">
+            <div class="date-header">{{ formatDate(group.date) }}</div>
 
-            <div class="expense-details">
-              <div class="expense-place">
-                <!-- Mostrar `place` si es gasto, `title` si es ingreso -->
-                {{ movement.type === 'expense' ? movement.place : movement.title }}
+            <div class="expense-card" *ngFor="let movement of group.movements">
+              <div class="expense-icon">
+                <div
+                  class="icon-circle"
+                  [style.background-color]="getCategoryColor(movement.category)">
+                  <i class="material-icons">
+                    {{ movement.type === 'expense'
+                    ? getCategoryIcon(movement.category)
+                    : 'attach_money' }}
+                  </i>
+                </div>
               </div>
-              <div class="expense-date">
-                {{ formatDate(movement.date) }} • {{ movement.time }}
-              </div>
-            </div>
 
-            <div class="expense-amount">
-              <span [class]="getAmountClass(movement.type)">
-                {{ formatAmount(movement.total, movement.type) }}
-              </span>
-              <i class="material-icons visibility-icon" (click)="openDetails(movement)">visibility</i>
+              <div class="expense-details">
+                <div class="expense-place">
+                  {{ movement.type === 'expense' ? movement.place : movement.title }}
+                </div>
+                <div class="expense-date">
+                  {{ formatDate(movement.date) }} • {{ movement.time }}
+                </div>
+              </div>
+
+              <div class="expense-amount">
+            <span [class]="getAmountClass(movement.type)">
+              {{ formatAmount(movement.total, movement.type) }}
+            </span>
+                <i class="material-icons visibility-icon" (click)="openDetails(movement)">visibility</i>
+              </div>
             </div>
           </div>
-        </div>
+        </ng-container>
       </ng-container>
     </div>
+
 
     <div class="no-results" *ngIf="movements.length === 0 && searchText">
       <i class="material-icons">search_off</i>
