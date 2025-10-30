@@ -1,8 +1,4 @@
-/* Permitir scroll en el diálogo */
-::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
-  max-height: 90vh; /* ocupa el 90% de la altura visible */
-  overflow-y: auto; /* permite desplazamiento vertical */
-}
+
 
 .recurrent-dialog {
   position: relative;
