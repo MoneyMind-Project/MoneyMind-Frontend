@@ -40,7 +40,7 @@ export class UserService {
   // Login
   login(credentials: { email: string; password: string }): Observable<ApiResponse<{ token: string, user: User }>> {
     return this.http.post<any>(`${this.apiUrl}/users/login/`, credentials).pipe(
-      map((response) => { // ✅ Cambiado de switchMap a map
+      map((response) => {
         if (response && response.token && response.user) {
           // 1️⃣ Guardar usuario en localStorage (cifrado)
           const currentUser = { token: response.token, user: response.user };
@@ -75,39 +75,147 @@ export class UserService {
       )
     );
   }
-  
+
   private async setupOneSignal(userId: string): Promise<void> {
     try {
-      // Timeout general de 30 segundos
-      const result = await Promise.race([
-        this.oneSignal.requestPermissionAndSetUser(userId),
-        new Promise<{ success: boolean; message: string }>((resolve) =>
+      // 1️⃣ Verificar si el navegador soporta notificaciones
+      if (!('Notification' in window)) {
+        console.warn('⚠️ Este navegador no soporta notificaciones');
+        return;
+      }
+
+      // 2️⃣ Verificar si el permiso ya está bloqueado
+      if (Notification.permission === 'denied') {
+        console.warn('🚫 Las notificaciones están bloqueadas por el usuario');
+        this.showNotificationBlockedMessage();
+        return;
+      }
+
+      // 3️⃣ Verificar si el usuario ya está suscrito
+      const isAlreadySubscribed = await Promise.race([
+        this.oneSignal.isSubscribed(),
+        new Promise<boolean>((resolve) =>
           setTimeout(() => {
-            console.warn('⏱️ OneSignal setup timeout, continuando sin notificaciones');
-            resolve({ success: false, message: 'TIMEOUT' });
-          }, 30000)
+            console.warn('⏱️ Timeout verificando suscripción');
+            resolve(false);
+          }, 5000)
         )
       ]);
 
-      if (result.success) {
-        console.log('✅ Usuario suscrito y vinculado correctamente a OneSignal');
-      } else {
-        if (result.message === 'PERMISSION_BLOCKED') {
-          console.warn('🚫 Notificaciones bloqueadas manualmente en el navegador');
-          this.showNotificationBlockedMessage();
-        } else if (result.message === 'PERMISSION_DENIED') {
-          console.warn('⚠️ Usuario rechazó las notificaciones');
-        } else if (result.message === 'TIMEOUT') {
-          console.warn('⏱️ OneSignal tardó demasiado, se continuó sin configurar notificaciones');
+      console.log('🔔 Usuario suscrito:', isAlreadySubscribed); // ✅ Movido aquí
+
+      if (isAlreadySubscribed) {
+        console.log('✅ Usuario ya estaba suscrito a OneSignal');
+
+        // Obtener subscription ID
+        const subscriptionId = await Promise.race([
+          this.oneSignal.getSubscriptionId(),
+          new Promise<string | null>((resolve) =>
+            setTimeout(() => {
+              console.warn('⏱️ Timeout obteniendo subscription ID');
+              resolve(null);
+            }, 5000)
+          )
+        ]);
+        console.log('📱 Subscription ID:', subscriptionId); // ✅ Movido aquí
+
+        // 4️⃣ Solo vincular el userId si ya está suscrito
+        try {
+          await Promise.race([
+            this.oneSignal.setExternalUserId(userId),
+            new Promise<void>((resolve) =>
+              setTimeout(() => {
+                console.warn('⏱️ Timeout vinculando usuario');
+                resolve();
+              }, 5000)
+            )
+          ]);
+          console.log('🔗 Usuario vinculado correctamente');
+        } catch (error) {
+          console.error('❌ Error vinculando usuario:', error);
+        }
+        return;
+      }
+
+      // 5️⃣ Si tiene permiso 'granted', suscribir directamente sin preguntar
+      if (Notification.permission === 'granted') {
+        console.log('✅ Permiso ya otorgado, suscribiendo automáticamente...');
+
+        const result = await Promise.race([
+          this.oneSignal.requestPermissionAndSetUser(userId),
+          new Promise<{ success: boolean; message: string }>((resolve) =>
+            setTimeout(() => {
+              console.warn('⏱️ Timeout en suscripción automática');
+              resolve({ success: false, message: 'TIMEOUT' });
+            }, 15000)
+          )
+        ]);
+
+        if (result.success) {
+          console.log('✅ Usuario suscrito y vinculado correctamente');
+
+          // Verificar subscription después de suscribirse
+          const subscriptionId = await Promise.race([
+            this.oneSignal.getSubscriptionId(),
+            new Promise<string | null>((resolve) =>
+              setTimeout(() => {
+                console.warn('⏱️ Timeout obteniendo subscription ID');
+                resolve(null);
+              }, 5000)
+            )
+          ]);
+          console.log('📱 Subscription ID:', subscriptionId);
         } else {
-          console.warn('⚠️ No se pudo completar la suscripción:', result.message);
+          console.warn('⚠️ No se pudo completar la suscripción automática:', result.message);
+        }
+        return;
+      }
+
+      // 6️⃣ Si el permiso es 'default', solicitar permiso al usuario
+      if (Notification.permission === 'default') {
+        console.log('🔔 Solicitando permiso de notificaciones al usuario...');
+
+        const result = await Promise.race([
+          this.oneSignal.requestPermissionAndSetUser(userId),
+          new Promise<{ success: boolean; message: string }>((resolve) =>
+            setTimeout(() => {
+              console.warn('⏱️ OneSignal setup timeout, continuando sin notificaciones');
+              resolve({ success: false, message: 'TIMEOUT' });
+            }, 30000)
+          )
+        ]);
+
+        if (result.success) {
+          console.log('✅ Usuario suscrito y vinculado correctamente a OneSignal');
+
+          // Verificar subscription después de suscribirse
+          const subscriptionId = await Promise.race([
+            this.oneSignal.getSubscriptionId(),
+            new Promise<string | null>((resolve) =>
+              setTimeout(() => {
+                console.warn('⏱️ Timeout obteniendo subscription ID');
+                resolve(null);
+              }, 5000)
+            )
+          ]);
+          console.log('📱 Subscription ID:', subscriptionId);
+        } else {
+          if (result.message === 'PERMISSION_BLOCKED') {
+            console.warn('🚫 Notificaciones bloqueadas manualmente en el navegador');
+            this.showNotificationBlockedMessage();
+          } else if (result.message === 'PERMISSION_DENIED') {
+            console.warn('⚠️ Usuario rechazó las notificaciones');
+          } else if (result.message === 'TIMEOUT') {
+            console.warn('⏱️ OneSignal tardó demasiado, se continuó sin configurar notificaciones');
+          } else {
+            console.warn('⚠️ No se pudo completar la suscripción:', result.message);
+          }
         }
       }
     } catch (error) {
       console.error('❌ Error configurando OneSignal (no afecta el login):', error);
     }
   }
-
 
   private showNotificationBlockedMessage(): void {
     // Mostrar mensaje al usuario con instrucciones

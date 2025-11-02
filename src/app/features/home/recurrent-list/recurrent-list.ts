@@ -61,7 +61,6 @@ export class RecurrentList implements OnInit {
 
     dialogRef.afterClosed().subscribe((newRecurrentPay: RecurringPayment | null) => {
       if (newRecurrentPay) {
-        console.log('Nueva alerta creada:', newRecurrentPay);
         this.recurringPayments.push(newRecurrentPay);
         this.toast.success('Alerta creada exitosamente', 'Éxito', 3000);
       }

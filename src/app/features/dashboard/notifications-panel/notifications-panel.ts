@@ -59,7 +59,6 @@ export class NotificationsPanel implements OnInit {
           if (res.success) {
             notification.seen = true;
             this.unreadCount = Math.max(0, this.unreadCount - 1);
-            console.log(`✅ Alerta ${notification.id} marcada como vista.`);
           } else {
             console.warn(`⚠️ No se pudo marcar la alerta ${notification.id} como vista.`);
           }

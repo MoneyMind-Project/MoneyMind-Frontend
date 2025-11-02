@@ -152,7 +152,6 @@ export class Register {
     if (this.currentStep === 2) {
       // Verifica contraseñas
       if (this.registerForm.hasError('passwordMismatch')) {
-        console.log("Contraseñas no iguales");
         this.registerForm.get('confirmPassword')?.markAsTouched();
         this.registerForm.get('confirmPassword')?.updateValueAndValidity();
         return;

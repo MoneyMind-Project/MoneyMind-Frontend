@@ -148,7 +148,6 @@ export class Profile implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Perfil actualizado:', result);
         // Actualiza la data local para refrescar la vista
         this.currentUser = { ...this.currentUser, ...result.user };
         this.monthly_income = result.monthly_income;

@@ -46,21 +46,6 @@ export class MovementDetails implements OnInit {
     this.canDelete = diffInDays <= 2;
   }
 
-  checkIfCanDelete5Minutes(): void {
-    if (!this.movement.created_at) {
-      this.canDelete = true;
-      console.log('No created_at, canDelete set to true');
-      return;
-    }
-
-    const createdDate = new Date(this.movement.created_at);
-    const now = new Date();
-    const diffInMs = now.getTime() - createdDate.getTime();
-    const diffInMinutes = diffInMs / (1000 * 60);
-
-    this.canDelete = diffInMinutes <= 5;
-  }
-
   close() {
     this.dialogRef.close();
   }

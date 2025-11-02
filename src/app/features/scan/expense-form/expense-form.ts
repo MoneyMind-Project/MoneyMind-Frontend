@@ -67,7 +67,6 @@ export class ExpenseForm implements OnInit {
     });
 
     if (this.initialData) {
-      console.log('Abriendo el form tengo como initial data:', this.initialData.date);
       const patchedData = {
         ...this.initialData,
         category: this.initialData.category ?? null,
@@ -75,7 +74,6 @@ export class ExpenseForm implements OnInit {
         time: this.initialData.time ? this.parseTimeString(this.initialData.time) : null
       };
       this.form.patchValue(patchedData);
-      console.log('Abriendo el form.date tengo:', this.form.value.date);
     }
   }
 
