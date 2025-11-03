@@ -102,7 +102,7 @@
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Distribución de gastos por minicategorías</mat-card-title>
-              <button mat-button class="filter-btn" (click)="toggleFlip('categorias')">
+              <button mat-button class="filter-btn" *ngIf="!showBackCategorias" (click)="toggleFlip('categorias')">
                 Ver descripción
               </button>
             </mat-card-header>
@@ -155,7 +155,7 @@
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Evolución de ahorro</mat-card-title>
-              <button mat-button class="filter-btn" (click)="toggleFlip('ahorro')">
+              <button mat-button class="filter-btn" *ngIf="!showBackAhorro" (click)="toggleFlip('ahorro')">
                 Ver descripción
               </button>
             </mat-card-header>
@@ -208,7 +208,7 @@
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Proporción de categorías padres</mat-card-title>
-              <button mat-button class="filter-btn" (click)="toggleFlip('padres')">
+              <button mat-button class="filter-btn" *ngIf="!showBackPadres" (click)="toggleFlip('padres')">
                 Ver descripción
               </button>
             </mat-card-header>
@@ -261,7 +261,7 @@
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Predicción de gastos por mes</mat-card-title>
-              <button mat-button class="filter-btn" (click)="toggleFlip('proyeccion')">
+              <button mat-button class="filter-btn" *ngIf="!showBackProyeccion" (click)="toggleFlip('proyeccion')">
                 Ver descripción
               </button>
             </mat-card-header>
@@ -314,7 +314,7 @@
           <div class="flip-card-front">
             <mat-card-header>
               <mat-card-title>Gastos esenciales vs no esenciales</mat-card-title>
-              <button mat-button class="filter-btn" (click)="toggleFlip('esenciales')">
+              <button mat-button class="filter-btn" *ngIf="!showBackEsenciales" (click)="toggleFlip('esenciales')">
                 Ver descripción
               </button>
             </mat-card-header>
