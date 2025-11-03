@@ -174,12 +174,14 @@ export class Dashboard implements OnInit, AfterViewInit {
     this.reportService.getDashboardOverview(month, year).subscribe({
       next: (response) => {
         if (response.success && response.data) {
+          console.log(response)
           this.totalGastadoMes = response.data.total_gastado_mes || 0;
-          this.categoriaMasAlta = response.data.categoria_mas_alta.label || 'N/A';
+          this.categoriaMasAlta = response.data.categoria_mas_alta || 'N/A';
           this.presupuestoRestante = response.data.presupuesto_restante || 0;
           this.proyeccionProximoMes = response.data.proyeccion_proximo_mes || 0;
+          this.isLoadingKpis = false;
+          console.log(this.isLoadingKpis);
         }
-        this.isLoadingKpis = false;
       },
       error: (error) => {
         console.error('Error al cargar KPIs:', error);
@@ -391,6 +393,13 @@ export class Dashboard implements OnInit, AfterViewInit {
     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
       'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
+    // ✅ Crear un array de 12 meses con los valores correspondientes
+    const balancesByMonth = new Array(12).fill(null); // null para meses sin datos
+
+    data.forEach(item => {
+      balancesByMonth[item.month - 1] = item.balance; // Restar 1 porque el array es 0-11
+    });
+
     new Chart(ctx, {
       type: 'bar',
       data: {
@@ -398,7 +407,7 @@ export class Dashboard implements OnInit, AfterViewInit {
         datasets: [
           {
             label: 'Balance mensual (S/)',
-            data: data.map(d => d.balance), // 👈 ahora usamos balance
+            data: balancesByMonth, // ✅ Array de 12 posiciones
             backgroundColor: '#4caf50',
             borderRadius: 8,
           }
@@ -413,8 +422,17 @@ export class Dashboard implements OnInit, AfterViewInit {
             callbacks: {
               label: (context) => {
                 const value = context.raw as number;
+                if (value === null) return 'Sin datos';
                 return `S/ ${value.toFixed(2)}`;
               }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => `S/ ${value}`
             }
           }
         }

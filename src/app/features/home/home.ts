@@ -126,7 +126,7 @@ export class Home implements OnInit, AfterViewInit {
             padding: 12,
             cornerRadius: 8,
             callbacks: {
-              label: (context) => `Gastado: ${this.formatCurrency(context.parsed.y)}`
+              label: (context) => `Gastado: S/{this.formatCurrency(context.parsed.y)}`
             }
           }
         },

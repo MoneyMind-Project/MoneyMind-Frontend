@@ -41,7 +41,8 @@
           <span class="amount-label">Restante</span>
           <span class="amount-value"
                 [class.low]="dashboardData.data.budget.percentage > 80">
-            {{ dashboardData.data.budget.remaining | currency }}
+            S/ {{ dashboardData.data.budget.remaining | currency:'PEN':'' }}
+
           </span>
         </div>
 
