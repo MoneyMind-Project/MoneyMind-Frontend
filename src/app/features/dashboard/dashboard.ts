@@ -681,8 +681,10 @@ export class Dashboard implements OnInit, AfterViewInit {
 
     // Gasto total por mes (histórico + predicción)
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const gastosReales = [2800, 3200, 2900, 3400, 3100, 2850, 3600, 3300, 3450, null, null, null];
-    const predicciones = [null, null, null, null, null, null, null, null, 3450, 3500, 3650, 3700];
+
+    // Datos vacíos
+    const gastosReales: (number | null)[] = new Array(12).fill(null);
+    const predicciones: (number | null)[] = new Array(12).fill(null);
 
     this.prediccionChart = new Chart(ctx, {
       type: 'line',
