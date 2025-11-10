@@ -6,6 +6,12 @@
   min-width: 480px;
 }
 
+.spacer{
+  display: none;
+  height: 48px;
+  width: 100%;
+}
+
 .full-width {
   width: 100%;
   font-size: 14px; /* Reduce el tamaño de fuente de todos los form-fields */
@@ -143,6 +149,12 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .spacer{
+    display: block;
+    height: 48px;
+    width: 100%;
+  }
+
   .income-form {
     padding: 12px 0; /* Reducido */
     max-width: 560px;
